@@ -46,3 +46,7 @@ A [decisão do scaffold](docs/scaffold-inicial.md) substitui as referências his
 - [Contexto para agentes](AI_CONTEXT.md)
 
 O Backend permanece separado e é a fonte de verdade para contratos, dados e regras do servidor.
+
+## Revisão da base completa
+
+O backend foi inicializado com Supabase no repositório separado [backend-api, branch chore/verify-initial-base](https://github.com/beneficios-weg/backend-api/tree/chore/verify-initial-base). Consulte o README desse branch para instalar a CLI fixada e iniciar os serviços locais com Docker. Não há integração entre os projetos nem implementação de domínio nesta etapa.
