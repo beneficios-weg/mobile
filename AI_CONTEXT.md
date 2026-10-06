@@ -1,5 +1,9 @@
 # Contexto para agentes — WEG Benefits Mobile
 
+## Implementação vigente
+
+O responsável autorizou a implementação dos itens confirmados. Consulte [Implementação MVP](docs/implementacao-mvp.md) para comportamento implementado, decisões iniciais para revisão e limites. As instruções antigas de somente scaffold descrevem uma etapa concluída e não restringem este novo pedido.
+
 ## Missão e limites
 
 Este é o repositório **frontend mobile** do WEG Benefits. Trabalhe somente nele. O repositório Backend é separado e é a fonte de verdade para modelo de dados, DER, banco, endpoints, payloads, códigos HTTP, autenticação, validações e campos calculados.

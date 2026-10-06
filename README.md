@@ -1,52 +1,36 @@
 # WEG Benefits Mobile
 
-Base inicial do aplicativo WEG Benefits. Stack vigente: **Svelte + TypeScript + Vite + Capacitor**, com projeto Android versionado. Ainda não há telas nem funcionalidades de negócio.
+MVP para revisão: Svelte + TypeScript + Vite + Capacitor, Supabase Auth/API, cache SQLite Android, fila offline e módulo Kotlin de geofences com verificação curta de visitas.
 
-## Instalação e execução
+## Preparação
 
-Pré-requisito: Node.js >= 22.12.0 (esta base foi gerada com Node 24.11.1 e npm 11.6.2).
+Node >=22.12.0; backend Supabase local ou ambiente de homologação configurado.
 
 ```sh
 npm ci
-npm run check
-npm run build
-npm run dev
 ```
 
-`npm run preview` serve o build web localmente.
-
-## Android
+Copie `.env.example` para `.env.local` e configure URL e chave publishable/anon. Para web local, URL `http://127.0.0.1:54321`; para emulador Android, `http://10.0.2.2:54321`. Nunca use chaves secret/service_role no mobile.
 
 ```sh
+npm run check
+npm test
+npm run dev
 npm run android:sync
 npm run android:open
 ```
 
-O primeiro comando gera o build web e executa `cap sync android`. O segundo abre o projeto no Android Studio, que deve estar instalado com SDK/JDK compatíveis. O identificador inicial é `br.com.beneficiosweg.mobile`, o nome é `WEG Benefits` e o diretório web é `dist`.
+Android exige JDK 21, SDK plataforma/build-tools 36 e dispositivo com Google Play Services. Em Windows, `npm run android:build` compila APK debug e executa testes Kotlin; Linux/macOS: `cd android && ./gradlew assembleDebug testDebugUnitTest` após sync. Não edite `dist` nem assets web copiados em `android`.
 
-## Escopo desta base
+## Implementação e revisão
 
-Somente scaffold e configurações de desenvolvimento. Nenhuma tela, autenticação, regra de negócio, API, Supabase, SQLite, geofence ou lógica de localização foi implementada. Não há projeto iOS nem segredos/variáveis de ambiente necessários nesta etapa.
-
-## Documentação
-
-A [decisão do scaffold](docs/scaffold-inicial.md) substitui as referências históricas a React Native/Expo. Os demais documentos preservam o planejamento do produto; não comprovam funcionalidades implementadas.
-
-- [Visão geral](docs/visao-geral.md)
-- [Arquitetura mobile](docs/arquitetura-mobile.md)
-- [Telas e fluxos](docs/telas-e-fluxos.md)
-- [Componentes de UI](docs/componentes-ui.md)
-- [Geolocalização](docs/geolocalizacao.md)
-- [Detecção de visitas](docs/deteccao-visitas.md)
-- [Offline e sincronização](docs/offline-sync.md)
-- [Integração com a API](docs/integracao-api.md)
-- [Testes mobile](docs/testes-mobile.md)
-- [Decisões abertas](docs/decisoes-abertas.md)
-- [Designs](designs/README.md)
+- [Escopo, regras iniciais, arquitetura e limites](docs/implementacao-mvp.md)
+- [Backend implementado em branch separada](https://github.com/beneficios-weg/backend-api/tree/feat/confirmed-backend)
+- [Telas e fluxos planejados](docs/telas-e-fluxos.md)
 - [Contexto para agentes](AI_CONTEXT.md)
 
-O Backend permanece separado e é a fonte de verdade para contratos, dados e regras do servidor.
+Fluxos: autenticação, catálogo, categorias/busca, mapa, detalhes, favoritos, visitas e monitoramento. Há estados offline/erro/vazio. Não existem dados de parceiros reais neste branch. A interface é uma base de revisão, ainda sem validação visual contra o Figma.
 
-## Revisão da base completa
+Parâmetros de visita, modelo inicial e conflitos estão documentados para revisão do tech lead. Não há Swift/iOS, identidade corporativa WEG, avaliações/comentários ou mapas offline. Geofences precisam de validação em aparelho e não funcionam após Force Stop até reabrir o aplicativo.
 
-O backend foi inicializado com Supabase no repositório separado [backend-api, branch chore/verify-initial-base](https://github.com/beneficios-weg/backend-api/tree/chore/verify-initial-base). Consulte o README desse branch para instalar a CLI fixada e iniciar os serviços locais com Docker. Não há integração entre os projetos nem implementação de domínio nesta etapa.
+As páginas do scaffold inicial são histórico. Os READMEs antigos e documentos de planejamento não substituem o comportamento descrito em `docs/implementacao-mvp.md`.
