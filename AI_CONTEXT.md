@@ -10,8 +10,8 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 
 ## Contexto confirmado
 
-- Aplicativo React Native, mobile-first.
-- Equipe de quatro pessoas e cerca de 30 horas totais: evitar overengineering.
+- Aplicativo Svelte + TypeScript + Vite + Capacitor, mobile-first (decisão de 2026-10-06).
+- Iniciar somente o scaffold mínimo; não implementar funcionalidades nesta etapa.
 - Tipografia Inter e Lucide Icons.
 - Componentes reutilizáveis e mapa como elemento central.
 - Sete telas: Login, Início, Categoria, Loja, Favoritos, Mapa em tela cheia e Lojas visitadas.
@@ -21,7 +21,11 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 - Não usar QR Code, NFC, confirmação manual, BLE, UWB ou IA para detectar visitas.
 - Pontos GPS de análise são temporários; não persistir trajetos completos.
 
-## Estado do repositório em 2026-09-29
+## Decisão vigente em 2026-10-06
+
+Consulte [Scaffold inicial](docs/scaffold-inicial.md). A base executável e o Android estão presentes; React Native/Expo são referências históricas superadas. Demais requisitos permanecem planejamento.
+
+## Estado histórico do repositório em 2026-09-29
 
 Na consolidação, a branch base continha somente um README de uma linha. Não havia código, `package.json`, testes ou designs versionados. Uma branch remota documental citava Expo, TypeScript e React Navigation, mas esses itens não são verificáveis como implementação. Trate a estrutura descrita em `docs/arquitetura-mobile.md` como planejada.
 

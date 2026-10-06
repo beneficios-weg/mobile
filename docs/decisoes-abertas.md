@@ -1,5 +1,7 @@
 # Decisões abertas e inconsistências
 
+> Atualização de 2026-10-06: a stack vigente é Svelte + TypeScript + Vite + Capacitor. Consulte [Scaffold inicial](scaffold-inicial.md). As referências a React Native/Expo abaixo são históricas; a arquitetura funcional permanece planejada.
+
 ## Como usar
 
 Cada item marcado como **DECISÃO PENDENTE** precisa de responsável e registro da decisão antes que a documentação seja promovida de “planejada” para “implementada”. Recomendações não são decisões.

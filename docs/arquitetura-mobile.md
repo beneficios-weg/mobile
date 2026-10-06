@@ -1,5 +1,7 @@
 # Arquitetura mobile
 
+> Atualização de 2026-10-06: a stack vigente é Svelte + TypeScript + Vite + Capacitor. Consulte [Scaffold inicial](scaffold-inicial.md). As referências a React Native/Expo abaixo são históricas; a arquitetura funcional permanece planejada.
+
 ## Estado
 
 A arquitetura abaixo é **planejada**, não encontrada no código. Na consolidação não existiam `package.json` nem diretório `src/`. Ela serve como limite simples para iniciar o React Native sem overengineering.
