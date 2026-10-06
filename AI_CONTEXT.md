@@ -1,9 +1,5 @@
 # Contexto para agentes — WEG Benefits Mobile
 
-## Implementação vigente
-
-O responsável autorizou a implementação dos itens confirmados. Consulte [Implementação MVP](docs/implementacao-mvp.md) para comportamento implementado, decisões iniciais para revisão e limites. As instruções antigas de somente scaffold descrevem uma etapa concluída e não restringem este novo pedido.
-
 ## Missão e limites
 
 Este é o repositório **frontend mobile** do WEG Benefits. Trabalhe somente nele. O repositório Backend é separado e é a fonte de verdade para modelo de dados, DER, banco, endpoints, payloads, códigos HTTP, autenticação, validações e campos calculados.
@@ -48,3 +44,6 @@ Na consolidação, a branch base continha somente um README de uma linha. Não h
 - `docs/integracao-api.md`
 - `docs/offline-sync.md`
 - `docs/deteccao-visitas.md`
+
+## Escopo atual da branch
+Entrega limitada ao módulo Kotlin/geofences e scaffold. Não implementar outros fluxos sem nova solicitação. Contrato e limites: docs/kotlin-geofences.md.

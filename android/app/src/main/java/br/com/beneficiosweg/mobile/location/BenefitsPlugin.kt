@@ -16,31 +16,11 @@ import com.getcapacitor.annotation.PermissionCallback
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import org.json.JSONObject
 
 @CapacitorPlugin(name = "BenefitsNative", permissions = [
     Permission(alias = "location", strings = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
 ])
 class BenefitsPlugin : Plugin() {
-    @PluginMethod fun read(call: PluginCall) {
-        LocalDatabase(context).use { call.resolve(JSObject().put("value", it.read(call.getString("key") ?: ""))) }
-    }
-    @PluginMethod fun write(call: PluginCall) {
-        val key = call.getString("key") ?: return call.reject("Key required")
-        val value = call.getString("value") ?: return call.reject("Value required")
-        LocalDatabase(context).use { it.write(key, value) }; call.resolve()
-    }
-    @PluginMethod fun remove(call: PluginCall) {
-        LocalDatabase(context).use { it.delete(call.getString("key") ?: "") }; call.resolve()
-    }
-    @PluginMethod fun secureRead(call: PluginCall) {
-        try { call.resolve(JSObject().put("value", SecureSession.read(context, call.getString("key") ?: "session"))) }
-        catch (error: Exception) { call.reject("Não foi possível recuperar a sessão protegida", error) }
-    }
-    @PluginMethod fun secureWrite(call: PluginCall) {
-        try { SecureSession.write(context, call.getString("key") ?: "session", call.getString("value")); call.resolve() }
-        catch (error: Exception) { call.reject("Não foi possível guardar a sessão protegida", error) }
-    }
     @PluginMethod fun requestLocation(call: PluginCall) {
         if (getPermissionState("location") == PermissionState.GRANTED) call.resolve()
         else requestPermissionForAlias("location", call, "locationResult")
