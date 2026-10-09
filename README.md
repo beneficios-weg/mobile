@@ -1,47 +1,77 @@
-# Svelte + TS + Vite
+# WEG Benefits Mobile
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+Aplicativo corporativo mobile para colaboradores da WEG descobrirem benefícios em estabelecimentos parceiros próximos. A experiência é centrada em mapa, categorias, detalhes do estabelecimento, favoritos e histórico de visitas detectadas por geolocalização.
 
-## Recommended IDE Setup
+## Problema e solução
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+O produto responde à pergunta: **“Quais benefícios tenho perto de mim agora?”**. A solução planejada reúne descoberta por proximidade, busca e categorias, consulta do benefício principal de cada estabelecimento, favoritos independentes de visitas e detecção automática de visitas.
 
-## Need an official Svelte framework?
+## Estado atual
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+Este repositório contém, neste momento, somente a documentação consolidada. Não há `package.json`, código React Native, testes, arquivos de configuração nem designs versionados na branch base. Por isso:
 
-## Technical considerations
+- React Native e a abordagem mobile-first são requisitos confirmados;
+- Inter, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes confirmadas;
+- Expo, TypeScript e React Navigation aparecem em uma branch documental remota, mas ainda não podem ser validados na implementação;
+- instalação, execução, variáveis de ambiente, biblioteca de mapas, armazenamento local e segundo recurso nativo permanecem como **DECISÃO PENDENTE**.
 
-**Why use this over SvelteKit?**
+Consulte [Decisões abertas](docs/decisoes-abertas.md) antes de implementar.
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+## Escopo funcional
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+As sete telas previstas são Login, Início, Categoria, Loja/Estabelecimento, Favoritos, Mapa em tela cheia e Lojas visitadas. Recuperação de senha e primeiro acesso são fluxos auxiliares. A navegação principal utiliza uma Floating Tab Bar.
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+Veja [Telas e fluxos](docs/telas-e-fluxos.md) e [Componentes de UI](docs/componentes-ui.md).
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+## Stack e arquitetura
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+| Item | Situação |
+|---|---|
+| React Native | Requisito confirmado |
+| Mobile-first | Requisito confirmado |
+| Inter | Diretriz visual confirmada |
+| Lucide Icons | Diretriz de iconografia confirmada |
+| Expo, TypeScript, React Navigation | Citados em documentação ainda não integrada; validar antes de adotar |
+| Mapas, storage e state management | **DECISÃO PENDENTE** |
 
-**Why include `.vscode/extensions.json`?**
+A organização planejada e seus limites estão em [Arquitetura mobile](docs/arquitetura-mobile.md). Ela não representa código já existente.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+## Instalação e execução
 
-**Why enable `allowJs` in the TS template?**
+Ainda não existem comandos verificáveis. O repositório não possui `package.json` e, portanto, não é correto documentar `npm install`, `npm start` ou comandos Expo como se estivessem disponíveis.
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
+Quando a implementação for inicializada, atualizar esta seção exclusivamente com scripts presentes em `package.json`, incluindo pré-requisitos e versões suportadas.
 
-**Why is HMR not preserving my local component state?**
+## Variáveis de ambiente
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
+Não há nomes de variáveis definidos nem arquivo `.env.example`. A configuração da URL base da API e quaisquer parâmetros públicos do provedor de mapas dependem das escolhas de implementação e do contrato do Backend. Segredos e tokens privados nunca devem ser versionados.
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+## API e dados
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+O Backend é a fonte de verdade para modelo de dados, endpoints, payloads, códigos HTTP, autenticação, validações e campos calculados. Este repositório descreve somente como o aplicativo deverá consumir esse contrato. Como o contrato publicado não foi disponibilizado nesta consolidação, a matriz de consumo está marcada para confirmação em [Integração com a API](docs/integracao-api.md).
+
+## Localização e funcionamento offline
+
+- [Geolocalização](docs/geolocalizacao.md)
+- [Detecção de visitas](docs/deteccao-visitas.md)
+- [Cache e sincronização offline](docs/offline-sync.md)
+
+Os pontos GPS usados na análise são temporários; esta documentação não prevê armazenamento permanente de trajetos.
+
+## Design
+
+Há uma referência de Figma registrada na documentação remota anterior: [App — Benefícios](https://www.figma.com/design/fQtw5ogzbaQfkSDZHVeeRI). O acesso e a correspondência com a versão vigente não foram validados. Consulte [designs/README.md](designs/README.md).
+
+## Índice da documentação
+
+- [Visão geral](docs/visao-geral.md)
+- [Arquitetura mobile](docs/arquitetura-mobile.md)
+- [Telas e fluxos](docs/telas-e-fluxos.md)
+- [Componentes de UI](docs/componentes-ui.md)
+- [Geolocalização](docs/geolocalizacao.md)
+- [Detecção de visitas](docs/deteccao-visitas.md)
+- [Offline e sincronização](docs/offline-sync.md)
+- [Integração com a API](docs/integracao-api.md)
+- [Testes mobile](docs/testes-mobile.md)
+- [Decisões abertas](docs/decisoes-abertas.md)
+- [Contexto para agentes](AI_CONTEXT.md)
