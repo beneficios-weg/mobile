@@ -1,6 +1,6 @@
 # Componentes de UI
 
-Não existem componentes implementados na branch base. Os nomes abaixo são **nomes planejados** do briefing e devem ser substituídos pelos nomes reais quando o código surgir. O design final é responsabilidade do Frontend e deve seguir os protótipos vigentes.
+Este inventário reúne componentes implementados e planejados. Os contratos e o visual devem acompanhar os protótipos vigentes; componentes implementados usam seus nomes reais no código.
 
 | Componente planejado | Responsabilidade |
 |---|---|
@@ -8,7 +8,7 @@ Não existem componentes implementados na branch base. Os nomes abaixo são **no
 | `MapView` | Contêiner do provedor de mapas e viewport |
 | `MapPin` | Marcador de estabelecimento e estado selecionado |
 | `SearchBar` | Entrada de pesquisa e limpeza |
-| `CategoryCard` | Acesso visual a uma categoria |
+| `CategoryButton` | Seleção acessível de categoria com ícone, tom visual e estado selecionado |
 | `CategoryGrid` | Organização responsiva de categorias |
 | `EstablishmentCard` | Resumo do estabelecimento, distância e benefício disponível |
 | `BenefitBadge` | Destaque curto do benefício principal |
