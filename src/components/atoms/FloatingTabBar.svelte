@@ -52,15 +52,16 @@
 <style>
   .floating-tabs {
     position: fixed;
-    width: min(75vw, 560px);
+    width: 350px;
+    height: 64px;
     z-index: 20;
     left: 50%;
-    bottom: 24px;
+    bottom: 20px;
     display: flex;
     align-items: center;
     gap: 4px;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 7px 8px;
     border: 1px solid rgb(225 232 240 / 85%);
     border-radius: 26px;
     background: #fff;
@@ -130,18 +131,10 @@
     outline-offset: 2px;
   }
 
-  @media (max-width: 420px) {
+  @media (max-width: 389px) {
     .floating-tabs {
-      width: calc(100vw - 32px);
-      gap: 2px;
-    }
-
-    .tab {
-      flex-grow: 1;
-    }
-
-    .tab.active {
-      flex-grow: 2.6;
+      bottom: max(0px, calc(13.3333vw - 32px));
+      transform: translateX(-50%) scale(clamp(0.5, calc(100vw / 390px), 1));
     }
   }
 
