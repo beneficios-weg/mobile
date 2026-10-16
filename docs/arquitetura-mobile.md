@@ -2,7 +2,7 @@
 
 ## Estado
 
-A arquitetura abaixo é **planejada**, não encontrada no código. Na consolidação não existiam `package.json` nem diretório `src/`. Ela serve como limite simples para iniciar o React Native sem overengineering.
+A arquitetura abaixo é **planejada** para a futura implementação mobile. Este checkout contém um starter Svelte/Vite e Capacitor, mas ainda não implementa as telas do produto. O contrato conceitual das entidades está em [Modelo de dados](modelo-dados.md), e os tipos correspondentes ficam em `src/lib/domain.ts`.
 
 ## Estrutura planejada
 
