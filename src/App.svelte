@@ -1,89 +1,82 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+  import CategoryButton, { type CategoryButtonTone } from './components/atoms/CategoryButton.svelte'
+  import clientsIcon from './assets/categories/clients-weg.svg'
+  import educationIcon from './assets/categories/education.svg'
+  import languageIcon from './assets/categories/languages.svg'
+  import coursesIcon from './assets/categories/courses-training.svg'
+  import healthIcon from './assets/categories/health-wellbeing.svg'
+  import leisureIcon from './assets/categories/leisure.svg'
+  import styleIcon from './assets/categories/style-clothing.svg'
+
+  const categories: { label: string; tone: CategoryButtonTone; icon: string }[] = [
+    { label: 'Clientes WEG', tone: 'sky', icon: clientsIcon },
+    { label: 'Educação', tone: 'lavender', icon: educationIcon },
+    { label: 'Idiomas', tone: 'mint', icon: languageIcon },
+    { label: 'Cursos e Treinamentos', tone: 'amber', icon: coursesIcon },
+    { label: 'Saúde e Bem-Estar', tone: 'coral', icon: healthIcon },
+    { label: 'Lazer', tone: 'rose', icon: leisureIcon },
+    { label: 'Estética e Vestuário', tone: 'slate', icon: styleIcon },
+  ]
+
+  let selectedCategory = $state<string | null>(null)
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>hs</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<svelte:head>
+  <title>Teste responsivo dos botões de categoria</title>
+</svelte:head>
 
-<div class="ticks"></div>
+<main class="button-showcase" aria-label="Teste responsivo dos botões de categoria">
+  <section class="category-grid" aria-label="Categorias de benefícios">
+    {#each categories as category (category.label)}
+      <CategoryButton
+        label={category.label}
+        icon={category.icon}
+        tone={category.tone}
+        selected={selectedCategory === category.label}
+        onclick={() => (selectedCategory = category.label)}
+      />
+    {/each}
+  </section>
+</main>
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+<style>
+  :global(body) {
+    background: #f3f7fa;
+  }
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+  :global(#app) {
+    width: 100%;
+    max-width: none;
+    min-height: 100svh;
+    border: 0;
+    text-align: initial;
+  }
+
+  .button-showcase {
+    display: grid;
+    min-height: 100svh;
+    box-sizing: border-box;
+    place-items: start center;
+    padding: 24px 16px;
+  }
+
+  .category-grid {
+    width: min(100%, 760px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 16px;
+  }
+
+  @media (max-width: 340px) {
+    .category-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 720px) {
+    .category-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
