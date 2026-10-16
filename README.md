@@ -8,12 +8,12 @@ O produto responde à pergunta: **“Quais benefícios tenho perto de mim agora?
 
 ## Estado atual
 
-Este repositório contém, neste momento, somente a documentação consolidada. Não há `package.json`, código React Native, testes, arquivos de configuração nem designs versionados na branch base. Por isso:
+Este checkout contém um starter Svelte/Vite com Capacitor, documentação do produto e tipos TypeScript para o domínio de dados. As telas do WEG Benefits e a integração com o Backend ainda não estão implementadas. React Native aparece como requisito na documentação anterior, mas não corresponde ao starter encontrado neste checkout; a decisão de stack continua pendente.
 
-- React Native e a abordagem mobile-first são requisitos confirmados;
-- Inter, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes confirmadas;
-- Expo, TypeScript e React Navigation aparecem em uma branch documental remota, mas ainda não podem ser validados na implementação;
-- instalação, execução, variáveis de ambiente, biblioteca de mapas, armazenamento local e segundo recurso nativo permanecem como **DECISÃO PENDENTE**.
+- Inter, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes visuais/funcionais;
+- o modelo lógico para categorias, marcas, estabelecimentos, benefícios, serviços, horários, favoritos, visitas e avaliações está em [Modelo de dados](docs/modelo-dados.md);
+- os tipos em `src/lib/domain.ts` não definem payloads nem substituem o contrato oficial do Backend;
+- autenticação, endpoints, mapa, armazenamento local e segundo recurso nativo permanecem como **DECISÃO PENDENTE**.
 
 Consulte [Decisões abertas](docs/decisoes-abertas.md) antes de implementar.
 
@@ -38,9 +38,7 @@ A organização planejada e seus limites estão em [Arquitetura mobile](docs/arq
 
 ## Instalação e execução
 
-Ainda não existem comandos verificáveis. O repositório não possui `package.json` e, portanto, não é correto documentar `npm install`, `npm start` ou comandos Expo como se estivessem disponíveis.
-
-Quando a implementação for inicializada, atualizar esta seção exclusivamente com scripts presentes em `package.json`, incluindo pré-requisitos e versões suportadas.
+Os scripts reais estão em `package.json`. A configuração atual fornece `npm run dev`, `npm run build` e `npm run check` para o starter Svelte/Vite; esses comandos não representam ainda uma aplicação mobile de produto concluída.
 
 ## Variáveis de ambiente
 
@@ -72,6 +70,7 @@ Há uma referência de Figma registrada na documentação remota anterior: [App 
 - [Detecção de visitas](docs/deteccao-visitas.md)
 - [Offline e sincronização](docs/offline-sync.md)
 - [Integração com a API](docs/integracao-api.md)
+- [Modelo de dados](docs/modelo-dados.md)
 - [Testes mobile](docs/testes-mobile.md)
 - [Decisões abertas](docs/decisoes-abertas.md)
 - [Contexto para agentes](AI_CONTEXT.md)
