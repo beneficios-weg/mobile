@@ -14,6 +14,8 @@ Não existem componentes implementados na branch base. Os nomes abaixo são **no
 | `BenefitBadge` | Destaque curto do benefício principal |
 | `FavoriteButton` | Alternância acessível do favorito |
 | `SortControl` | Escolha de ordenação disponível |
+| `FilterButton` | Ação de filtragem/ordenação dos estabelecimentos próximos |
+| `FilterDropdown` | Agrupa `FilterButton` e painel expansível para opções de filtragem |
 | `FilterControl` | Entrada para filtros confirmados pelo produto |
 | `StoreList` | Lista, estados vazio/loading/erro e paginação, se contratada |
 | `BenefitCard` | Conteúdo detalhado do benefício |
