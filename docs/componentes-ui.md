@@ -12,7 +12,7 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 | `CategoryGrid` | Organização responsiva de categorias |
 | `EstablishmentCard` | Resumo do estabelecimento, distância e benefício disponível |
 | `BenefitBadge` | Destaque curto do benefício principal |
-| `FavoriteButton` | Alternância acessível do favorito |
+| `FavoriteButton` | Alternância acessível do favorito (implementado em `src/components/atoms/FavoriteButton.svelte`) |
 | `SortControl` | Escolha de ordenação disponível |
 | `FilterControl` | Entrada para filtros confirmados pelo produto |
 | `StoreList` | Lista, estados vazio/loading/erro e paginação, se contratada |
