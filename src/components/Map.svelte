@@ -2,18 +2,28 @@
   import { onMount } from 'svelte'
   import * as L from 'leaflet'
   import 'leaflet/dist/leaflet.css'
+  import BenefitLocationCard from './atoms/BenefitLocationCard.svelte'
   import { demoBenefits, type Benefit } from '../services/benefitsService'
   import { getCurrentLocation, type Coordinates } from '../services/geolocationService'
+  import { getManualBenefits, saveManualBenefits } from '../services/manualBenefitsService'
   import { getDrivingRoute, type RouteResult } from '../services/routingService'
 
   const initialCenter: L.LatLngExpression = [-26.483, -49.078]
+  const brazilBounds = L.latLngBounds([-34, -74], [6, -34])
+  const isInsideBrazil = (benefit: Benefit) =>
+    brazilBounds.contains([benefit.latitude, benefit.longitude])
 
   let mapElement: HTMLDivElement
   let map: L.Map | undefined
   let locationMarker: L.CircleMarker | undefined
   let routeLayer: L.Polyline | undefined
+  let benefitMarkers: L.LayerGroup | undefined
   let currentLocation = $state<Coordinates | null>(null)
   let selectedBenefit = $state<Benefit | null>(null)
+  let manualBenefits = $state<Benefit[]>([])
+  let allBenefits = $derived(
+    [...demoBenefits, ...manualBenefits].filter(isInsideBrazil),
+  )
   let locationState = $state<'idle' | 'loading' | 'ready' | 'error'>('idle')
   let routeState = $state<'idle' | 'loading' | 'ready' | 'error'>('idle')
   let locationMessage = $state('')
@@ -33,6 +43,25 @@
     return remainingMinutes ? `${hours} h ${remainingMinutes} min de carro` : `${hours} h de carro`
   }
 
+  function distanceFromUser(benefit: Benefit) {
+    if (!currentLocation) return ''
+
+    const radians = (degrees: number) => (degrees * Math.PI) / 180
+    const earthRadiusKm = 6371
+    const latitudeDelta = radians(benefit.latitude - currentLocation.latitude)
+    const longitudeDelta = radians(benefit.longitude - currentLocation.longitude)
+    const a =
+      Math.sin(latitudeDelta / 2) ** 2 +
+      Math.cos(radians(currentLocation.latitude)) *
+        Math.cos(radians(benefit.latitude)) *
+        Math.sin(longitudeDelta / 2) ** 2
+    const distanceKm = earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+    return distanceKm < 1
+      ? `${Math.round(distanceKm * 1000)} m`
+      : `${distanceKm.toFixed(1).replace('.', ',')} km`
+  }
+
   function makeBenefitPopup(benefit: Benefit) {
     const content = document.createElement('div')
     const title = document.createElement('strong')
@@ -46,7 +75,10 @@
   function addBenefitMarkers() {
     if (!map) return
 
-    for (const benefit of demoBenefits) {
+    benefitMarkers?.remove()
+    benefitMarkers = L.layerGroup().addTo(map)
+
+    for (const benefit of allBenefits) {
       const marker = L.marker([benefit.latitude, benefit.longitude], {
         icon: L.divIcon({
           className: 'benefit-marker-wrapper',
@@ -57,7 +89,7 @@
         }),
         title: benefit.name,
         alt: benefit.name,
-      }).addTo(map)
+      }).addTo(benefitMarkers)
 
       marker.bindPopup(makeBenefitPopup(benefit))
       marker.on('click', () => void selectBenefit(benefit))
@@ -70,6 +102,10 @@
 
     try {
       currentLocation = await getCurrentLocation()
+      if (!brazilBounds.contains([currentLocation.latitude, currentLocation.longitude])) {
+        currentLocation = null
+        throw new Error('Sua localização está fora da área atendida no Brasil.')
+      }
       locationState = 'ready'
       locationMessage = 'Sua localização foi encontrada.'
 
@@ -120,6 +156,8 @@
     if (!map || !currentLocation) return
 
     routeController?.abort()
+    routeLayer?.remove()
+    routeLayer = undefined
     routeController = new AbortController()
     const controller = routeController
     routeState = 'loading'
@@ -158,19 +196,27 @@
   }
 
   onMount(() => {
+    manualBenefits = getManualBenefits().filter((benefit) =>
+      brazilBounds.contains([benefit.latitude, benefit.longitude]),
+    )
+
     map = L.map(mapElement, {
       zoomControl: false,
       preferCanvas: true,
+      maxBounds: brazilBounds,
+      maxBoundsViscosity: 1,
+      minZoom: 4,
+      maxZoom: 18,
     }).setView(initialCenter, 13)
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
+      maxZoom: 18,
+      noWrap: true,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map)
 
     L.control.zoom({ position: 'bottomright' }).addTo(map)
     addBenefitMarkers()
-
     return () => {
       routeController?.abort()
       map?.remove()
@@ -203,18 +249,14 @@
   {/if}
 
   <div class="benefit-list" aria-label="Benefícios disponíveis">
-    {#each demoBenefits as benefit (benefit.id)}
-      <button
-        type="button"
-        class="benefit-card"
-        class:selected={selectedBenefit?.id === benefit.id}
-        aria-pressed={selectedBenefit?.id === benefit.id}
+    {#each allBenefits as benefit (benefit.id)}
+      {@const distance = distanceFromUser(benefit)}
+      <BenefitLocationCard
+        {benefit}
+        {distance}
+        selected={selectedBenefit?.id === benefit.id}
         onclick={() => selectBenefit(benefit)}
-      >
-        <span class="benefit-card__category">{benefit.category}</span>
-        <strong>{benefit.name}</strong>
-        <span>{benefit.description}</span>
-      </button>
+      />
     {/each}
   </div>
 
@@ -225,7 +267,12 @@
   {/if}
 
   <div class="map-frame">
-    <div class="map-canvas" bind:this={mapElement} aria-label="Mapa interativo com benefícios" role="application"></div>
+    <div
+      class="map-canvas"
+      bind:this={mapElement}
+      aria-label="Mapa interativo com benefícios no Brasil."
+      role="application"
+    ></div>
     <div class="map-legend" aria-hidden="true">
       <span class="legend-benefit"></span> Benefício
       <span class="legend-user"></span> Você
@@ -305,49 +352,9 @@
 
   .benefit-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
     margin-bottom: 12px;
-  }
-
-  .benefit-card {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-    padding: 14px 16px;
-    border: 1px solid var(--map-border);
-    border-radius: 16px;
-    background: var(--map-surface);
-    color: var(--map-muted);
-    font: inherit;
-    font-size: 13px;
-    line-height: 1.4;
-    text-align: left;
-    cursor: pointer;
-    transition:
-      border-color 160ms ease,
-      box-shadow 160ms ease;
-  }
-
-  .benefit-card strong {
-    color: var(--map-text);
-    font-size: 15px;
-  }
-
-  .benefit-card__category {
-    color: var(--map-accent);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .benefit-card:hover,
-  .benefit-card.selected {
-    border-color: var(--map-accent);
-    box-shadow: 0 4px 14px rgb(0 87 157 / 10%);
   }
 
   .status,
@@ -481,10 +488,6 @@
   }
 
   @media (max-width: 420px) {
-    .benefit-list {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
     .map-legend {
       right: 8px;
       bottom: 8px;
