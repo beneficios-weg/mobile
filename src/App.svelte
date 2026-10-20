@@ -1,5 +1,7 @@
 <script lang="ts">
   import CategoryButton, { type CategoryButtonTone } from './components/atoms/CategoryButton.svelte'
+  import FloatingTabBar from './components/atoms/FloatingTabBar.svelte'
+  import Map from './components/Map.svelte'
   import clientsIcon from './assets/categories/clients-weg.svg'
   import educationIcon from './assets/categories/education.svg'
   import languageIcon from './assets/categories/languages.svg'
@@ -38,6 +40,12 @@
     {/each}
   </section>
 </main>
+
+<Map/>
+
+<FloatingTabBar />
+
+
 
 <style>
   :global(body) {

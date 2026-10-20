@@ -13,6 +13,7 @@
     "@capacitor/cli": "^8.5.2",
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@tsconfig/svelte": "^5.0.8",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.3",
     "svelte": "^5.57.0",
     "svelte-check": "^4.7.6",
@@ -21,6 +22,8 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",
-    "@capacitor/core": "^8.5.2"
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/geolocation": "^8.2.4",
+    "leaflet": "^1.9.4"
   }
 }
