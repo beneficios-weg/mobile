@@ -10,6 +10,6 @@
 
 <button class="back-button" type="button" {disabled} {onclick} aria-label={label}>
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M19 12H5M12 19l-7-7 7-7" />
+    <path d="m15 18-6-6 6-6" />
   </svg>
 </button>
