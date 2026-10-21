@@ -11,7 +11,7 @@
 
 <button
   type="button"
-  class="favorite-button"
+  class="favorite-toggle"
   class:liked
   {disabled}
   aria-label={label}
@@ -26,59 +26,3 @@
     />
   </svg>
 </button>
-
-<style>
-  .favorite-button {
-    width: 44px;
-    height: 44px;
-    display: inline-grid;
-    place-items: center;
-    flex: 0 0 44px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: #00579d;
-    cursor: pointer;
-    transition:
-      background-color 160ms ease,
-      transform 160ms ease;
-  }
-
-  .favorite-button:hover:not(:disabled) {
-    background: rgb(0 87 157 / 8%);
-  }
-
-  .favorite-button:active:not(:disabled) {
-    transform: scale(0.94);
-  }
-
-  .favorite-button:focus-visible {
-    outline: 3px solid rgb(0 87 157 / 30%);
-    outline-offset: 2px;
-  }
-
-  .favorite-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-    overflow: visible;
-  }
-
-  path {
-    fill: transparent;
-    stroke: currentColor;
-    transition:
-      fill 160ms ease,
-      stroke 160ms ease;
-  }
-
-  .liked path {
-    fill: currentColor;
-    stroke: currentColor;
-  }
-</style>
