@@ -10,7 +10,7 @@
   border: 1px solid #d8e2ec;
   border-radius: 50%;
   background: #fff;
-  color: #1b2938;
+  color: #00579d;
   box-shadow: 0 8px 24px rgb(17 32 51 / 12%);
   cursor: pointer;
   transition:
@@ -38,10 +38,10 @@
 }
 
 .back-button svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
