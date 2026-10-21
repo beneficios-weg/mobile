@@ -1,0 +1,47 @@
+.back-button {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+  border: 1px solid #d8e2ec;
+  border-radius: 50%;
+  background: #fff;
+  color: #1b2938;
+  box-shadow: 0 8px 24px rgb(17 32 51 / 12%);
+  cursor: pointer;
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.back-button:hover:not(:disabled) {
+  box-shadow: 0 10px 28px rgb(17 32 51 / 16%);
+}
+
+.back-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.back-button:focus-visible {
+  outline: 3px solid rgb(0 87 157 / 28%);
+  outline-offset: 3px;
+}
+
+.back-button:disabled {
+  color: #9aafc1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

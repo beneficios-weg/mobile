@@ -2,67 +2,44 @@
   import { onMount } from 'svelte'
   import * as L from 'leaflet'
   import 'leaflet/dist/leaflet.css'
-  import BenefitLocationCard from './atoms/BenefitLocationCard.svelte'
-  import { demoBenefits, type Benefit } from '../services/benefitsService'
-  import { getCurrentLocation, type Coordinates } from '../services/geolocationService'
-  import { getManualBenefits, saveManualBenefits } from '../services/manualBenefitsService'
-  import { getDrivingRoute, type RouteResult } from '../services/routingService'
+
+  type MapBenefit = {
+    id: string
+    name: string
+    category: string
+    latitude: number
+    longitude: number
+  }
+
+  type MapPosition = {
+    latitude: number
+    longitude: number
+  }
+
+  type Props = {
+    benefits: MapBenefit[]
+    userLocation?: MapPosition | null
+    routeCoordinates?: [number, number][] | null
+    onBenefitSelect?: (benefit: MapBenefit) => void
+  }
+
+  let {
+    benefits,
+    userLocation = null,
+    routeCoordinates = null,
+    onBenefitSelect,
+  }: Props = $props()
 
   const initialCenter: L.LatLngExpression = [-26.483, -49.078]
-  const brazilBounds = L.latLngBounds([-34, -74], [6, -34])
-  const isInsideBrazil = (benefit: Benefit) =>
-    brazilBounds.contains([benefit.latitude, benefit.longitude])
+  const southAmericaBounds = L.latLngBounds([-45, -78], [10, -34])
 
   let mapElement: HTMLDivElement
-  let map: L.Map | undefined
-  let locationMarker: L.CircleMarker | undefined
-  let routeLayer: L.Polyline | undefined
-  let benefitMarkers: L.LayerGroup | undefined
-  let currentLocation = $state<Coordinates | null>(null)
-  let selectedBenefit = $state<Benefit | null>(null)
-  let manualBenefits = $state<Benefit[]>([])
-  let allBenefits = $derived(
-    [...demoBenefits, ...manualBenefits].filter(isInsideBrazil),
-  )
-  let locationState = $state<'idle' | 'loading' | 'ready' | 'error'>('idle')
-  let routeState = $state<'idle' | 'loading' | 'ready' | 'error'>('idle')
-  let locationMessage = $state('')
-  let routeMessage = $state('')
-  let routeSummary = $state('')
-  let routeController: AbortController | undefined
+  let map = $state.raw<L.Map | undefined>(undefined)
+  let benefitMarkers = $state.raw<L.LayerGroup | undefined>(undefined)
+  let locationMarker = $state.raw<L.CircleMarker | undefined>(undefined)
+  let routeLayer = $state.raw<L.Polyline | undefined>(undefined)
 
-  function formatDistance(meters: number) {
-    return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`
-  }
-
-  function formatDuration(seconds: number) {
-    const minutes = Math.max(1, Math.round(seconds / 60))
-    if (minutes < 60) return `${minutes} min de carro`
-    const hours = Math.floor(minutes / 60)
-    const remainingMinutes = minutes % 60
-    return remainingMinutes ? `${hours} h ${remainingMinutes} min de carro` : `${hours} h de carro`
-  }
-
-  function distanceFromUser(benefit: Benefit) {
-    if (!currentLocation) return ''
-
-    const radians = (degrees: number) => (degrees * Math.PI) / 180
-    const earthRadiusKm = 6371
-    const latitudeDelta = radians(benefit.latitude - currentLocation.latitude)
-    const longitudeDelta = radians(benefit.longitude - currentLocation.longitude)
-    const a =
-      Math.sin(latitudeDelta / 2) ** 2 +
-      Math.cos(radians(currentLocation.latitude)) *
-        Math.cos(radians(benefit.latitude)) *
-        Math.sin(longitudeDelta / 2) ** 2
-    const distanceKm = earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-    return distanceKm < 1
-      ? `${Math.round(distanceKm * 1000)} m`
-      : `${distanceKm.toFixed(1).replace('.', ',')} km`
-  }
-
-  function makeBenefitPopup(benefit: Benefit) {
+  function createBenefitPopup(benefit: MapBenefit) {
     const content = document.createElement('div')
     const title = document.createElement('strong')
     const category = document.createElement('div')
@@ -72,13 +49,15 @@
     return content
   }
 
-  function addBenefitMarkers() {
-    if (!map) return
+  function renderBenefits(
+    mapInstance: L.Map,
+    items: MapBenefit[],
+    onSelect?: (benefit: MapBenefit) => void,
+  ) {
+    benefitMarkers ??= L.layerGroup().addTo(mapInstance)
+    benefitMarkers.clearLayers()
 
-    benefitMarkers?.remove()
-    benefitMarkers = L.layerGroup().addTo(map)
-
-    for (const benefit of allBenefits) {
+    for (const benefit of items) {
       const marker = L.marker([benefit.latitude, benefit.longitude], {
         icon: L.divIcon({
           className: 'benefit-marker-wrapper',
@@ -91,120 +70,78 @@
         alt: benefit.name,
       }).addTo(benefitMarkers)
 
-      marker.bindPopup(makeBenefitPopup(benefit))
-      marker.on('click', () => void selectBenefit(benefit))
+      marker.bindPopup(createBenefitPopup(benefit))
+      marker.on('click', () => onSelect?.(benefit))
     }
   }
 
-  async function requestLocation() {
-    locationState = 'loading'
-    locationMessage = ''
-
-    try {
-      currentLocation = await getCurrentLocation()
-      if (!brazilBounds.contains([currentLocation.latitude, currentLocation.longitude])) {
-        currentLocation = null
-        throw new Error('Sua localização está fora da área atendida no Brasil.')
-      }
-      locationState = 'ready'
-      locationMessage = 'Sua localização foi encontrada.'
-
-      if (map) {
-        const position: L.LatLngExpression = [currentLocation.latitude, currentLocation.longitude]
-        if (locationMarker) locationMarker.setLatLng(position)
-        else {
-          locationMarker = L.circleMarker(position, {
-            className: 'user-location-marker',
-            radius: 9,
-            color: '#fff',
-            weight: 3,
-            fillColor: '#1684e8',
-            fillOpacity: 1,
-          })
-            .bindTooltip('Você está aqui')
-            .addTo(map)
-        }
-
-        if (selectedBenefit) await loadRoute(selectedBenefit)
-        else map.setView(position, 15)
-      }
-    } catch (error) {
-      locationState = 'error'
-      locationMessage =
-        error instanceof Error ? error.message : 'Não foi possível obter sua localização.'
+  function renderUserLocation(mapInstance: L.Map, location: MapPosition | null) {
+    if (!location) {
+      locationMarker?.remove()
+      locationMarker = undefined
+      return
     }
+
+    const position: L.LatLngExpression = [location.latitude, location.longitude]
+    if (locationMarker) {
+      locationMarker.setLatLng(position)
+      return
+    }
+
+    locationMarker = L.circleMarker(position, {
+      className: 'user-location-marker',
+      radius: 9,
+      color: '#fff',
+      weight: 3,
+      fillColor: '#1684e8',
+      fillOpacity: 1,
+    })
+      .bindTooltip('Você está aqui')
+      .addTo(mapInstance)
   }
 
-  async function selectBenefit(benefit: Benefit) {
-    selectedBenefit = benefit
-    routeMessage = ''
-    routeSummary = ''
-    routeController?.abort()
+  function renderRoute(
+    mapInstance: L.Map,
+    coordinates: [number, number][] | null,
+  ) {
     routeLayer?.remove()
     routeLayer = undefined
+    if (!coordinates?.length) return
 
-    map?.setView([benefit.latitude, benefit.longitude], 15, { animate: true })
-    if (map) {
-      L.popup().setLatLng([benefit.latitude, benefit.longitude]).setContent(makeBenefitPopup(benefit)).openOn(map)
-    }
+    routeLayer = L.polyline(coordinates, {
+      className: 'benefit-route',
+      color: '#0878e8',
+      weight: 5,
+      opacity: 0.9,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(mapInstance)
 
-    if (currentLocation) await loadRoute(benefit)
-    else routeMessage = 'Ative sua localização para traçar a rota até este benefício.'
+    const bounds = L.latLngBounds(coordinates)
+    if (locationMarker) bounds.extend(locationMarker.getLatLng())
+    mapInstance.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 })
   }
 
-  async function loadRoute(benefit: Benefit) {
-    if (!map || !currentLocation) return
+  $effect(() => {
+    const currentMap = map
+    const currentBenefits = benefits
+    const currentLocation = userLocation
+    const currentRouteCoordinates = routeCoordinates
+    const currentOnBenefitSelect = onBenefitSelect
 
-    routeController?.abort()
-    routeLayer?.remove()
-    routeLayer = undefined
-    routeController = new AbortController()
-    const controller = routeController
-    routeState = 'loading'
-    routeMessage = 'Calculando a rota…'
-    routeSummary = ''
+    if (!currentMap) return
 
-    try {
-      const route: RouteResult = await getDrivingRoute(
-        currentLocation,
-        benefit,
-        controller.signal,
-      )
-      if (controller.signal.aborted || selectedBenefit?.id !== benefit.id) return
-
-      routeLayer = L.polyline(route.coordinates, {
-        className: 'benefit-route',
-        color: '#0878e8',
-        weight: 5,
-        opacity: 0.9,
-        lineCap: 'round',
-        lineJoin: 'round',
-      }).addTo(map)
-
-      const bounds = L.latLngBounds(route.coordinates)
-      if (locationMarker) bounds.extend(locationMarker.getLatLng())
-      map.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 })
-
-      routeState = 'ready'
-      routeMessage = ''
-      routeSummary = `${formatDistance(route.distanceMeters)} · ${formatDuration(route.durationSeconds)}`
-    } catch (error) {
-      if (controller.signal.aborted) return
-      routeState = 'error'
-      routeMessage = error instanceof Error ? error.message : 'Não foi possível calcular a rota.'
-    }
-  }
+    renderBenefits(currentMap, currentBenefits, currentOnBenefitSelect)
+    renderUserLocation(currentMap, currentLocation)
+    renderRoute(currentMap, currentRouteCoordinates)
+  })
 
   onMount(() => {
-    manualBenefits = getManualBenefits().filter((benefit) =>
-      brazilBounds.contains([benefit.latitude, benefit.longitude]),
-    )
-
     map = L.map(mapElement, {
       zoomControl: false,
       preferCanvas: true,
-      maxBounds: brazilBounds,
-      maxBoundsViscosity: 1,
+      maxBounds: southAmericaBounds,
+      maxBoundsViscosity: 2,
       minZoom: 4,
       maxZoom: 18,
     }).setView(initialCenter, 13)
@@ -212,60 +149,23 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       noWrap: true,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map)
 
     L.control.zoom({ position: 'bottomright' }).addTo(map)
-    addBenefitMarkers()
+
     return () => {
-      routeController?.abort()
       map?.remove()
       map = undefined
+      benefitMarkers = undefined
+      locationMarker = undefined
+      routeLayer = undefined
     }
   })
 </script>
 
-<section class="benefits-map" aria-labelledby="map-title">
-  <header class="map-header">
-    <div>
-      <p class="eyebrow">Benefícios por perto</p>
-      <h1 id="map-title">Encontre um benefício</h1>
-      <p class="intro">Veja os locais no mapa e trace uma rota a partir da sua localização.</p>
-    </div>
-    <button
-      class="location-button"
-      type="button"
-      onclick={requestLocation}
-      disabled={locationState === 'loading'}
-    >
-      {locationState === 'loading' ? 'Localizando…' : 'Usar minha localização'}
-    </button>
-  </header>
-
-  {#if locationMessage}
-    <p class:status-error={locationState === 'error'} class="status" aria-live="polite">
-      {locationMessage}
-    </p>
-  {/if}
-
-  <div class="benefit-list" aria-label="Benefícios disponíveis">
-    {#each allBenefits as benefit (benefit.id)}
-      {@const distance = distanceFromUser(benefit)}
-      <BenefitLocationCard
-        {benefit}
-        {distance}
-        selected={selectedBenefit?.id === benefit.id}
-        onclick={() => selectBenefit(benefit)}
-      />
-    {/each}
-  </div>
-
-  {#if routeMessage || routeSummary}
-    <p class:status-error={routeState === 'error'} class="route-status" aria-live="polite">
-      {routeMessage || routeSummary}
-    </p>
-  {/if}
-
+<section class="benefits-map" aria-label="Mapa de benefícios">
   <div class="map-frame">
     <div
       class="map-canvas"
@@ -275,7 +175,9 @@
     ></div>
     <div class="map-legend" aria-hidden="true">
       <span class="legend-benefit"></span> Benefício
-      <span class="legend-user"></span> Você
+      {#if userLocation}
+        <span class="legend-user"></span> Você
+      {/if}
     </div>
   </div>
 </section>

@@ -8,4 +8,4 @@ Os componentes reutilizáveis são organizados por nível do Atomic Design:
 
 Crie cada pasta quando o primeiro componente daquele nível for adicionado. Templates e páginas representam layouts e telas da aplicação, então ficam fora desta biblioteca de componentes.
 
-Os estilos dos componentes ficam em `src/components/style.css`, carregado uma vez em `src/main.ts`. Cada seção usa a classe raiz do componente para manter seus seletores isolados; ao criar um componente, adicione uma classe própria antes de incluir seu CSS nesse arquivo.
+Os estilos ficam em `src/components/styles/`, em um arquivo por átomo ou componente de interface. `src/components/styles/index.css` importa cada folha e é carregado uma vez em `src/main.ts`. Mantenha os seletores sob a classe raiz do componente para evitar vazamento entre componentes.

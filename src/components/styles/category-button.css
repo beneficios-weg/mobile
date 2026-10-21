@@ -1,0 +1,97 @@
+.category-button[data-tone='sky'] {
+  --category-background: #dbf4ff;
+  --category-foreground: #5db7e5;
+}
+
+.category-button[data-tone='lavender'] {
+  --category-background: #f0eefc;
+  --category-foreground: #8277e8;
+}
+
+.category-button[data-tone='mint'] {
+  --category-background: #e9f7f2;
+  --category-foreground: #3faf84;
+}
+
+.category-button[data-tone='amber'] {
+  --category-background: #fff3df;
+  --category-foreground: #e7a94b;
+}
+
+.category-button[data-tone='coral'] {
+  --category-background: #ffebeb;
+  --category-foreground: #f06d5d;
+}
+
+.category-button[data-tone='rose'] {
+  --category-background: #f6e8f2;
+  --category-foreground: #9b5c82;
+}
+
+.category-button[data-tone='slate'] {
+  --category-background: #e8edf7;
+  --category-foreground: #5b6f9e;
+}
+
+.category-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 58px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: var(--category-background);
+  color: var(--category-foreground);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 12px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgb(17 32 51 / 8%);
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.category-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgb(17 32 51 / 12%);
+}
+
+.category-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.category-button:focus-visible {
+  outline: 3px solid rgb(0 87 157 / 30%);
+  outline-offset: 3px;
+}
+
+.category-button.selected {
+  border-color: var(--category-foreground);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--category-foreground) 20%, transparent),
+    0 4px 12px rgb(17 32 51 / 8%);
+}
+
+.category-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.category-button .icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  object-fit: contain;
+}
