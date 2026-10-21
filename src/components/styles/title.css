@@ -11,7 +11,7 @@
   font: 590 18px/22px Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-@media (max-width: 830px) {
+@media (min-width: 830px) {
   .page-title {
     margin: 0;
     color: #112033;
@@ -21,7 +21,7 @@
 
   .page-subtitle {
     margin: 0;
-    font: 700 22px/24px Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font: 590 22px/24px Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
     color: #112033;
     letter-spacing: 0;
   }
