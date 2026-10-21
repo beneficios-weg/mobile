@@ -7,3 +7,5 @@ Os componentes reutilizáveis são organizados por nível do Atomic Design:
 - `organisms/`: seções completas da interface, compostas por moléculas e átomos.
 
 Crie cada pasta quando o primeiro componente daquele nível for adicionado. Templates e páginas representam layouts e telas da aplicação, então ficam fora desta biblioteca de componentes.
+
+Os estilos ficam em `src/components/styles/`, em um arquivo por átomo ou componente de interface. `src/components/styles/index.css` importa cada folha e é carregado uma vez em `src/main.ts`. Mantenha os seletores sob a classe raiz do componente para evitar vazamento entre componentes.
