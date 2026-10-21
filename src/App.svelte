@@ -1,6 +1,7 @@
 <script lang="ts">
   import CategoryButton, { type CategoryButtonTone } from './components/atoms/CategoryButton.svelte'
   import Map from './components/Map.svelte'
+  import Title from './components/atoms/Title.svelte'
   import clientsIcon from './assets/categories/clients-weg.svg'
   import educationIcon from './assets/categories/education.svg'
   import languageIcon from './assets/categories/languages.svg'
@@ -27,6 +28,9 @@
 </svelte:head>
 
 <main class="button-showcase" aria-label="Teste responsivo dos botões de categoria">
+  <div class="home-title">
+    <Title text="Saúde e Bem-Estar" />
+  </div>
   <section class="category-grid" aria-label="Categorias de benefícios">
     {#each categories as category (category.label)}
       <CategoryButton
@@ -53,5 +57,10 @@
     min-height: 100svh;
     border: 0;
     text-align: initial;
+  }
+
+  .home-title {
+    box-sizing: border-box;
+    padding: 24px 20px;
   }
 </style>
