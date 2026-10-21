@@ -595,46 +595,6 @@
   letter-spacing: 0;
 }
 
-/* ScrollShadow */
-.scroll-shadow {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  width: 100%;
-  height: 16px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms ease;
-}
-
-.scroll-shadow.top {
-  top: 0;
-  background: linear-gradient(
-    180deg,
-    rgb(244 248 250 / 87%) 0%,
-    rgb(244 248 250 / 3%) 100%
-  );
-}
-
-.scroll-shadow.bottom {
-  bottom: 0;
-  background: linear-gradient(
-    0deg,
-    rgb(244 248 250 / 87%) 0%,
-    rgb(244 248 250 / 3%) 100%
-  );
-}
-
-.scroll-shadow.visible {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-shadow {
-    transition-duration: 0.01ms;
-  }
-}
-
 /* Map */
 .benefits-map {
   --map-accent: #00579d;
