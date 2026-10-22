@@ -2,7 +2,7 @@
 
 Os componentes reutilizáveis são organizados por nível do Atomic Design:
 
-- `atoms/`: elementos básicos e independentes, como `Input`, `PrimaryButton` e `CategoryButton`.
+- `atoms/`: elementos básicos e independentes, como `Input`, `PrimaryButton`, `CategoryButton` e `ExpandButton`.
 - `molecules/`: grupos pequenos de átomos que trabalham juntos, como um campo de busca com botão.
 - `organisms/`: seções completas da interface, compostas por moléculas e átomos.
 
