@@ -31,3 +31,6 @@ A tela pode passar `userLocation` e `routeCoordinates` depois de obtê-los pelas
 O mapa usa Leaflet e tiles do OpenStreetMap, mantém o viewport dentro de limites aproximados do Brasil, não repete tiles horizontalmente e exibe os pins recebidos. Quando `userLocation` é fornecida, exibe o marcador correspondente; quando `routeCoordinates` é fornecida, desenha a geometria e enquadra rota e origem no viewport.
 
 As classes visuais do mapa ficam em `src/components/styles/map.css`. O endereço OSRM padrão em `routingService.ts` serve apenas ao protótipo; o serviço de rota deve ser configurado fora do componente de mapa.
+## Uso na tela de categoria
+
+`CategoryPage` usa `Map.svelte` com `variant="category"`, mantendo o mapa dentro do contêiner e das dimensões responsivas já definidos pela tela. Os tiles vêm do OpenStreetMap; os pins mantêm o tratamento visual da categoria e a seleção sincroniza o pin com o card correspondente. Os nomes e coordenadas exibidos continuam sendo dados locais demonstrativos, ainda sem integração com a API de estabelecimentos.
