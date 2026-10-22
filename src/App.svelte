@@ -16,12 +16,22 @@
   let favorite = $state(false);
   let query = $state("");
   let searchText = $state("");
+
+  const categoryRoute = "/categoria/saude-e-bem-estar";
+  const isCategoryRoute = window.location.pathname === categoryRoute;
+
+  function returnToHome() {
+    window.location.assign("/");
+  }
 </script>
 
 <svelte:head>
-  <title>WEG Benefits — revisão dos componentes</title>
+  <title>{isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
+{#if isCategoryRoute}
+  <CategoryPage onback={returnToHome} />
+{:else}
 <main class="component-preview">
   <header class="preview-header">
     <div>
@@ -82,6 +92,7 @@
 
   <FloatingTabBar bind:selected={activeTab} />
 </main>
+{/if}
 
 <style>
   :global(body) {
