@@ -10,7 +10,7 @@ O produto responde à pergunta: **“Quais benefícios tenho perto de mim agora?
 
 Este checkout contém um starter Svelte/Vite com Capacitor, documentação do produto e tipos TypeScript para o domínio de dados. As telas do WEG Benefits e a integração com o Backend ainda não estão implementadas. React Native aparece como requisito na documentação anterior, mas não corresponde ao starter encontrado neste checkout; a decisão de stack continua pendente.
 
-- Inter, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes visuais/funcionais;
+- tipografia de sistema conforme a página de categorias, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes visuais/funcionais;
 - o modelo lógico para categorias, marcas, estabelecimentos, benefícios, serviços, horários, favoritos, visitas e avaliações está em [Modelo de dados](docs/modelo-dados.md);
 - os tipos em `src/lib/domain.ts` não definem payloads nem substituem o contrato oficial do Backend;
 - autenticação, endpoints, mapa, armazenamento local e segundo recurso nativo permanecem como **DECISÃO PENDENTE**.
@@ -29,7 +29,7 @@ Veja [Telas e fluxos](docs/telas-e-fluxos.md) e [Componentes de UI](docs/compone
 |---|---|
 | React Native | Requisito confirmado |
 | Mobile-first | Requisito confirmado |
-| Inter | Diretriz visual confirmada |
+| Tipografia | Mesma pilha de Categorias: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif` |
 | Lucide Icons | Diretriz de iconografia confirmada |
 | Expo, TypeScript, React Navigation | Citados em documentação ainda não integrada; validar antes de adotar |
 | Mapas, storage e state management | **DECISÃO PENDENTE** |
