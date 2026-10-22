@@ -51,3 +51,11 @@ Todos os itens desta tabela são **DECISÃO PENDENTE**.
 ## Critério para encerrar uma decisão
 
 Registrar data, participantes, alternativa escolhida, justificativa e documentos/código afetados. Atualizar esta página, a documentação temática e os testes correspondentes no mesmo Pull Request.
+
+## Decisão confirmada — tipografia de Categorias e Favoritos
+
+- **Data e responsável:** 2026-10-21, confirmação direta do solicitante durante a implementação de Favoritos.
+- **Decisão:** usar em Favoritos a mesma pilha de `src/pages/CategoryPage.css`: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif`.
+- **Divergência corrigida:** a documentação indicava Inter como obrigatória, enquanto a página de categorias já usava fontes de sistema. Aplicar Inter mudaria o padrão visual solicitado.
+- **Aplicação:** estilos locais de Favoritos, diretrizes em `docs/componentes-ui.md`, contexto para agentes, README, instruções de design e comentário da árvore de arquitetura. Não alterar os estilos de outras telas nesta tarefa.
+- **Limite:** esta confirmação resolve a tipografia dessas páginas; os demais tokens e itens de DP-12 continuam pendentes. Em caso de dúvida sobre o protótipo, perguntar antes de escolher uma alternativa.

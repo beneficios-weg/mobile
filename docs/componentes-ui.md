@@ -23,7 +23,7 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 ## Diretrizes visuais
 
 - mobile-first;
-- tipografia Inter;
+- tipografia de sistema, com a mesma configuração da página de categorias;
 - Lucide Icons;
 - mapa como elemento central;
 - componentes reutilizáveis, pequenos e acessíveis;
@@ -31,6 +31,26 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 - estados de interação, foco, indisponibilidade e carregamento visíveis.
 
 As cores exatas, espaçamentos, sombras e tamanhos não estão versionados; devem vir do Figma validado e ser convertidos em tokens compartilhados.
+
+### Tipografia confirmada
+
+Em 2026-10-21, o solicitante confirmou que Favoritos deve usar a mesma configuração de `src/pages/CategoryPage.css`:
+
+```css
+font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+```
+
+Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribuir SF Pro. A indicação anterior de Inter como fonte obrigatória foi substituída por esta decisão. Não adicionar fontes externas nem alterar a tipografia dos componentes compartilhados para atender uma única página: aplicar o padrão na composição da página. Se faltar informação no protótipo ou no padrão existente, confirmar antes de escolher.
+
+### Página de Favoritos
+
+`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
+
+Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores dos estabelecimentos permanecem vermelhos em todos eles; a localização de demonstração permanece azul.
+
+As imagens de paisagem apresentam divergências de conteúdo: o celular usa o título “Estabelecimentos da categoria” e o tablet marca a aba “Início”. O solicitante confirmou manter “Estabelecimentos favoritos” e a aba “Favoritos” ativa nas quatro versões.
+
+A página recebe os favoritos e callbacks por propriedades. Busca, ordenação, seleção e expansão são locais à UI; a remoção é delegada ao callback. Os dados de demonstração de `src/pages/favorites.ts` são fornecidos pela rota e não representam integração com o Backend, cache ou persistência.
 
 ## Contratos dos componentes
 

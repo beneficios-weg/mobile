@@ -30,6 +30,10 @@ Exibe os detalhes fornecidos pelo Backend e destaca um benefício principal no M
 
 Lista estabelecimentos marcados pelo usuário e pode apresentar contexto de mapa conforme o design. Favoritar é uma ação explícita e independente de visita. A autoridade, o endpoint e a política de sincronização dos favoritos são **DECISÃO PENDENTE** até confirmação do Backend.
 
+A implementação de UI está em `src/pages/FavoritesPage.svelte`, na rota `/favoritos`, sem substituir a tela inicial. A prévia usa dados fictícios mantidos em memória na rota: permite buscar por nome, bairro ou desconto, ordenar por proximidade, nome ou desconto, selecionar um estabelecimento no mapa ou na lista, remover favoritos e expandir/recolher a lista. Recarregar a página restaura os exemplos; isso não representa persistência ou sincronização. O mapa é demonstrativo, sem solicitar geolocalização nem carregar um provedor externo. A navegação para telas ainda não implementadas não integra esta entrega.
+
+O layout segue as quatro referências fornecidas, com marcadores vermelhos em todas as orientações e tipografia de sistema idêntica à página de categorias. Ver detalhes em [Componentes de UI](componentes-ui.md).
+
 ## 06 — Mapa em tela cheia
 
 Expande o mapa mantendo o contexto da tela de origem, seus filtros e a seleção atual. Deve tratar falta de permissão, posição indisponível e ausência de estabelecimentos. O mapa não implica rastreamento permanente.

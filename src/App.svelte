@@ -12,6 +12,8 @@
   import Title from "./components/atoms/Title.svelte";
   import { demoBenefits } from "./services/benefitsService";
   import CategoryPage from "./pages/CategoryPage.svelte";
+  import FavoritesPage from "./pages/FavoritesPage.svelte";
+  import { previewFavorites } from "./pages/favorites";
 
   let selectedCategory = $state("Alimentação");
   let activeTab = $state<"home" | "map" | "favorites" | "history">("home");
@@ -21,6 +23,8 @@
 
   const categoryRoute = "/categoria/saude-e-bem-estar";
   const isCategoryRoute = window.location.pathname === categoryRoute;
+  const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
+  let favoritePlaces = $state([...previewFavorites]);
 
   function returnToHome() {
     window.location.assign("/");
@@ -28,10 +32,19 @@
 </script>
 
 <svelte:head>
-  <title>{isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
+  <title>{isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
-{#if isCategoryRoute}
+{#if isFavoritesRoute}
+  <FavoritesPage
+    places={favoritePlaces}
+    onback={returnToHome}
+    onremovefavorite={(id) => (favoritePlaces = favoritePlaces.filter((place) => place.id !== id))}
+    onnavigate={(tab) => {
+      if (tab === "home") returnToHome();
+    }}
+  />
+{:else if isCategoryRoute}
   <CategoryPage onback={returnToHome} />
 {:else}
 <main class="component-preview">
