@@ -2,11 +2,17 @@
   type Props = {
     liked?: boolean
     disabled?: boolean
+    onlikedchange?: (liked: boolean) => void
   }
 
-  let { liked = $bindable(false), disabled = false }: Props = $props()
+  let { liked = $bindable(false), disabled = false, onlikedchange }: Props = $props()
 
   const label = $derived(liked ? 'Remover dos favoritos' : 'Adicionar aos favoritos')
+
+  function toggleFavorite() {
+    liked = !liked
+    onlikedchange?.(liked)
+  }
 </script>
 
 <button
@@ -16,7 +22,7 @@
   {disabled}
   aria-label={label}
   aria-pressed={liked}
-  onclick={() => (liked = !liked)}
+  onclick={toggleFavorite}
 >
   <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
     <path
