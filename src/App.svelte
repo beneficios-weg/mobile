@@ -9,20 +9,31 @@
   import PrimaryButton from "./components/atoms/PrimaryButton.svelte";
   import ResultsCount from "./components/atoms/ResultsCount.svelte";
   import Search from "./components/atoms/Search.svelte";
-  import Title from "./components/atoms/Title.svelte";
   import { demoBenefits } from "./services/benefitsService";
+  import './components/styles/style.css'
+  import CategoryPage from "./pages/CategoryPage.svelte";
 
   let selectedCategory = $state("Alimentação");
   let activeTab = $state<"home" | "map" | "favorites" | "history">("home");
   let favorite = $state(false);
   let query = $state("");
   let searchText = $state("");
+
+  const categoryRoute = "/categoria/saude-e-bem-estar";
+  const isCategoryRoute = window.location.pathname === categoryRoute;
+
+  function returnToHome() {
+    window.location.assign("/");
+  }
 </script>
 
 <svelte:head>
-  <title>WEG Benefits — revisão dos componentes</title>
+  <title>{isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
+{#if isCategoryRoute}
+  <CategoryPage onback={returnToHome} />
+{:else}
 <main class="component-preview">
   <header class="preview-header">
     <div>
@@ -75,7 +86,7 @@
 
   <section class="preview-section" aria-labelledby="benefits-title">
     <div class="preview-title-row">
-      <Title text="Perto de você" /><ResultsCount count={demoBenefits.length} />
+      <h2 class="page-title">Perto de você</h2>
     </div>
     <BenefitLocationCard benefit={demoBenefits[0]} distance="800 m" selected />
     <BenefitLocationCard benefit={demoBenefits[1]} distance="1,2 km" />
@@ -83,6 +94,7 @@
 
   <FloatingTabBar bind:selected={activeTab} />
 </main>
+{/if}
 
 <style>
   :global(body) {

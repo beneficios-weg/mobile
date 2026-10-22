@@ -18,6 +18,7 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 | `StoreList` | Lista, estados vazio/loading/erro e paginação, se contratada |
 | `BenefitCard` | Conteúdo detalhado do benefício |
 | `PrimaryButton` | Ação primária consistente |
+| `ExpandButton` | Alterna a visualização entre os estados compacto e expandido |
 | `FloatingTabBar` | Navegação entre destinos principais |
 
 ## Diretrizes visuais
