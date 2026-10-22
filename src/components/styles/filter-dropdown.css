@@ -84,6 +84,27 @@
   margin-top: 4px;
 }
 
+.filter-dropdown__group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.filter-dropdown__group legend {
+  padding: 0 6px;
+  color: #66768a;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.filter-dropdown__group + .filter-dropdown__group {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5ebf0;
+}
+
 .filter-dropdown__option {
   min-height: 40px;
   display: flex;
@@ -109,6 +130,13 @@
 
 .filter-dropdown__option.selected:hover {
   background: #f0f6fb;
+}
+
+.filter-dropdown__option.disabled,
+.filter-dropdown__option.disabled:hover {
+  background: transparent;
+  color: #8998a6;
+  cursor: not-allowed;
 }
 
 .filter-dropdown__option input {
@@ -162,6 +190,13 @@
 .filter-dropdown__option input:focus-visible {
   outline: 3px solid rgb(8 120 232 / 24%);
   outline-offset: 3px;
+}
+
+.filter-dropdown__option input:disabled {
+  border-color: #d8e2ec;
+  background: #f4f6f8;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .filter-dropdown__option:active input {

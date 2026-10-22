@@ -18,6 +18,10 @@
 
   type Props = {
     benefits: MapBenefit[]
+    variant?: 'default' | 'category'
+    center?: MapPosition
+    initialZoom?: number
+    selectedBenefitId?: string | null
     userLocation?: MapPosition | null
     routeCoordinates?: [number, number][] | null
     onBenefitSelect?: (benefit: MapBenefit) => void
@@ -25,12 +29,15 @@
 
   let {
     benefits,
+    variant = 'default',
+    center = { latitude: -26.483, longitude: -49.078 },
+    initialZoom = 13,
+    selectedBenefitId = null,
     userLocation = null,
     routeCoordinates = null,
     onBenefitSelect,
   }: Props = $props()
 
-  const initialCenter: L.LatLngExpression = [-26.483, -49.078]
   const southAmericaBounds = L.latLngBounds([-45, -78], [10, -34])
 
   let mapElement: HTMLDivElement
@@ -53,6 +60,8 @@
     mapInstance: L.Map,
     items: MapBenefit[],
     onSelect?: (benefit: MapBenefit) => void,
+    selectedId: string | null = null,
+    categoryStyle = false,
   ) {
     benefitMarkers ??= L.layerGroup().addTo(mapInstance)
     benefitMarkers.clearLayers()
@@ -60,11 +69,13 @@
     for (const benefit of items) {
       const marker = L.marker([benefit.latitude, benefit.longitude], {
         icon: L.divIcon({
-          className: 'benefit-marker-wrapper',
-          html: '<span class="benefit-marker"></span>',
-          iconSize: [30, 42],
-          iconAnchor: [15, 38],
-          popupAnchor: [0, -36],
+          className: categoryStyle ? 'benefit-marker-wrapper benefit-marker-wrapper--category' : 'benefit-marker-wrapper',
+          html: categoryStyle
+            ? `<span class="benefit-marker benefit-marker--category${benefit.id === selectedId ? ' is-selected' : ''}"></span>`
+            : '<span class="benefit-marker"></span>',
+          iconSize: categoryStyle ? [24, 24] : [30, 42],
+          iconAnchor: categoryStyle ? [12, 12] : [15, 38],
+          popupAnchor: categoryStyle ? [0, -12] : [0, -36],
         }),
         title: benefit.name,
         alt: benefit.name,
@@ -125,13 +136,21 @@
   $effect(() => {
     const currentMap = map
     const currentBenefits = benefits
+    const currentVariant = variant
+    const currentSelectedBenefitId = selectedBenefitId
     const currentLocation = userLocation
     const currentRouteCoordinates = routeCoordinates
     const currentOnBenefitSelect = onBenefitSelect
 
     if (!currentMap) return
 
-    renderBenefits(currentMap, currentBenefits, currentOnBenefitSelect)
+    renderBenefits(
+      currentMap,
+      currentBenefits,
+      currentOnBenefitSelect,
+      currentSelectedBenefitId,
+      currentVariant === 'category',
+    )
     renderUserLocation(currentMap, currentLocation)
     renderRoute(currentMap, currentRouteCoordinates)
   })
@@ -139,23 +158,33 @@
   onMount(() => {
     map = L.map(mapElement, {
       zoomControl: false,
+      attributionControl: variant !== 'category',
       preferCanvas: true,
       maxBounds: southAmericaBounds,
       maxBoundsViscosity: 2,
       minZoom: 4,
       maxZoom: 18,
-    }).setView(initialCenter, 13)
+    }).setView([center.latitude, center.longitude], initialZoom)
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    L.tileLayer(tileUrl, {
       maxZoom: 18,
       noWrap: true,
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map)
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map)
+    if (variant === 'category') {
+      L.control.attribution({ position: 'topright', prefix: false }).addTo(map)
+    }
+    if (variant === 'default') L.control.zoom({ position: 'bottomright' }).addTo(map)
+
+    const resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }))
+    resizeObserver.observe(mapElement)
+    requestAnimationFrame(() => map?.invalidateSize({ pan: false }))
 
     return () => {
+      resizeObserver.disconnect()
       map?.remove()
       map = undefined
       benefitMarkers = undefined
@@ -165,7 +194,30 @@
   })
 </script>
 
-<section class="benefits-map" aria-label="Mapa de benefícios">
+<section class="benefits-map" class:benefits-map--category={variant === 'category'} aria-label="Mapa de benefícios">
+  {#if variant === 'category'}
+    <svg class="map-filter-definitions" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id="osm-empty-land-tint" color-interpolation-filters="sRGB">
+          <feColorMatrix
+            in="SourceGraphic"
+            type="matrix"
+            values="1 0 0 0 0
+              0 1 0 0 0
+              0 0 1 0 0
+              2.126 7.152 0.722 0 -9"
+            result="brightness-mask"
+          />
+          <feComponentTransfer in="brightness-mask" result="empty-area-mask">
+            <feFuncA type="table" tableValues="0 0 1 0 0" />
+          </feComponentTransfer>
+          <feFlood flood-color="#001f3f" result="blue-tint" />
+          <feComposite in="blue-tint" in2="empty-area-mask" operator="in" result="tinted-empty-area" />
+          <feBlend in="SourceGraphic" in2="tinted-empty-area" mode="normal" />
+        </filter>
+      </defs>
+    </svg>
+  {/if}
   <div class="map-frame">
     <div
       class="map-canvas"
@@ -173,11 +225,13 @@
       aria-label="Mapa interativo com benefícios no Brasil."
       role="application"
     ></div>
+    {#if variant === 'default'}
     <div class="map-legend" aria-hidden="true">
       <span class="legend-benefit"></span> Benefício
       {#if userLocation}
         <span class="legend-user"></span> Você
       {/if}
     </div>
+    {/if}
   </div>
 </section>

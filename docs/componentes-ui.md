@@ -20,6 +20,35 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 | `PrimaryButton` | Ação primária consistente |
 | `FloatingTabBar` | Navegação entre destinos principais |
 
+## Implementados e uso atual
+
+O código contém os componentes abaixo. Os itens da tabela anterior continuam representando componentes planejados, a menos que estejam listados aqui.
+
+| Componente implementado | Arquivo | Uso atual |
+|---|---|---|
+| `BackButton` | `src/components/atoms/BackButton.svelte` | Categoria e prévia de componentes |
+| `Input` | `src/components/atoms/Input.svelte` | Login e prévia de componentes |
+| `Search` | `src/components/atoms/Search.svelte` | Categoria e prévia de componentes |
+| `PrimaryButton` | `src/components/atoms/PrimaryButton.svelte` | Login e prévia de componentes |
+| `FavoriteButton` | `src/components/atoms/FavoriteButton.svelte` | Categoria e prévia de componentes |
+| `CategoryButton` | `src/components/atoms/CategoryButton.svelte` | Prévia de componentes |
+| `FloatingTabBar` | `src/components/atoms/FloatingTabBar.svelte` | Categoria e prévia de componentes |
+| `Title` | `src/components/atoms/Title.svelte` | Prévia de componentes |
+| `ResultsCount` | `src/components/atoms/ResultsCount.svelte` | Categoria e prévia de componentes |
+| `ScrollShadow` | `src/components/atoms/ScrollShadow.svelte` | Categoria |
+| `FilterButton` | `src/components/atoms/FilterButton.svelte` | Usado por `FilterDropdown` |
+| `BenefitLocationCard` | `src/components/atoms/BenefitLocationCard.svelte` | Prévia de componentes |
+| `FilterDropdown` | `src/components/molecules/FilterDropdown.svelte` | Categoria; ordena os resultados e pode restringir a estabelecimentos em horário de funcionamento |
+| `EstablishmentCard` | `src/components/molecules/EstablishmentCard.svelte` | Categoria |
+| `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes |
+
+## Páginas e telas no código
+
+- `/` ainda apresenta uma galeria de componentes em `src/App.svelte`; não é a tela de Início do produto.
+- `/categoria/saude-e-bem-estar` renderiza `CategoryPage`. A ordenação, os cards e o mapa Leaflet usam componentes reutilizáveis. O mapa exibe tiles reais do OpenStreetMap e sincroniza a seleção entre pins e cards; os estabelecimentos e suas coordenadas ainda são dados locais demonstrativos, sem conexão com a API do produto.
+- `src/screens/Login.svelte` implementa a tela de Login com `Input` e `PrimaryButton`, mas ainda não está conectada a uma rota em `src/App.svelte`.
+- `FilterDropdown` salva as opções durante a edição e aplica os critérios quando o painel fecha. Crescente e decrescente não podem ficar ativos juntos; as demais opções podem ser combinadas. Quando há mais de uma ordenação, a prioridade segue a ordem de seleção. O horário de funcionamento atua como filtro adicional; os horários da tela atual são demonstrativos.
+
 ## Diretrizes visuais
 
 - mobile-first;

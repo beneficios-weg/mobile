@@ -1,36 +1,76 @@
 <script lang="ts">
   import FilterButton from '../atoms/FilterButton.svelte'
 
+  export type EstablishmentFilterOption =
+    | 'name-asc'
+    | 'name-desc'
+    | 'discount'
+    | 'nearest'
+    | 'open-now'
+
+  export type EstablishmentFilterState = EstablishmentFilterOption[]
+
   type Props = {
     id?: string
-    options?: string[]
-    value?: string[]
-    onapply?: (selected: string[]) => void
+    value?: EstablishmentFilterState
+    onapply?: (selected: EstablishmentFilterState) => void
   }
 
-  const defaultOptions = [
-    'Esportes e Atividade Física',
-    'Saúde e Bem-Estar',
-    'Educação',
-    'Lazer',
-    'Idiomas',
-    'Beleza e Vestuário',
+  const options: { value: EstablishmentFilterOption; label: string }[] = [
+    { value: 'name-asc', label: 'Ordem Alfabética Crescente' },
+    { value: 'name-desc', label: 'Ordem Alfabética Decrescente' },
+    { value: 'discount', label: 'Maior Desconto' },
+    { value: 'nearest', label: 'Mais Próximo' },
+    { value: 'open-now', label: 'Em Horário de Funcionamento' },
   ]
-  const defaultValue: string[] = []
 
   let {
-    id = 'category-filter',
-    options = defaultOptions,
-    value = $bindable([...defaultValue]),
+    id = 'establishment-filter',
+    value = $bindable<EstablishmentFilterState>([]),
     onapply,
   }: Props = $props()
 
   let isOpen = $state(false)
-  let draftFilters = $state([...value])
+  let draftValue = $state<EstablishmentFilterState>([...value])
   let root: HTMLDivElement
 
   const panelId = $derived(`${id}-panel`)
   const titleId = $derived(`${id}-title`)
+  const visibleValue = $derived(isOpen ? draftValue : value)
+  const selectedLabel = $derived(
+    visibleValue.length
+      ? visibleValue.map((value) => options.find((option) => option.value === value)!.label).join('; ')
+      : 'Mais Próximo',
+  )
+  const canClear = $derived(draftValue.length > 0)
+
+  function isSelected(option: EstablishmentFilterOption) {
+    return draftValue.includes(option)
+  }
+
+  function isDisabled(option: EstablishmentFilterOption) {
+    if (option === 'name-asc') return draftValue.includes('name-desc')
+    if (option === 'name-desc') return draftValue.includes('name-asc')
+    return false
+  }
+
+  function toggleOption(option: EstablishmentFilterOption) {
+    if (isDisabled(option)) return
+    draftValue = draftValue.includes(option)
+      ? draftValue.filter((selected) => selected !== option)
+      : [...draftValue, option]
+    value = [...draftValue]
+  }
+
+  function clearFilters() {
+    draftValue = []
+    value = []
+  }
+
+  function applyFilters() {
+    isOpen = false
+    onapply?.([...value])
+  }
 
   function toggleOpen() {
     if (isOpen) {
@@ -38,26 +78,8 @@
       return
     }
 
-    draftFilters = [...value]
+    draftValue = [...value]
     isOpen = true
-  }
-
-  function toggleFilter(filter: string) {
-    const nextFilters = draftFilters.includes(filter)
-      ? draftFilters.filter((selected) => selected !== filter)
-      : [...draftFilters, filter]
-    draftFilters = nextFilters
-    value = [...nextFilters]
-  }
-
-  function clearFilters() {
-    draftFilters = []
-    value = []
-  }
-
-  function applyFilters() {
-    isOpen = false
-    onapply?.([...value])
   }
 
   function closeOnOutsideClick(event: MouseEvent) {
@@ -70,10 +92,6 @@
       root?.querySelector('button')?.focus()
     }
   }
-
-  const visibleFilters = $derived(isOpen ? draftFilters : value)
-  const noFilters = $derived(visibleFilters.length === 0)
-  const selectedLabel = $derived(noFilters ? 'Mais próximos' : visibleFilters.join('; '))
 </script>
 
 <svelte:window onclick={closeOnOutsideClick} onkeydown={handleKeydown} />
@@ -83,7 +101,7 @@
     label={selectedLabel}
     expanded={isOpen}
     controls={panelId}
-    {noFilters}
+    noFilters={false}
     onclick={toggleOpen}
   />
 
@@ -97,11 +115,11 @@
     inert={!isOpen}
   >
     <header class="filter-dropdown__header">
-      <h2 id={titleId}>Categorias</h2>
+      <h2 id={titleId}>Filtros</h2>
       <button
         class="filter-dropdown__clear"
         type="button"
-        disabled={draftFilters.length === 0}
+        disabled={!canClear}
         onclick={clearFilters}
       >
         Limpar
@@ -109,14 +127,19 @@
     </header>
 
     <div class="filter-dropdown__options">
-      {#each options as option (option)}
-        <label class="filter-dropdown__option" class:selected={draftFilters.includes(option)}>
+      {#each options as option (option.value)}
+        <label
+          class="filter-dropdown__option"
+          class:selected={isSelected(option.value)}
+          class:disabled={isDisabled(option.value)}
+        >
           <input
             type="checkbox"
-            checked={draftFilters.includes(option)}
-            onchange={() => toggleFilter(option)}
+            checked={isSelected(option.value)}
+            disabled={isDisabled(option.value)}
+            onchange={() => toggleOption(option.value)}
           />
-          <span>{option}</span>
+          <span>{option.label}</span>
         </label>
       {/each}
     </div>

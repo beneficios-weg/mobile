@@ -99,6 +99,57 @@
   box-shadow: 0 8px 24px rgb(17 32 51 / 10%);
 }
 
+.benefits-map--category {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: inherit;
+  background: #e9f5fb;
+  font-family: inherit;
+}
+
+.benefits-map--category .map-frame {
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: #e9f5fb;
+  box-shadow: none;
+}
+
+.benefits-map .map-filter-definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.benefits-map--category .map-canvas {
+  height: 100%;
+  min-height: 0;
+  background: #e9f5fb;
+}
+
+.benefits-map--category .leaflet-tile-pane {
+  filter: url(#osm-empty-land-tint) grayscale(0.88) sepia(0.42) hue-rotate(190deg) saturate(1.7) brightness(0.78) contrast(1.12);
+}
+
+.benefits-map--category .leaflet-top.leaflet-right .leaflet-control-attribution {
+  margin: 8px;
+  padding: 4px 7px;
+  border: 1px solid rgb(216 226 236 / 78%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 84%);
+  color: #66768a;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.benefits-map--category .leaflet-control-attribution a {
+  color: #00579d;
+}
+
 .benefits-map .map-canvas {
   width: 100%;
   height: min(68vh, 680px);
@@ -168,6 +219,35 @@
   content: '';
 }
 
+.benefits-map .benefit-marker--category {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+  border-radius: 50%;
+  background: var(--category-pin-color, #fa6c56);
+  box-shadow: 0 2px 5px rgb(31 61 78 / 20%);
+  transform: none;
+}
+
+.benefits-map .benefit-marker--category::after {
+  top: 5px;
+  left: 5px;
+  width: 4px;
+  height: 4px;
+}
+
+.benefits-map .benefit-marker--category.is-selected {
+  width: 23px;
+  height: 23px;
+  border-width: 3px;
+  box-shadow: 0 0 0 4px rgb(0 87 157 / 12%), 0 2px 5px rgb(31 61 78 / 20%);
+}
+
+.benefits-map .benefit-marker--category.is-selected::after {
+  top: 6px;
+  left: 6px;
+}
+
 .benefits-map .leaflet-container {
   z-index: 0;
   color: #263646;
@@ -209,4 +289,17 @@
     right: 8px;
     bottom: 8px;
   }
+}
+
+.benefits-map--category {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+}
+
+.benefits-map--category .map-frame,
+.benefits-map--category .map-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
 }
