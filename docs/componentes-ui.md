@@ -54,7 +54,7 @@ Cada descrição aparece em uma linha, com reticências após a última palavra 
 
 - `/` ainda apresenta uma galeria de componentes em `src/App.svelte`; não é a tela de Início do produto.
 - `/categoria/saude-e-bem-estar` renderiza `CategoryPage`. A ordenação, os cards e o mapa Leaflet usam componentes reutilizáveis. O mapa exibe tiles reais do OpenStreetMap e sincroniza a seleção entre pins e cards; os estabelecimentos e suas coordenadas ainda são dados locais demonstrativos, sem conexão com a API do produto.
-- `src/screens/Login.svelte` implementa a tela de Login com `Input` e `PrimaryButton`, mas ainda não está conectada a uma rota em `src/App.svelte`.
+- `/login` renderiza `src/pages/Login.svelte`, que compõe os átomos `Input` e `PrimaryButton`. Os estilos e as regras responsivas ficam em `src/pages/styles/Login.css`, importado pela própria página; os seletores ficam limitados ao Login para não afetar as demais telas. A autenticação ainda não está integrada ao Backend.
 - `FilterDropdown` salva as opções durante a edição e aplica os critérios quando o painel fecha. Crescente e decrescente não podem ficar ativos juntos; as demais opções podem ser combinadas. Quando há mais de uma ordenação, a prioridade segue a ordem de seleção. O horário de funcionamento atua como filtro adicional; os horários da tela atual são demonstrativos.
 
 ## Diretrizes visuais
@@ -71,7 +71,7 @@ As cores exatas, espaçamentos, sombras e tamanhos não estão versionados; deve
 
 ### Tipografia confirmada
 
-Em 2026-10-21, o solicitante confirmou que Favoritos deve usar a mesma configuração de `src/pages/CategoryPage.css`:
+Em 2026-10-21, o solicitante confirmou que Favoritos deve usar a mesma configuração de `src/pages/styles/CategoryPage.css`:
 
 ```css
 font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
@@ -81,7 +81,7 @@ Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribu
 
 ### Página de Favoritos
 
-`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
+`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/styles/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
 
 Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores dos estabelecimentos permanecem vermelhos em todos eles; a localização de demonstração permanece azul.
 
