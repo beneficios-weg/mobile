@@ -13,6 +13,12 @@ dist
 dist-ssr
 *.local
 
+# Local environment and temporary design references
+.env
+.env.*
+!.env.example
+/image.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
