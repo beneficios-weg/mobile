@@ -10,6 +10,7 @@
   import ResultsCount from "./components/atoms/ResultsCount.svelte";
   import Search from "./components/atoms/Search.svelte";
   import { demoBenefits } from "./services/benefitsService";
+  import './components/styles/style.css'
   import CategoryPage from "./pages/CategoryPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
   import { previewFavorites } from "./pages/favorites";

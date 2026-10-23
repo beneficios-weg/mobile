@@ -1,0 +1,50 @@
+.expand-button {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: #f3f7fa;
+  color: #00579d;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.expand-button:hover:not(:disabled) {
+  background: #e8f3fb;
+}
+
+.expand-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.expand-button:focus-visible {
+  outline: 3px solid rgb(0 87 157 / 30%);
+  outline-offset: 3px;
+}
+
+.expand-button:disabled {
+  color: #9aafc1;
+  cursor: not-allowed;
+}
+
+.expand-button svg {
+  width: 28px;
+  height: 28px;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expand-button {
+    transition-duration: 0.01ms;
+  }
+}
