@@ -1,4 +1,5 @@
 .favorites-page {
+  --category-pin-color: #ff624b;
   --favorites-font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
   width: 100%;
   height: 100vh;
@@ -51,61 +52,6 @@
   border-radius: 24px;
   background: #e9f5fb;
   box-shadow: 0 8px 20px rgb(0 87 157 / 8%);
-}
-
-.favorites-page .favorites-map__pin {
-  position: absolute;
-  top: var(--pin-y);
-  left: var(--pin-x);
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-}
-
-.favorites-page .favorites-map__pin > span {
-  width: 16px;
-  height: 16px;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  background: #ff624b;
-}
-
-.favorites-page .favorites-map__pin > span::after {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #fff;
-  content: '';
-}
-
-.favorites-page .favorites-map__pin.selected > span {
-  box-shadow: 0 0 0 3px #ff624b;
-}
-
-.favorites-page .favorites-map__user {
-  position: absolute;
-  top: 38%;
-  left: 50%;
-  width: 36px;
-  height: 36px;
-  color: #00579d;
-  transform: translate(-50%, -52.5%);
-}
-
-.favorites-page .favorites-map__user svg {
-  display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .favorites-page .favorites-results {
@@ -413,10 +359,6 @@
     height: min(35.176dvh, 480px);
     border-radius: 26px;
   }
-  .favorites-page .favorites-map__pin > span {
-    width: 20px;
-    height: 20px;
-  }
   .favorites-page .favorites-results {
     padding: 40px 40px 0;
   }
@@ -512,14 +454,6 @@
     height: auto;
     flex: 1;
   }
-  .favorites-page .favorites-map__user {
-    top: 41%;
-    left: 53%;
-  }
-  .favorites-page .favorites-map__pin {
-    top: calc(var(--pin-y) * 1.09);
-    left: calc(var(--pin-x) * 1.06);
-  }
   .favorites-page .floating-tabs {
     left: calc(3.8vw + (50vw - 3.8vw - 32px) / 2);
     bottom: max(16px, env(safe-area-inset-bottom));
@@ -595,18 +529,6 @@
   }
   .favorites-page .favorites-map {
     border-radius: 26px;
-  }
-  .favorites-page .favorites-map__pin > span {
-    width: 18px;
-    height: 18px;
-  }
-  .favorites-page .favorites-map__user {
-    top: 50%;
-    left: 51.3%;
-  }
-  .favorites-page .favorites-map__pin {
-    top: calc(var(--pin-y) * 1.13);
-    left: calc(var(--pin-x) * 1.02);
   }
   .favorites-page .floating-tabs {
     left: calc(3.85vw + (50vw - 3.85vw - 46px) / 2);

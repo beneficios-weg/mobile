@@ -14,7 +14,7 @@
   import CategoryPage from "./pages/CategoryPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
   import Login from "./pages/Login.svelte";
-  import { previewFavorites } from "./pages/favorites";
+  import { previewFavorites, previewFavoritesLocation } from "./pages/favorites";
 
   import './components/styles/style.css'
   let selectedCategory = $state("Alimentação");
@@ -43,6 +43,7 @@
 {:else if isFavoritesRoute}
   <FavoritesPage
     places={favoritePlaces}
+    userLocation={previewFavoritesLocation}
     onback={returnToHome}
     onremovefavorite={(id) => (favoritePlaces = favoritePlaces.filter((place) => place.id !== id))}
     onnavigate={(tab) => {

@@ -117,22 +117,10 @@
   box-shadow: none;
 }
 
-.benefits-map .map-filter-definitions {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
 .benefits-map--category .map-canvas {
   height: 100%;
   min-height: 0;
   background: #e9f5fb;
-}
-
-.benefits-map--category .leaflet-tile-pane {
-  filter: url(#osm-empty-land-tint) grayscale(0.88) sepia(0.42) hue-rotate(190deg) saturate(1.7) brightness(0.78) contrast(1.12);
 }
 
 .benefits-map--category .leaflet-top.leaflet-right .leaflet-control-attribution {

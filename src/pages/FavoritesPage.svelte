@@ -6,17 +6,19 @@
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
   import Search from '../components/atoms/Search.svelte'
+  import Map from '../components/Map.svelte'
   import { filterFavorites, type FavoritePlace, type FavoritesSortOrder } from './favorites'
   import './styles/FavoritesPage.css'
 
   type Props = {
     places?: FavoritePlace[]
+    userLocation?: { latitude: number; longitude: number } | null
     onback?: () => void
     onremovefavorite?: (id: string) => void
     onnavigate?: (tab: 'home' | 'map' | 'favorites' | 'history') => void
   }
 
-  let { places = [], onback, onremovefavorite, onnavigate }: Props = $props()
+  let { places = [], userLocation = null, onback, onremovefavorite, onnavigate }: Props = $props()
 
   let searchValue = $state('')
   let sortOrder = $state<FavoritesSortOrder>('nearest')
@@ -30,6 +32,17 @@
   let expandedHeader: HTMLDivElement
 
   const visiblePlaces = $derived(filterFavorites(places, searchValue, sortOrder))
+  const mapBenefits = $derived(visiblePlaces.map((place) => ({
+    id: place.id,
+    name: place.name,
+    category: place.neighborhood,
+    latitude: place.latitude,
+    longitude: place.longitude,
+  })))
+  const mapCenter = $derived(userLocation ?? (places[0] && {
+    latitude: places[0].latitude,
+    longitude: places[0].longitude,
+  }))
 
   function updateScrollShadows() {
     if (!listElement) return
@@ -91,24 +104,16 @@
       <h1>Favoritos</h1>
     </header>
 
-    <div class="favorites-map" role="region" aria-label="Mapa demonstrativo dos estabelecimentos favoritos" inert={listExpanded}>
-      <span class="favorites-map__user" role="img" aria-label="Sua localização de demonstração">
-        <svg viewBox="0 0 40 40" aria-hidden="true">
-          <path d="M20 1a20 20 0 0 1 18 12l-12 5-6-6Z" fill="currentColor" />
-          <circle cx="20" cy="21" r="8" fill="currentColor" stroke="white" stroke-width="3" />
-        </svg>
-      </span>
-      {#each visiblePlaces as place (place.id)}
-        <button
-          class="favorites-map__pin"
-          class:selected={selectedPlaceId === place.id}
-          style={`--pin-x:${place.mapPosition[0]}%;--pin-y:${place.mapPosition[1]}%`}
-          type="button"
-          aria-label={`Selecionar ${place.name}, ${place.neighborhood}`}
-          aria-pressed={selectedPlaceId === place.id}
-          onclick={() => selectPlace(place.id, true)}
-        ><span></span></button>
-      {/each}
+    <div class="favorites-map" role="region" aria-label="Mapa dos estabelecimentos favoritos" inert={listExpanded}>
+      <Map
+        benefits={mapBenefits}
+        variant="category"
+        center={mapCenter}
+        initialZoom={13}
+        selectedBenefitId={selectedPlaceId}
+        {userLocation}
+        onBenefitSelect={(benefit) => void selectPlace(benefit.id, true)}
+      />
     </div>
 
     <FloatingTabBar bind:selected={selectedTab} ontabchange={(tab) => {

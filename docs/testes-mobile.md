@@ -4,6 +4,14 @@
 
 O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
 
+## Revisão do mapa de Favoritos — 2026-10-23
+
+A página anterior exibia um fundo com pins posicionados em porcentagem, sem instanciar `Map.svelte`. A revisão substituiu essa representação pelo mapa Leaflet com tiles do OpenStreetMap nas cores originais, coordenadas de demonstração e seleção compartilhada com os cards. Os estilos antigos dos pins estáticos foram removidos.
+
+As validações de tipos e build passaram sem erros ou avisos. Asserções Node verificaram busca com acentos e espaços, ordenação, remoção, estado vazio, preservação dos dados de origem e coordenadas distintas dentro dos limites do mapa. Um teste com Leaflet simulado verificou preservação dos marcadores durante a seleção, atualização do callback, estados acessíveis e remoção dos pins filtrados; ele não substitui a validação no navegador.
+
+O navegador de automação não estava disponível nesta revisão. O solicitante aprovou visualmente a entrega em `/favoritos` e autorizou o commit em 2026-10-23. Essa aprovação não representa uma nova inspeção automatizada do navegador. A navegação para as abas Mapa e Histórico ainda depende de telas de destino não implementadas.
+
 ## Validação da UI de Favoritos — 2026-10-21
 
 | Verificação | Resultado |
