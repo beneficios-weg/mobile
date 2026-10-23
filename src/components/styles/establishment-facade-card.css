@@ -1,0 +1,180 @@
+.establishment-facade-card {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1px solid #d8e6f1;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgb(0 110 250 / 10%), 0 8px 22px rgb(0 110 250 / 9%);
+  color: #14243a;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+}
+
+.establishment-facade-card__details {
+  min-width: 0;
+  flex: 1;
+}
+
+.establishment-facade-card__name {
+  overflow: hidden;
+  margin: 0 0 2px;
+  color: #172536;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.establishment-facade-card__address,
+.establishment-facade-card__hours {
+  overflow: hidden;
+  margin: 0;
+  color: #6d7f96;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.establishment-facade-card__contact {
+  min-height: 28px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #e9f3fb;
+  color: #14243a;
+  font-size: 12px;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.establishment-facade-card__contact span:first-child {
+  color: #00579d;
+}
+
+.establishment-facade-card__action {
+  width: 80px;
+  min-height: 86px;
+  flex: 0 0 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 6px;
+  border: 0;
+  border-radius: 22px;
+  background: #e9f3fb;
+  color: #00579d;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.establishment-facade-card__action:hover:not(:disabled) {
+  background: #dceefa;
+}
+
+.establishment-facade-card__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.establishment-facade-card__action svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.establishment-facade-card__action:focus-visible,
+.establishment-facade-card__close:focus-visible,
+.establishment-facade-card__contact:focus-visible {
+  outline: 3px solid rgb(0 87 157 / 30%);
+  outline-offset: 3px;
+}
+
+.establishment-facade-card__dialog {
+  width: min(90vw, 720px);
+  max-width: none;
+  max-height: min(85vh, 800px);
+  box-sizing: border-box;
+  padding: 16px;
+  border: 0;
+  border-radius: 20px;
+  background: #fff;
+  color: #14243a;
+  box-shadow: 0 18px 60px rgb(12 32 56 / 28%);
+}
+
+.establishment-facade-card__dialog::backdrop {
+  background: rgb(15 31 48 / 58%);
+  backdrop-filter: blur(3px);
+}
+
+.establishment-facade-card__dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.establishment-facade-card__dialog-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.establishment-facade-card__close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #e9f3fb;
+  color: #00579d;
+  cursor: pointer;
+}
+
+.establishment-facade-card__close svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.establishment-facade-card__dialog img {
+  width: 100%;
+  max-height: calc(85vh - 96px);
+  display: block;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  /* Ajustes responsivos para celular. */
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  /* Ajustes responsivos para tablet. */
+}
+
+@media (min-width: 1025px) {
+  /* Ajustes responsivos para desktop. */
+}

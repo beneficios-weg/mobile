@@ -4,6 +4,7 @@
   import CategoryButton from "./components/atoms/CategoryButton.svelte";
   import FavoriteButton from "./components/atoms/FavoriteButton.svelte";
   import ExpandButton from "./components/atoms/ExpandButton.svelte";
+  import EstablishmentFacadeCard from "./components/atoms/EstablishmentFacadeCard.svelte";
   import FloatingTabBar from "./components/atoms/FloatingTabBar.svelte";
   import Input from "./components/atoms/Input.svelte";
   import Map from "./components/Map.svelte";
@@ -116,6 +117,19 @@
     </div>
     <BenefitLocationCard benefit={demoBenefits[0]} distance="800 m" selected />
     <BenefitLocationCard benefit={demoBenefits[1]} distance="1,2 km" />
+  </section>
+
+  <section class="preview-section" aria-labelledby="facade-card-title">
+    <h2 id="facade-card-title">Detalhes do estabelecimento</h2>
+    <EstablishmentFacadeCard
+      name="Academia Move"
+      neighborhood="Centro"
+      address="Rua das Palmeiras, 120"
+      openingStatus="Aberto hoje"
+      openingHours="06:00–22:00"
+      contact="47 99914-1233"
+      facadeImageUrl="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23e9f3fb'/%3E%3Crect x='120' y='140' width='560' height='280' rx='12' fill='%2300579d'/%3E%3Crect x='175' y='195' width='150' height='225' fill='%23fff'/%3E%3Crect x='360' y='195' width='250' height='110' fill='%23b9d9ef'/%3E%3Crect x='360' y='325' width='250' height='95' fill='%23fff'/%3E%3Ctext x='400' y='105' text-anchor='middle' font-family='Arial' font-size='36' fill='%2314243a'%3EAcademia Move%3C/text%3E%3C/svg%3E"
+    />
   </section>
 
   <FloatingTabBar bind:selected={activeTab} />
