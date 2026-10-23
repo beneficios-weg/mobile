@@ -29,7 +29,7 @@
     <p class="establishment-facade-card__hours">{openingStatus} · {openingHours}</p>
     <a class="establishment-facade-card__contact" href={`tel:${contact.replace(/[^+\d]/g, '')}`}>
       <span>Contato</span>
-      <span>{contact}</span>
+      <span class="estavlishment-facade-card-bold_contact">{contact}</span>
     </a>
   </div>
 

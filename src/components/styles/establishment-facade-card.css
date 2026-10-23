@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'SF Pro Contact';
+  src: local('SF Pro Text'), local('SF Pro');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 .establishment-facade-card {
   min-width: 0;
   display: flex;
@@ -44,15 +52,17 @@
 
 .establishment-facade-card__contact {
   min-height: 28px;
+  max-width: fit-content;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 12px;
   margin-top: 6px;
-  padding: 5px 8px;
+  padding: 5px 5rem 5px 8px;
   border-radius: 999px;
   background: #e9f3fb;
   color: #14243a;
+  font-family: 'SF Pro Contact', -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
   font-size: 12px;
   line-height: 1.2;
   text-decoration: none;
@@ -166,7 +176,6 @@
   border-radius: 12px;
   object-fit: contain;
 }
-
 @media (max-width: 600px) {
   /* Ajustes responsivos para celular. */
 }
