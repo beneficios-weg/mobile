@@ -7,7 +7,7 @@
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
   import Search from '../components/atoms/Search.svelte'
   import { filterFavorites, type FavoritePlace, type FavoritesSortOrder } from './favorites'
-  import './FavoritesPage.css'
+  import './styles/FavoritesPage.css'
 
   type Props = {
     places?: FavoritePlace[]
