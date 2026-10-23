@@ -1,22 +1,28 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
-  import FavoriteButton from '../components/atoms/FavoriteButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
   import Search from '../components/atoms/Search.svelte'
+  import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
+  import Map from '../components/Map.svelte'
+  import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
   import healthIcon from '../assets/categories/health-wellbeing.svg'
 
-  type SortOrder = 'nearest' | 'name' | 'discount'
   type CategoryPlace = {
     id: string
     name: string
     neighborhood: string
     distanceKm: number
     discount: number
-    pinX: number
-    pinY: number
+    latitude: number
+    longitude: number
+  }
+  type OpeningHours = {
+    days: number[]
+    opensAt: string
+    closesAt: string
   }
   type Props = {
     onback?: () => void
@@ -25,18 +31,31 @@
   let { onback }: Props = $props()
 
   const places: CategoryPlace[] = [
-    { id: 'move', name: 'Academia Move', neighborhood: 'Centro', distanceKm: 0.8, discount: 20, pinX: 18, pinY: 13 },
-    { id: 'visao', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 0.8, discount: 12, pinX: 33, pinY: 32 },
-    { id: 'bem-viver', name: 'Clínica Bem Viver', neighborhood: 'Centro', distanceKm: 0.8, discount: 15, pinX: 40, pinY: 61 },
-    { id: 'move-vila', name: 'Academia Move', neighborhood: 'Vila Nova', distanceKm: 1.4, discount: 20, pinX: 75, pinY: 25 },
-    { id: 'saude-farmacia', name: 'Farmácia Saúde', neighborhood: 'América', distanceKm: 2.1, discount: 10, pinX: 17, pinY: 69 },
-    { id: 'studio-ativa', name: 'Studio Ativa', neighborhood: 'Vila Nova', distanceKm: 2.6, discount: 15, pinX: 63, pinY: 76 },
-    { id: 'vitalis', name: 'Centro Vitalis', neighborhood: 'Centro', distanceKm: 3.4, discount: 18, pinX: 83, pinY: 52 },
-    { id: 'medilife', name: 'MediLife Clínica', neighborhood: 'América', distanceKm: 4.1, discount: 12, pinX: 43, pinY: 16 },
+    { id: 'move', name: 'Academia Move', neighborhood: 'Centro', distanceKm: 0.8, discount: 20, latitude: -26.3043, longitude: -48.8464 },
+    { id: 'visao', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 0.8, discount: 12, latitude: -26.3051, longitude: -48.8448 },
+    { id: 'bem-viver', name: 'Clínica Bem Viver', neighborhood: 'Centro', distanceKm: 0.8, discount: 15, latitude: -26.3029, longitude: -48.8491 },
+    { id: 'move-vila', name: 'Academia Move', neighborhood: 'Vila Nova', distanceKm: 1.4, discount: 20, latitude: -26.2948, longitude: -48.9127 },
+    { id: 'saude-farmacia', name: 'Farmácia Saúde', neighborhood: 'América', distanceKm: 2.1, discount: 10, latitude: -26.2816, longitude: -48.8505 },
+    { id: 'studio-ativa', name: 'Studio Ativa', neighborhood: 'Vila Nova', distanceKm: 2.6, discount: 15, latitude: -26.2972, longitude: -48.9098 },
+    { id: 'vitalis', name: 'Centro Vitalis', neighborhood: 'Centro', distanceKm: 3.4, discount: 18, latitude: -26.3071, longitude: -48.8428 },
+    { id: 'medilife', name: 'MediLife Clínica', neighborhood: 'América', distanceKm: 4.1, discount: 12, latitude: -26.2798, longitude: -48.8474 },
   ]
+  const mapCenter = { latitude: -26.3045, longitude: -48.8487 }
+  const openingHoursByPlace: Record<string, OpeningHours> = {
+    move: { days: [1, 2, 3, 4, 5, 6], opensAt: '06:00', closesAt: '22:00' },
+    visao: { days: [1, 2, 3, 4, 5, 6], opensAt: '09:00', closesAt: '19:00' },
+    'bem-viver': { days: [1, 2, 3, 4, 5], opensAt: '08:00', closesAt: '18:00' },
+    'move-vila': { days: [0, 1, 2, 3, 4, 5, 6], opensAt: '06:00', closesAt: '22:00' },
+    'saude-farmacia': { days: [0, 1, 2, 3, 4, 5, 6], opensAt: '08:00', closesAt: '22:00' },
+    'studio-ativa': { days: [1, 2, 3, 4, 5, 6], opensAt: '07:00', closesAt: '21:00' },
+    vitalis: { days: [1, 2, 3, 4, 5], opensAt: '08:00', closesAt: '18:00' },
+    medilife: { days: [1, 2, 3, 4, 5], opensAt: '08:00', closesAt: '20:00' },
+  }
 
   let searchValue = $state('')
-  let sortOrder = $state<SortOrder>('nearest')
+  let filterSelection = $state<EstablishmentFilterState>([])
+  let appliedFilters = $state<EstablishmentFilterState>([])
+  let currentTime = $state(new Date())
   let selectedPlaceId = $state<string | null>(null)
   let favoriteIds = $state<string[]>([])
   let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
@@ -47,18 +66,52 @@
 
   const visiblePlaces = $derived.by(() => {
     const query = searchValue.trim().toLocaleLowerCase('pt-BR')
-    const filtered = places.filter((place) =>
-      `${place.name} ${place.neighborhood} saúde bem-estar`.toLocaleLowerCase('pt-BR').includes(query),
-    )
+    const filtered = places.filter((place) => {
+      const matchesSearch = `${place.name} ${place.neighborhood} saúde bem-estar`
+        .toLocaleLowerCase('pt-BR')
+        .includes(query)
+      return matchesSearch && (!appliedFilters.includes('open-now') || isPlaceOpen(place.id, currentTime))
+    })
 
-    if (sortOrder === 'name') return [...filtered].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
-    if (sortOrder === 'discount') return [...filtered].sort((a, b) => b.discount - a.discount)
-    return [...filtered].sort((a, b) => a.distanceKm - b.distanceKm)
+    const sortCriteria = appliedFilters.filter((option) => option !== 'open-now')
+    if (!sortCriteria.length) return filtered
+
+    return [...filtered].sort((a, b) => {
+      for (const criterion of sortCriteria) {
+        let comparison = 0
+        if (criterion === 'name-asc') comparison = a.name.localeCompare(b.name, 'pt-BR')
+        if (criterion === 'name-desc') comparison = b.name.localeCompare(a.name, 'pt-BR')
+        if (criterion === 'discount') comparison = b.discount - a.discount
+        if (criterion === 'nearest') comparison = a.distanceKm - b.distanceKm
+        if (comparison !== 0) return comparison
+      }
+      return 0
+    })
   })
+  const mapBenefits = $derived(visiblePlaces.map((place) => ({
+    id: place.id,
+    name: place.name,
+    category: place.neighborhood,
+    latitude: place.latitude,
+    longitude: place.longitude,
+  })))
 
   function updateScrollShadows(list: HTMLDivElement) {
     showTopShadow = list.scrollTop > 0
     showBottomShadow = list.scrollTop + list.clientHeight < list.scrollHeight - 1
+  }
+
+  function isPlaceOpen(placeId: string, at: Date) {
+    const hours = openingHoursByPlace[placeId]
+    if (!hours || !hours.days.includes(at.getDay())) return false
+    const time = at.getHours() * 60 + at.getMinutes()
+    const [openHour, openMinute] = hours.opensAt.split(':').map(Number)
+    const [closeHour, closeMinute] = hours.closesAt.split(':').map(Number)
+    return time >= openHour * 60 + openMinute && time < closeHour * 60 + closeMinute
+  }
+
+  function applyFilters(filters: EstablishmentFilterState) {
+    appliedFilters = [...filters]
   }
 
   function handleListScroll(event: Event) {
@@ -75,7 +128,11 @@
     const resizeObserver = new ResizeObserver(() => updateScrollShadows(listElement))
     resizeObserver.observe(listElement)
     updateScrollShadows(listElement)
-    return () => resizeObserver.disconnect()
+    const clock = window.setInterval(() => (currentTime = new Date()), 60_000)
+    return () => {
+      resizeObserver.disconnect()
+      window.clearInterval(clock)
+    }
   })
 
   $effect(() => {
@@ -93,21 +150,15 @@
       <h1 class="category-page__title">Saúde e Bem-Estar</h1>
     </header>
 
-    <div class="category-map" role="region" aria-label="Mapa demonstrativo dos estabelecimentos da categoria">
-      <span class="category-map__user" aria-label="Sua localização" role="img">
-        <span></span>
-      </span>
-      {#each visiblePlaces as place (place.id)}
-        <button
-          class="category-map__pin"
-          class:selected={selectedPlaceId === place.id}
-          style={`--pin-x:${place.pinX}%;--pin-y:${place.pinY}%`}
-          type="button"
-          aria-label={`Selecionar ${place.name}, ${place.neighborhood}`}
-          aria-pressed={selectedPlaceId === place.id}
-          onclick={() => (selectedPlaceId = place.id)}
-        ><span></span></button>
-      {/each}
+    <div class="category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
+      <Map
+        benefits={mapBenefits}
+        variant="category"
+        center={mapCenter}
+        initialZoom={13}
+        selectedBenefitId={selectedPlaceId}
+        onBenefitSelect={(benefit) => (selectedPlaceId = benefit.id)}
+      />
     </div>
 
     <FloatingTabBar bind:selected={selectedTab} />
@@ -127,21 +178,7 @@
         placeholder="Buscar locais ou benefícios"
       />
 
-      <label class="category-sort">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M4 7h10M18 7h2M4 17h2m4 0h10M14 5v4M8 15v4" />
-          <circle cx="16" cy="7" r="2" />
-          <circle cx="8" cy="17" r="2" />
-        </svg>
-        <select bind:value={sortOrder} aria-label="Ordenar estabelecimentos">
-          <option value="nearest">Mais próximos</option>
-          <option value="name">Nome (A–Z)</option>
-          <option value="discount">Maior desconto</option>
-        </select>
-        <svg class="category-sort__chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="m7 10 5 5 5-5" />
-        </svg>
-      </label>
+      <FilterDropdown bind:value={filterSelection} onapply={applyFilters} />
 
       <div class="category-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
@@ -175,25 +212,16 @@
       >
         {#if visiblePlaces.length}
           {#each visiblePlaces as place (place.id)}
-            <article class="category-establishment-card" class:selected={selectedPlaceId === place.id}>
-              <button
-                class="category-establishment-card__main"
-                type="button"
-                aria-pressed={selectedPlaceId === place.id}
-                onclick={() => (selectedPlaceId = place.id)}
-              >
-                <span class="category-establishment-card__avatar" aria-hidden="true">{place.name.charAt(0)}</span>
-                <span class="category-establishment-card__content">
-                  <strong>{place.name}</strong>
-                  <span>{place.neighborhood} · {place.distanceKm.toFixed(1).replace('.', ',')} km</span>
-                  <span class="category-establishment-card__offer">{place.discount}% OFF</span>
-                </span>
-              </button>
-              <FavoriteButton
-                liked={favoriteIds.includes(place.id)}
-                onlikedchange={(liked) => toggleFavorite(place.id, liked)}
-              />
-            </article>
+            <EstablishmentCard
+              name={place.name}
+              neighborhood={place.neighborhood}
+              distanceKm={place.distanceKm}
+              discount={place.discount}
+              selected={selectedPlaceId === place.id}
+              liked={favoriteIds.includes(place.id)}
+              onselect={() => (selectedPlaceId = place.id)}
+              onlikedchange={(liked) => toggleFavorite(place.id, liked)}
+            />
           {/each}
         {:else}
           <div class="category-results__empty" role="status">

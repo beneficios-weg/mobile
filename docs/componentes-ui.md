@@ -21,10 +21,39 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 | `ExpandButton` | Alterna a visualização entre os estados compacto e expandido |
 | `FloatingTabBar` | Navegação entre destinos principais |
 
+## Implementados e uso atual
+
+O código contém os componentes abaixo. Os itens da tabela anterior continuam representando componentes planejados, a menos que estejam listados aqui.
+
+| Componente implementado | Arquivo | Uso atual |
+|---|---|---|
+| `BackButton` | `src/components/atoms/BackButton.svelte` | Categoria e prévia de componentes |
+| `Input` | `src/components/atoms/Input.svelte` | Login e prévia de componentes |
+| `Search` | `src/components/atoms/Search.svelte` | Categoria e prévia de componentes |
+| `PrimaryButton` | `src/components/atoms/PrimaryButton.svelte` | Login e prévia de componentes |
+| `FavoriteButton` | `src/components/atoms/FavoriteButton.svelte` | Categoria e prévia de componentes |
+| `CategoryButton` | `src/components/atoms/CategoryButton.svelte` | Prévia de componentes |
+| `FloatingTabBar` | `src/components/atoms/FloatingTabBar.svelte` | Categoria e prévia de componentes |
+| `Title` | `src/components/atoms/Title.svelte` | Prévia de componentes |
+| `ResultsCount` | `src/components/atoms/ResultsCount.svelte` | Categoria e prévia de componentes |
+| `ScrollShadow` | `src/components/atoms/ScrollShadow.svelte` | Categoria |
+| `FilterButton` | `src/components/atoms/FilterButton.svelte` | Usado por `FilterDropdown` |
+| `BenefitLocationCard` | `src/components/atoms/BenefitLocationCard.svelte` | Prévia de componentes |
+| `FilterDropdown` | `src/components/molecules/FilterDropdown.svelte` | Categoria; ordena os resultados e pode restringir a estabelecimentos em horário de funcionamento |
+| `EstablishmentCard` | `src/components/molecules/EstablishmentCard.svelte` | Categoria |
+| `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes |
+
+## Páginas e telas no código
+
+- `/` ainda apresenta uma galeria de componentes em `src/App.svelte`; não é a tela de Início do produto.
+- `/categoria/saude-e-bem-estar` renderiza `CategoryPage`. A ordenação, os cards e o mapa Leaflet usam componentes reutilizáveis. O mapa exibe tiles reais do OpenStreetMap e sincroniza a seleção entre pins e cards; os estabelecimentos e suas coordenadas ainda são dados locais demonstrativos, sem conexão com a API do produto.
+- `src/screens/Login.svelte` implementa a tela de Login com `Input` e `PrimaryButton`, mas ainda não está conectada a uma rota em `src/App.svelte`.
+- `FilterDropdown` salva as opções durante a edição e aplica os critérios quando o painel fecha. Crescente e decrescente não podem ficar ativos juntos; as demais opções podem ser combinadas. Quando há mais de uma ordenação, a prioridade segue a ordem de seleção. O horário de funcionamento atua como filtro adicional; os horários da tela atual são demonstrativos.
+
 ## Diretrizes visuais
 
 - mobile-first;
-- tipografia Inter;
+- tipografia de sistema, com a mesma configuração da página de categorias;
 - Lucide Icons;
 - mapa como elemento central;
 - componentes reutilizáveis, pequenos e acessíveis;
@@ -32,6 +61,26 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 - estados de interação, foco, indisponibilidade e carregamento visíveis.
 
 As cores exatas, espaçamentos, sombras e tamanhos não estão versionados; devem vir do Figma validado e ser convertidos em tokens compartilhados.
+
+### Tipografia confirmada
+
+Em 2026-10-21, o solicitante confirmou que Favoritos deve usar a mesma configuração de `src/pages/CategoryPage.css`:
+
+```css
+font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+```
+
+Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribuir SF Pro. A indicação anterior de Inter como fonte obrigatória foi substituída por esta decisão. Não adicionar fontes externas nem alterar a tipografia dos componentes compartilhados para atender uma única página: aplicar o padrão na composição da página. Se faltar informação no protótipo ou no padrão existente, confirmar antes de escolher.
+
+### Página de Favoritos
+
+`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
+
+Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores dos estabelecimentos permanecem vermelhos em todos eles; a localização de demonstração permanece azul.
+
+As imagens de paisagem apresentam divergências de conteúdo: o celular usa o título “Estabelecimentos da categoria” e o tablet marca a aba “Início”. O solicitante confirmou manter “Estabelecimentos favoritos” e a aba “Favoritos” ativa nas quatro versões.
+
+A página recebe os favoritos e callbacks por propriedades. Busca, ordenação, seleção e expansão são locais à UI; a remoção é delegada ao callback. Os dados de demonstração de `src/pages/favorites.ts` são fornecidos pela rota e não representam integração com o Backend, cache ou persistência.
 
 ## Contratos dos componentes
 

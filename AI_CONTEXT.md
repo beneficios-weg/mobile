@@ -12,7 +12,8 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 
 - Aplicativo React Native, mobile-first.
 - Equipe de quatro pessoas e cerca de 30 horas totais: evitar overengineering.
-- Tipografia Inter e Lucide Icons.
+- Tipografia de sistema, seguindo a página de categorias: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif`. Lucide Icons para iconografia.
+- Não substituir a fonte por Inter nem baixar outra fonte por suposição. Se o protótipo ou o padrão existente não esclarecer um detalhe visual, confirmar com o solicitante antes de escolher.
 - Componentes reutilizáveis e mapa como elemento central.
 - Sete telas: Login, Início, Categoria, Loja, Favoritos, Mapa em tela cheia e Lojas visitadas.
 - Favoritos são independentes de visitas.

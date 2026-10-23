@@ -2,7 +2,28 @@
 
 ## Estado
 
-Não há aplicação, `package.json`, testes automatizados ou build executável nesta consolidação. Os casos abaixo são um roteiro de aceite. “Resultado obtido” será preenchido durante a execução real.
+O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
+
+## Validação da UI de Favoritos — 2026-10-21
+
+| Verificação | Resultado |
+|---|---|
+| `npm run check` e `npm run build` | Aprovados, sem erros nem avisos do Svelte |
+| Celular 390 × 844 e 844 × 390 | Mapa, controles, lista e navegação conferidos; sem transbordamento horizontal |
+| Tablet 834 × 1194 e 1194 × 834 | Mapa, controles, lista e navegação conferidos; sem transbordamento horizontal |
+| Telas menores 320 × 568 e 568 × 320 | Sem transbordamento horizontal e com lista rolável |
+| Tipografia | A fonte computada de Favoritos é idêntica à de Categorias: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif` |
+| Marcadores e aba ativa | Estabelecimentos vermelhos, localização de demonstração azul e aba Favoritos ativa |
+| Busca | Nome sem acentos, espaços nas extremidades, bairro e desconto; lista, mapa e contador acompanham o filtro |
+| Ordenação | Proximidade, nome e desconto; a função não altera a lista de origem |
+| Seleção | Selecionar um pin destaca o card correspondente e o traz para a área visível da lista |
+| Remoção | Contador e mapa atualizados; remover os oito exemplos exibe o estado sem favoritos |
+| Busca sem resultados | Mensagem contextual e contador zerado; limpar pelo teclado restaura a lista |
+| Expansão | Expandir, recolher e usar Escape funcionam; o foco retorna ao controle de expansão |
+| Título no tablet em paisagem | Mantém 24 px e altura de linha de 29 px antes e depois de expandir |
+| Rotas existentes | `/` mantém a prévia original sem Favoritos; `/categoria/saude-e-bem-estar` permanece disponível |
+
+As verificações de interação foram executadas no navegador. Busca, ordenação e preservação dos dados também foram conferidas com asserções Node sobre `src/pages/favorites.ts`. O solicitante aprovou visualmente a entrega após o ajuste do título no tablet em paisagem e autorizou a conclusão do cronograma. As quatro imagens temporárias de referência foram removidas. Estes resultados não validam os fluxos de API, autenticação ou sincronização abaixo.
 
 | Cenário | Pré-condição | Passos | Resultado esperado | Resultado obtido | Status |
 |---|---|---|---|---|---|

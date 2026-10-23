@@ -18,7 +18,7 @@ src/
 ├── utils/         # Funções puras, distância e formatação
 ├── types/         # Tipos alinhados ao contrato publicado
 ├── constants/     # Constantes sem segredos
-└── theme/         # Tokens visuais, incluindo Inter
+└── theme/         # Tokens visuais e tipografia de sistema
 ```
 
 Criar somente diretórios que tenham uso imediato. Esta árvore não obriga a adoção de todos eles no primeiro commit de implementação.
