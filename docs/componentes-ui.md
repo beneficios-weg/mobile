@@ -11,6 +11,9 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 | `CategoryButton` | Seleção acessível de categoria com ícone, tom visual e estado selecionado |
 | `CategoryGrid` | Organização responsiva de categorias |
 | `EstablishmentCard` | Resumo do estabelecimento, distância e benefício disponível |
+| `EstablishmentFacadeCard` | Exibe nome, endereço, horário, contato e abre a imagem da fachada recebida pela interface |
+| `AboutUnitCard` | Exibe o título h3 e a descrição completa da unidade em largura total |
+| `ExpandableAboutUnitCard` | Mostra descrição truncada em meia largura e permite expansão controlada pelo componente pai |
 | `BenefitBadge` | Destaque curto do benefício principal |
 | `FavoriteButton` | Alternância acessível do favorito (implementado em `src/components/atoms/FavoriteButton.svelte`) |
 | `SortControl` | Escolha de ordenação disponível |
@@ -41,6 +44,10 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 | `BenefitLocationCard` | `src/components/atoms/BenefitLocationCard.svelte` | Prévia de componentes |
 | `FilterDropdown` | `src/components/molecules/FilterDropdown.svelte` | Categoria; ordena os resultados e pode restringir a estabelecimentos em horário de funcionamento |
 | `EstablishmentCard` | `src/components/molecules/EstablishmentCard.svelte` | Categoria |
+| `EstablishmentFacadeCard` | `src/components/atoms/EstablishmentFacadeCard.svelte` | Prévia temporária de componentes; recebe campos prontos por props e não acessa a API |
+| `AboutUnitCard` | `src/components/atoms/AboutUnitCard.svelte` | Prévia temporária; exibição larga com título h3 |
+| `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; truncamento, expansão e recolhimento são controlados por estado da composição |
+| `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes; clique no mapa abre tela cheia, e Voltar ou Escape fecha |
 | `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
 | `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes |
 
