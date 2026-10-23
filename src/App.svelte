@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
   import BackButton from "./components/atoms/BackButton.svelte";
+  import AboutUnitCard from "./components/atoms/AboutUnitCard.svelte";
+  import ExpandableAboutUnitCard from "./components/atoms/ExpandableAboutUnitCard.svelte";
   import BenefitLocationCard from "./components/atoms/BenefitLocationCard.svelte";
   import CategoryButton from "./components/atoms/CategoryButton.svelte";
   import FavoriteButton from "./components/atoms/FavoriteButton.svelte";
@@ -23,6 +26,32 @@
   let previewExpanded = $state(false);
   let query = $state("");
   let searchText = $state("");
+  let expandedAboutUnitId = $state<string | null>(null);
+
+  const aboutUnitSamples = [
+    {
+      id: 'about-unit-1',
+      title: 'Sobre a unidade',
+      description:
+        'Academia completa para saúde e condicionamento, com musculação, funcional, aulas coletivas e acompanhamento profissional especializado.',
+    },
+    {
+      id: 'about-unit-2',
+      title: 'Sobre a unidade',
+      description:
+        'Espaço moderno com equipamentos completos, avaliação física e programas personalizados para diferentes objetivos.',
+    },
+    {
+      id: 'about-unit-3',
+      title: 'Sobre a unidade',
+      description:
+        'Treinos de musculação, funcional e aulas coletivas com acompanhamento profissional em todos os horários.',
+    },
+  ];
+
+  function toggleAboutUnit(id: string) {
+    expandedAboutUnitId = expandedAboutUnitId === id ? null : id;
+  }
 
   const categoryRoute = "/categoria/saude-e-bem-estar";
   const isCategoryRoute = window.location.pathname === categoryRoute;
@@ -130,6 +159,37 @@
       contact="47 99914-1233"
       facadeImageUrl="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23e9f3fb'/%3E%3Crect x='120' y='140' width='560' height='280' rx='12' fill='%2300579d'/%3E%3Crect x='175' y='195' width='150' height='225' fill='%23fff'/%3E%3Crect x='360' y='195' width='250' height='110' fill='%23b9d9ef'/%3E%3Crect x='360' y='325' width='250' height='95' fill='%23fff'/%3E%3Ctext x='400' y='105' text-anchor='middle' font-family='Arial' font-size='36' fill='%2314243a'%3EAcademia Move%3C/text%3E%3C/svg%3E"
     />
+  </section>
+
+  <section class="preview-section" aria-labelledby="about-unit-title">
+    {#if expandedAboutUnitId === null}
+      <div transition:fade={{ duration: 500 }}>
+        <h2 id="about-unit-title">Sobre a unidade · componente largo</h2>
+        <AboutUnitCard
+          title="Sobre a unidade"
+          description={aboutUnitSamples[0].description}
+        />
+      </div>
+    {/if}
+    <h2>Sobre a unidade · cards expansíveis</h2>
+    <div class="about-unit-card-grid" class:expanded={expandedAboutUnitId !== null}>
+      {#each aboutUnitSamples as unit (unit.id)}
+        {#if expandedAboutUnitId === null || expandedAboutUnitId === unit.id}
+          <div
+            class="about-unit-card-grid__item"
+            in:fade={{ duration: 500 }}
+            out:fade={{ duration: 500 }}
+          >
+            <ExpandableAboutUnitCard
+              title={unit.title}
+              description={unit.description}
+              expanded={expandedAboutUnitId === unit.id}
+              onclick={() => toggleAboutUnit(unit.id)}
+            />
+          </div>
+        {/if}
+      {/each}
+    </div>
   </section>
 
   <FloatingTabBar bind:selected={activeTab} />

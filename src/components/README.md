@@ -11,3 +11,5 @@ Crie cada pasta quando o primeiro componente daquele nível for adicionado. Temp
 Os estilos ficam em `src/components/styles/`, em um arquivo por átomo ou componente de interface. `src/components/styles/index.css` importa cada folha e é carregado uma vez em `src/main.ts`. Mantenha os seletores sob a classe raiz do componente para evitar vazamento entre componentes.
 
 `EstablishmentFacadeCard` recebe os campos de apresentação e a URL da fachada por props; a camada que consome a API deve mapear sua resposta para essas props. `facadeImageUrl` é opcional: quando disponível, o botão “Ver fachada” abre a imagem em um diálogo acessível.
+
+`AboutUnitCard` apresenta a descrição completa da unidade em largura total. `ExpandableAboutUnitCard` recebe título, descrição, estado expandido e callback; o componente pai controla qual card fica aberto e oculta os irmãos. Os dois componentes são somente de apresentação e recebem conteúdo por props.
