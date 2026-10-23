@@ -1,3 +1,9 @@
+.expandable-about-unit-card__slot {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
 .expandable-about-unit-card {
   position: relative;
   width: 100%;
@@ -11,10 +17,8 @@
   box-shadow: 0 4px 12px rgb(17 32 51 / 7%);
   color: #14243a;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
-  transition:
-    min-height 500ms ease,
-    padding 500ms ease,
-    box-shadow 500ms ease;
+  overflow: hidden;
+  transition: box-shadow 420ms ease;
 }
 
 .expandable-about-unit-card__title {
@@ -37,15 +41,24 @@
   -webkit-line-clamp: 5;
 }
 
+.expandable-about-unit-card__viewport {
+  position: relative;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.expandable-about-unit-card__viewport.is-scrollable {
+  z-index: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .expandable-about-unit-card.expanded {
-  min-height: 140px;
-  padding: 14px 16px;
   box-shadow: 0 6px 18px rgb(17 32 51 / 10%);
 }
 
 .expandable-about-unit-card.expanded .expandable-about-unit-card__description {
   display: block;
-  overflow: visible;
   -webkit-line-clamp: unset;
 }
 
@@ -64,10 +77,11 @@
 
 .expandable-about-unit-card__toggle:focus-visible {
   outline: 3px solid rgb(0 87 157 / 34%);
-  outline-offset: 3px;
+  outline-offset: -3px;
 }
 
 .about-unit-card-grid {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -76,9 +90,32 @@
 .about-unit-card-grid__item {
   min-width: 0;
   flex: 0 0 calc(50% - 8px);
-  transition: flex-basis 500ms ease;
 }
 
-.about-unit-card-grid.expanded .about-unit-card-grid__item {
-  flex-basis: 100%;
+.about-unit-card-grid__item .expandable-about-unit-card {
+  height: 100%;
+}
+
+.about-unit-card-visibility {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 260ms ease,
+    visibility 0s;
+}
+
+.about-unit-card-visibility.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 260ms ease,
+    visibility 0s linear 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expandable-about-unit-card,
+  .about-unit-card-visibility {
+    transition: none;
+  }
 }
