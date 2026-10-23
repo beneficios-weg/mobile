@@ -3,6 +3,7 @@
   import BenefitLocationCard from "./components/atoms/BenefitLocationCard.svelte";
   import CategoryButton from "./components/atoms/CategoryButton.svelte";
   import FavoriteButton from "./components/atoms/FavoriteButton.svelte";
+  import ExpandButton from "./components/atoms/ExpandButton.svelte";
   import FloatingTabBar from "./components/atoms/FloatingTabBar.svelte";
   import Input from "./components/atoms/Input.svelte";
   import Map from "./components/Map.svelte";
@@ -18,6 +19,7 @@
   let selectedCategory = $state("Alimentação");
   let activeTab = $state<"home" | "map" | "favorites" | "history">("home");
   let favorite = $state(false);
+  let previewExpanded = $state(false);
   let query = $state("");
   let searchText = $state("");
 
@@ -83,6 +85,17 @@
     <FavoriteButton bind:liked={favorite} />
   </section>
 
+
+  <section class="preview-section" aria-labelledby="expand-title">
+    <h2 id="expand-title">Visualização do mapa</h2>
+    <div class="preview-expand-demo" class:expanded={previewExpanded}>
+      <div>
+        <strong>Mapa de benefícios</strong>
+        <p aria-live="polite">{previewExpanded ? 'Visualização expandida' : 'Visualização compacta'}</p>
+      </div>
+      <ExpandButton bind:expanded={previewExpanded} />
+    </div>
+  </section>
   <section class="preview-section" aria-labelledby="categories-title">
     <h2 id="categories-title">Categorias</h2>
     <div class="preview-categories">
@@ -180,6 +193,37 @@
     margin: 0;
     color: #00579d;
     font-size: 13px;
+  }
+  .preview-expand-demo {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d8e2ec;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgb(0 110 250 / 10%);
+    transition:
+      min-height 180ms ease,
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+  .preview-expand-demo.expanded {
+    min-height: 128px;
+    border-color: #00579d;
+    background: #f7fbfe;
+  }
+  .preview-expand-demo strong {
+    color: #112033;
+    font-size: 14px;
+  }
+  .preview-expand-demo p {
+    margin: 4px 0 0;
+    color: #66768a;
+    font-size: 12px;
   }
   @media (max-width: 380px) {
     .component-preview {
