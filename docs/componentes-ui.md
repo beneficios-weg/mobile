@@ -48,12 +48,20 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 | `AboutUnitCard` | `src/components/atoms/AboutUnitCard.svelte` | Prévia temporária; exibição larga com título h3 |
 | `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; truncamento, expansão e recolhimento são controlados por estado da composição |
 | `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes; clique no mapa abre tela cheia, e Voltar ou Escape fecha |
+| `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
+| `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes |
+
+### Card de Benefício
+
+`BenefitCard` recebe `discounts` (lista de `{ value, description }`), `audience` e, opcionalmente, `title` e `audienceLabel`. Os estilos ficam em `src/components/styles/benefit-card.css`, com seletores limitados à classe `.benefit-details-card` para não conflitar com `BenefitLocationCard`.
+
+Cada descrição aparece em uma linha, com reticências após a última palavra inteira que cabe na largura disponível. A palavra que ultrapassa o limite fica totalmente oculta, sem cortes no meio. Apenas as linhas truncadas são interativas: clique, Enter ou Espaço alternam a descrição completa abaixo do destaque. A expansão de cada linha é independente, aumenta a altura do card e mantém o público abaixo da divisória verde. A detecção de truncamento acompanha mudanças de largura e conteúdo. O componente usa a fonte de sistema confirmada e recebe somente dados de apresentação, sem integração com API.
 
 ## Páginas e telas no código
 
 - `/` ainda apresenta uma galeria de componentes em `src/App.svelte`; não é a tela de Início do produto.
 - `/categoria/saude-e-bem-estar` renderiza `CategoryPage`. A ordenação, os cards e o mapa Leaflet usam componentes reutilizáveis. O mapa exibe tiles reais do OpenStreetMap e sincroniza a seleção entre pins e cards; os estabelecimentos e suas coordenadas ainda são dados locais demonstrativos, sem conexão com a API do produto.
-- `src/screens/Login.svelte` implementa a tela de Login com `Input` e `PrimaryButton`, mas ainda não está conectada a uma rota em `src/App.svelte`.
+- `/login` renderiza `src/pages/Login.svelte`, que compõe os átomos `Input` e `PrimaryButton`. Os estilos e as regras responsivas ficam em `src/pages/styles/Login.css`, importado pela própria página; os seletores ficam limitados ao Login para não afetar as demais telas. A autenticação ainda não está integrada ao Backend.
 - `FilterDropdown` salva as opções durante a edição e aplica os critérios quando o painel fecha. Crescente e decrescente não podem ficar ativos juntos; as demais opções podem ser combinadas. Quando há mais de uma ordenação, a prioridade segue a ordem de seleção. O horário de funcionamento atua como filtro adicional; os horários da tela atual são demonstrativos.
 
 ## Diretrizes visuais
@@ -70,7 +78,7 @@ As cores exatas, espaçamentos, sombras e tamanhos não estão versionados; deve
 
 ### Tipografia confirmada
 
-Em 2026-10-21, o solicitante confirmou que Favoritos deve usar a mesma configuração de `src/pages/CategoryPage.css`:
+Em 2026-10-21, o solicitante confirmou que Favoritos deve usar a mesma configuração de `src/pages/styles/CategoryPage.css`:
 
 ```css
 font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
@@ -80,7 +88,7 @@ Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribu
 
 ### Página de Favoritos
 
-`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
+`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/styles/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
 
 Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores dos estabelecimentos permanecem vermelhos em todos eles; a localização de demonstração permanece azul.
 
