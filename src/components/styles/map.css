@@ -117,22 +117,10 @@
   box-shadow: none;
 }
 
-.benefits-map .map-filter-definitions {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
 .benefits-map--category .map-canvas {
   height: 100%;
   min-height: 0;
   background: #e9f5fb;
-}
-
-.benefits-map--category .leaflet-tile-pane {
-  filter: url(#osm-empty-land-tint) grayscale(0.88) sepia(0.42) hue-rotate(190deg) saturate(1.7) brightness(0.78) contrast(1.12);
 }
 
 .benefits-map--category .leaflet-top.leaflet-right .leaflet-control-attribution {
@@ -219,33 +207,8 @@
   content: '';
 }
 
-.benefits-map .benefit-marker--category {
-  width: 18px;
-  height: 18px;
-  border-width: 2px;
-  border-radius: 50%;
-  background: var(--category-pin-color, #fa6c56);
-  box-shadow: 0 2px 5px rgb(31 61 78 / 20%);
-  transform: none;
-}
-
-.benefits-map .benefit-marker--category::after {
-  top: 5px;
-  left: 5px;
-  width: 4px;
-  height: 4px;
-}
-
-.benefits-map .benefit-marker--category.is-selected {
-  width: 23px;
-  height: 23px;
-  border-width: 3px;
-  box-shadow: 0 0 0 4px rgb(0 87 157 / 12%), 0 2px 5px rgb(31 61 78 / 20%);
-}
-
-.benefits-map .benefit-marker--category.is-selected::after {
-  top: 6px;
-  left: 6px;
+.benefits-map .benefit-marker.is-selected {
+  box-shadow: 0 0 0 4px rgb(0 87 157 / 12%), 0 3px 10px rgb(17 32 51 / 30%);
 }
 
 .benefits-map .leaflet-container {
