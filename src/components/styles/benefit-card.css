@@ -64,6 +64,17 @@
 }
 
 .benefit-details-card .benefit-details-card__summary {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 25px;
+}
+
+.benefit-details-card .benefit-details-card__value {
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
+  vertical-align: top;
   display: flex;
   min-width: 0;
   align-items: baseline;
@@ -81,6 +92,18 @@
 }
 
 .benefit-details-card .benefit-details-card__description {
+  position: absolute;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: #667e95;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.benefit-details-card .benefit-details-card__description-text {
+  display: block;
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;

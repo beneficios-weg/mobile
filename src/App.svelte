@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   import BackButton from "./components/atoms/BackButton.svelte";
   import AboutUnitCard from "./components/atoms/AboutUnitCard.svelte";
   import ExpandableAboutUnitCard from "./components/atoms/ExpandableAboutUnitCard.svelte";
   import BenefitLocationCard from "./components/atoms/BenefitLocationCard.svelte";
+  import BenefitCard from "./components/molecules/BenefitCard.svelte";
   import CategoryButton from "./components/atoms/CategoryButton.svelte";
   import FavoriteButton from "./components/atoms/FavoriteButton.svelte";
   import ExpandButton from "./components/atoms/ExpandButton.svelte";
@@ -18,6 +18,10 @@
   import './components/styles/style.css'
   import CategoryPage from "./pages/CategoryPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
+  import Login from "./pages/Login.svelte";
+  import EstablishmentInfoPage from "./pages/EstablishmentInfoPage.svelte";
+  import { previewFavorites, previewFavoritesLocation } from "./pages/favorites";
+
   import MainPage from "./pages/MainPage.svelte";
   import { previewFavorites } from "./pages/favorites";
   import './components/styles/style.css'
@@ -34,7 +38,7 @@
       id: 'about-unit-1',
       title: 'Sobre a unidade',
       description:
-        'Academia completa para saúde e condicionamento, com musculação, funcional, aulas coletivas e acompanhamento profissional especializado.',
+        'Academia completa para saúde e condicionamento, com musculação, funcional, aulas coletivas e acompanhamento profissional especializado. A unidade oferece avaliação física, orientação individual durante os treinos e programas para diferentes objetivos. Consulte a equipe para conhecer os horários das aulas e as condições disponíveis para colaboradores WEG.',
     },
     {
       id: 'about-unit-2',
@@ -57,6 +61,8 @@
   const categoryRoute = "/categoria/saude-e-bem-estar";
   const isCategoryRoute = window.location.pathname === categoryRoute;
   const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
+  const isLoginRoute = window.location.pathname.replace(/\/$/, "") === "/login";
+  const isEstablishmentRoute = window.location.pathname.replace(/\/$/, "") === "/estabelecimento/academia-move";
   const isComponentPreviewRoute = window.location.pathname.replace(/\/$/, "") === "/componentes-preview";
   let favoritePlaces = $state([...previewFavorites]);
 
@@ -66,12 +72,17 @@
 </script>
 
 <svelte:head>
-  <title>{isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
+  <title>{isLoginRoute ? "Entrar — WEG Benefits" : isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
-{#if isFavoritesRoute}
+{#if isEstablishmentRoute}
+  <EstablishmentInfoPage />
+{:else if isLoginRoute}
+  <Login />
+{:else if isFavoritesRoute}
   <FavoritesPage
     places={favoritePlaces}
+    userLocation={previewFavoritesLocation}
     onback={returnToHome}
     onremovefavorite={(id) => (favoritePlaces = favoritePlaces.filter((place) => place.id !== id))}
     onnavigate={(tab) => {
@@ -92,6 +103,55 @@
     </div>
     <BackButton label="Voltar" onclick={() => (activeTab = "home")} />
   </header>
+
+  <section class="preview-section" aria-labelledby="benefit-card-title">
+    <h2 id="benefit-card-title">Card de Benefício</h2>
+    <div class="preview-benefit-card">
+      <BenefitCard
+        discounts={[
+          { value: 'Até 50%', description: 'em produtos selecionados' },
+          { value: '5%', description: 'no pagamento realizado via PIX' },
+          { value: 'Frete grátis', description: 'acima de R$199,00 para compras realizadas na loja online, em todos os produtos selecionados.' },
+        ]}
+        audience="Colaboradores WEG e parentes até 2º grau"
+      />
+    </div>
+  </section>
+
+  <section class="preview-section" aria-labelledby="about-unit-title" data-about-unit-area>
+    <h2 id="about-unit-title">Sobre a unidade · cards interativos</h2>
+    <div class="about-unit-card-grid">
+      {#each aboutUnitSamples as unit (unit.id)}
+        {@const hidden = expandedAboutUnitId !== null && expandedAboutUnitId !== unit.id}
+        <div
+          class="about-unit-card-grid__item about-unit-card-visibility"
+          class:is-hidden={hidden}
+          inert={hidden}
+          aria-hidden={hidden}
+          data-about-unit-id={unit.id}
+        >
+          <ExpandableAboutUnitCard
+            title={unit.title}
+            description={unit.description}
+            expanded={expandedAboutUnitId === unit.id}
+            onclick={() => toggleAboutUnit(unit.id)}
+          />
+        </div>
+      {/each}
+    </div>
+    <div
+      class="about-unit-card-visibility"
+      class:is-hidden={expandedAboutUnitId !== null}
+      inert={expandedAboutUnitId !== null}
+      aria-hidden={expandedAboutUnitId !== null}
+    >
+      <h2>Sobre a unidade · componente largo</h2>
+      <AboutUnitCard
+        title="Sobre a unidade"
+        description={aboutUnitSamples[0].description}
+      />
+    </div>
+  </section>
 
   <section class="preview-map">
     <Map benefits={demoBenefits} />
@@ -163,37 +223,6 @@
     />
   </section>
 
-  <section class="preview-section" aria-labelledby="about-unit-title">
-    {#if expandedAboutUnitId === null}
-      <div transition:fade={{ duration: 500 }}>
-        <h2 id="about-unit-title">Sobre a unidade · componente largo</h2>
-        <AboutUnitCard
-          title="Sobre a unidade"
-          description={aboutUnitSamples[0].description}
-        />
-      </div>
-    {/if}
-    <h2>Sobre a unidade · cards expansíveis</h2>
-    <div class="about-unit-card-grid" class:expanded={expandedAboutUnitId !== null}>
-      {#each aboutUnitSamples as unit (unit.id)}
-        {#if expandedAboutUnitId === null || expandedAboutUnitId === unit.id}
-          <div
-            class="about-unit-card-grid__item"
-            in:fade={{ duration: 500 }}
-            out:fade={{ duration: 500 }}
-          >
-            <ExpandableAboutUnitCard
-              title={unit.title}
-              description={unit.description}
-              expanded={expandedAboutUnitId === unit.id}
-              onclick={() => toggleAboutUnit(unit.id)}
-            />
-          </div>
-        {/if}
-      {/each}
-    </div>
-  </section>
-
   <FloatingTabBar bind:selected={activeTab} />
 </main>
 {:else}
@@ -260,6 +289,10 @@
     font-size: 16px;
   }
   .preview-field {
+    min-width: 0;
+  }
+  .preview-benefit-card {
+    width: min(100%, 360px);
     min-width: 0;
   }
   .preview-categories {

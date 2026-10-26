@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { benefitDescriptionMotion } from '../../lib/benefitDescriptionMotion'
+
   type Discount = {
     value: string
     description: string
@@ -30,6 +32,12 @@
     expanded = next
   }
 
+  function setOverflow(index: number, value: boolean) {
+    if (overflowing.has(index) === value) return
+    const next = new Set(overflowing)
+    if (value) next.add(index)
+    else next.delete(index)
+    overflowing = next
   function fitDescription(text: string, width: number, measureWidth: (value: string) => number) {
     if (measureWidth(text) <= width) return text
 
@@ -91,6 +99,20 @@
 </script>
 
 {#snippet discountContent(discount: Discount, index: number)}
+  <span
+    class="benefit-details-card__summary"
+    use:benefitDescriptionMotion={{
+      description: discount.description,
+      expanded: expanded.has(index),
+      onoverflow: (value) => setOverflow(index, value),
+    }}
+  >
+    <strong class="benefit-details-card__value">{discount.value}</strong>
+    <span
+      class="benefit-details-card__description"
+      id={`${id}-discount-${index}`}
+    ><span class="benefit-details-card__description-text"></span></span>
+  </span>
   <span class="benefit-details-card__summary">
     <strong class="benefit-details-card__value">{discount.value}</strong>
     <span
@@ -118,6 +140,8 @@
             class="benefit-details-card__discount"
             type="button"
             aria-expanded={expanded.has(index)}
+            aria-controls={`${id}-discount-${index}`}
+            aria-describedby={`${id}-discount-${index}`}
             aria-controls={expanded.has(index) ? `${id}-discount-${index}` : undefined}
             aria-label={`${expanded.has(index) ? 'Recolher' : 'Expandir'} detalhes de ${discount.value}`}
             onclick={() => toggle(index)}

@@ -7,6 +7,8 @@
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
   import Search from '../components/atoms/Search.svelte'
+  import Map from '../components/Map.svelte'
+  import { filterFavorites, type FavoritePlace, type FavoritesSortOrder } from './favorites'
   import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
   import { filterFavorites, type FavoritePlace } from './favorites'
@@ -14,12 +16,13 @@
 
   type Props = {
     places?: FavoritePlace[]
+    userLocation?: { latitude: number; longitude: number } | null
     onback?: () => void
     onremovefavorite?: (id: string) => void
     onnavigate?: (tab: 'home' | 'map' | 'favorites' | 'history') => void
   }
 
-  let { places = [], onback, onremovefavorite, onnavigate }: Props = $props()
+  let { places = [], userLocation = null, onback, onremovefavorite, onnavigate }: Props = $props()
 
   let searchValue = $state('')
   let filterSelection = $state<EstablishmentFilterState>([])
@@ -34,6 +37,18 @@
   let expandButton = $state<HTMLButtonElement>()
   let expandedHeader: HTMLDivElement
 
+  const visiblePlaces = $derived(filterFavorites(places, searchValue, sortOrder))
+  const mapBenefits = $derived(visiblePlaces.map((place) => ({
+    id: place.id,
+    name: place.name,
+    category: place.neighborhood,
+    latitude: place.latitude,
+    longitude: place.longitude,
+  })))
+  const mapCenter = $derived(userLocation ?? (places[0] && {
+    latitude: places[0].latitude,
+    longitude: places[0].longitude,
+  }))
   const visiblePlaces = $derived(filterFavorites(places, searchValue, appliedFilters, currentTime))
   const mapBenefits = $derived(visiblePlaces.map((place) => ({
     id: place.id,
@@ -115,6 +130,15 @@
       <h1 class="directory-page__title">Favoritos</h1>
     </header>
 
+    <div class="favorites-map" role="region" aria-label="Mapa dos estabelecimentos favoritos" inert={listExpanded}>
+      <Map
+        benefits={mapBenefits}
+        variant="category"
+        center={mapCenter}
+        initialZoom={13}
+        selectedBenefitId={selectedPlaceId}
+        {userLocation}
+        onBenefitSelect={(benefit) => void selectPlace(benefit.id, true)}
     <div class="directory-map favorites-map" role="region" aria-label="Mapa dos estabelecimentos favoritos" inert={listExpanded}>
       <Map
         variant="default"

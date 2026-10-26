@@ -47,6 +47,7 @@
   let benefitMarkers = $state.raw<L.LayerGroup | undefined>(undefined)
   let locationMarker = $state.raw<L.CircleMarker | undefined>(undefined)
   let routeLayer = $state.raw<L.Polyline | undefined>(undefined)
+  const markersById = new globalThis.Map<string, L.Marker>()
 
   function createBenefitPopup(benefit: MapBenefit) {
     const content = document.createElement('div')
@@ -61,13 +62,44 @@
   function renderBenefits(
     mapInstance: L.Map,
     items: MapBenefit[],
-    onSelect?: (benefit: MapBenefit) => void,
     selectedId: string | null = null,
   ) {
     benefitMarkers ??= L.layerGroup().addTo(mapInstance)
-    benefitMarkers.clearLayers()
+    const visibleIds = new Set(items.map((benefit) => benefit.id))
+    for (const [id, marker] of markersById) {
+      if (!visibleIds.has(id)) {
+        benefitMarkers.removeLayer(marker)
+        markersById.delete(id)
+      }
+    }
 
     for (const benefit of items) {
+      const createIcon = () => L.divIcon({
+        className: categoryStyle ? 'benefit-marker-wrapper benefit-marker-wrapper--category' : 'benefit-marker-wrapper',
+        html: categoryStyle
+          ? '<span class="benefit-marker benefit-marker--category"></span>'
+          : '<span class="benefit-marker"></span>',
+        iconSize: categoryStyle ? [24, 24] : [30, 42],
+        iconAnchor: categoryStyle ? [12, 12] : [15, 38],
+        popupAnchor: categoryStyle ? [0, -12] : [0, -36],
+      })
+      let marker = markersById.get(benefit.id)
+      if (!marker) {
+        marker = L.marker([benefit.latitude, benefit.longitude], {
+          icon: createIcon(),
+          title: benefit.name,
+          alt: benefit.name,
+        }).addTo(benefitMarkers)
+        marker.on('click', () => {
+          const currentBenefit = benefits.find((item) => item.id === benefit.id)
+          if (currentBenefit) onBenefitSelect?.(currentBenefit)
+        })
+        markersById.set(benefit.id, marker)
+      } else {
+        marker.setLatLng([benefit.latitude, benefit.longitude])
+        const wasCategory = marker.options.icon?.options.className?.includes('benefit-marker-wrapper--category') ?? false
+        if (wasCategory !== categoryStyle) marker.setIcon(createIcon())
+      }
       const marker = L.marker([benefit.latitude, benefit.longitude], {
         icon: L.divIcon({
           className: 'benefit-marker-wrapper',
@@ -81,7 +113,10 @@
       }).addTo(benefitMarkers)
 
       marker.bindPopup(createBenefitPopup(benefit))
-      marker.on('click', () => onSelect?.(benefit))
+      const element = marker.getElement()
+      element?.setAttribute('aria-label', `Selecionar ${benefit.name}, ${benefit.category}`)
+      element?.setAttribute('aria-pressed', String(benefit.id === selectedId))
+      element?.querySelector('.benefit-marker')?.classList.toggle('is-selected', benefit.id === selectedId)
     }
   }
 
@@ -138,18 +173,20 @@
     const currentSelectedBenefitId = selectedBenefitId
     const currentLocation = userLocation
     const currentRouteCoordinates = routeCoordinates
-    const currentOnBenefitSelect = onBenefitSelect
 
     if (!currentMap) return
 
     renderBenefits(
       currentMap,
       currentBenefits,
-      currentOnBenefitSelect,
       currentSelectedBenefitId,
     )
     renderUserLocation(currentMap, currentLocation)
     renderRoute(currentMap, currentRouteCoordinates)
+    const selectedBenefit = currentBenefits.find((benefit) => benefit.id === currentSelectedBenefitId)
+    if (selectedBenefit && !currentMap.getBounds().contains([selectedBenefit.latitude, selectedBenefit.longitude])) {
+      currentMap.panTo([selectedBenefit.latitude, selectedBenefit.longitude])
+    }
   })
 
   onMount(() => {
@@ -187,6 +224,7 @@
       map?.remove()
       map = undefined
       benefitMarkers = undefined
+      markersById.clear()
       locationMarker = undefined
       routeLayer = undefined
     }

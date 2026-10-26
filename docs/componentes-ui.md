@@ -13,7 +13,7 @@ Este inventário reúne componentes implementados e planejados. Os contratos e o
 | `EstablishmentCard` | Resumo do estabelecimento, distância e benefício disponível |
 | `EstablishmentFacadeCard` | Exibe nome, endereço, horário, contato e abre a imagem da fachada recebida pela interface |
 | `AboutUnitCard` | Exibe o título h3 e a descrição completa da unidade em largura total |
-| `ExpandableAboutUnitCard` | Mostra descrição truncada em meia largura e permite expansão controlada pelo componente pai |
+| `ExpandableAboutUnitCard` | Expande a descrição verticalmente sobre o espaço reservado dos irmãos ocultos, sem alterar o layout da página |
 | `BenefitBadge` | Destaque curto do benefício principal |
 | `FavoriteButton` | Alternância acessível do favorito (implementado em `src/components/atoms/FavoriteButton.svelte`) |
 | `SortControl` | Escolha de ordenação disponível |
@@ -47,6 +47,9 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 | `EstablishmentCard` | `src/components/molecules/EstablishmentCard.svelte` | Categoria e Favoritos, com variantes que preservam os estilos de cada página |
 | `EstablishmentFacadeCard` | `src/components/atoms/EstablishmentFacadeCard.svelte` | Prévia temporária de componentes; recebe campos prontos por props e não acessa a API |
 | `AboutUnitCard` | `src/components/atoms/AboutUnitCard.svelte` | Prévia temporária; exibição larga com título h3 |
+| `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; destaque e ocultação dos irmãos preservam as dimensões da grade |
+| `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
+| `Map` | `src/components/Map.svelte` | Categoria, Favoritos e prévia de componentes |
 | `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; truncamento, expansão e recolhimento são controlados por estado da composição |
 | `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes; clique no mapa abre tela cheia, e Voltar ou Escape fecha |
 | `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
@@ -57,6 +60,14 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 `BenefitCard` recebe `discounts` (lista de `{ value, description }`), `audience` e, opcionalmente, `title` e `audienceLabel`. Os estilos ficam em `src/components/styles/benefit-card.css`, com seletores limitados à classe `.benefit-details-card` para não conflitar com `BenefitLocationCard`.
 
 Cada descrição aparece em uma linha, com reticências após a última palavra inteira que cabe na largura disponível. A palavra que ultrapassa o limite fica totalmente oculta, sem cortes no meio. Apenas as linhas truncadas são interativas: clique, Enter ou Espaço alternam a descrição completa abaixo do destaque. A expansão de cada linha é independente, aumenta a altura do card e mantém o público abaixo da divisória verde. A detecção de truncamento acompanha mudanças de largura e conteúdo. O componente usa a fonte de sistema confirmada e recebe somente dados de apresentação, sem integração com API.
+
+### Animação dos cards expansíveis
+
+`BenefitCard` usa `src/lib/benefitDescriptionMotion.ts` para mover um único texto visível da posição ao lado do destaque para baixo dele, em um trajeto curvo contínuo. A posição e a área visível da descrição e a altura ocupada pela linha são animadas juntas por 420 ms. A quebra de linhas é mantida estável durante o movimento, e o texto desce antes de se alinhar à esquerda para não atravessar o título. Ao recolher, retorna à posição original e recupera as reticências após palavras inteiras. Cliques consecutivos retomam a geometria visível, e mudanças de largura recalculam o layout.
+
+`ExpandableAboutUnitCard` usa `src/lib/aboutUnitExpansion.ts` em duas etapas: primeiro ocupa a largura permitida pela grade em 260 ms; depois cresce para baixo em 320 ms, revelando a descrição. Ao fechar, recolhe a altura antes de retornar à largura original. Não há escala, deslocamento ou animação aplicados às letras; a descrição adota a largura final após a etapa horizontal. Seu slot continua com a altura recolhida, preservando as dimensões da página. O pai oculta os outros cards por opacidade durante 260 ms, mantendo seus espaços na grade; o card largo abaixo também permanece montado. O contêiner com `data-about-unit-area` delimita a área disponível. Se um texto ultrapassa essa área, a descrição permite rolagem interna, sem aumentar a página. Cards ocultos ficam `inert` e fora da leitura assistiva; clicar novamente recolhe a descrição e restaura todos. Recolhido, o texto permanece limitado a cinco linhas.
+
+A preferência `prefers-reduced-motion` desativa as animações. Os dois cards expõem `aria-expanded` e `aria-controls`.
 
 ## Páginas e telas no código
 
@@ -95,6 +106,9 @@ Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribu
 
 ### Página de Favoritos
 
+`src/pages/FavoritesPage.svelte` compõe `Map`, `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/styles/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
+
+O mapa usa os tiles reais do OpenStreetMap, nas cores originais, e recebe as coordenadas de `FavoritePlace` (`latitude` e `longitude`). Busca e remoção atualizam a lista, o contador e os pins juntos. Selecionar um pin destaca e traz seu card para a área visível; selecionar um card destaca seu pin e o traz para o mapa quando necessário. Os marcadores existentes são preservados nas mudanças de seleção para manter foco e popups. A localização é opcional e recebida por `userLocation`; a rota fornece uma posição de demonstração, sem solicitar GPS. Os dados de estabelecimentos e coordenadas continuam sendo demonstrativos.
 `src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `ExpandButton`, `EstablishmentCard`, `FloatingTabBar` e `ScrollShadow`. `EstablishmentCard` compõe `FavoriteButton`. Seus estilos ficam em `src/pages/styles/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
 
 Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores dos estabelecimentos permanecem vermelhos em todos eles; a localização de demonstração permanece azul.
@@ -102,6 +116,8 @@ Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844
 As imagens de paisagem apresentam divergências de conteúdo: o celular usa o título “Estabelecimentos da categoria” e o tablet marca a aba “Início”. O solicitante confirmou manter “Estabelecimentos favoritos” e a aba “Favoritos” ativa nas quatro versões.
 
 A página recebe os favoritos e callbacks por propriedades. Busca, ordenação, seleção e expansão são locais à UI; a remoção é delegada ao callback. Os dados de demonstração de `src/pages/favorites.ts` são fornecidos pela rota e não representam integração com o Backend, cache ou persistência.
+
+Na composição atual de `src/App.svelte`, o retorno e a aba Início navegam para `/`. As abas Mapa e Histórico continuam dependendo de telas de destino ainda não implementadas; a troca para o mapa real de Favoritos não cria essas rotas.
 
 ## Contratos dos componentes
 
