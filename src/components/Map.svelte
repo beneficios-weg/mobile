@@ -2,19 +2,7 @@
   import { onMount } from 'svelte'
   import * as L from 'leaflet'
   import 'leaflet/dist/leaflet.css'
-
-  type MapBenefit = {
-    id: string
-    name: string
-    category: string
-    latitude: number
-    longitude: number
-  }
-
-  type MapPosition = {
-    latitude: number
-    longitude: number
-  }
+  import type { MapPlace as MapBenefit, MapPosition, MapViewport } from '../lib/mapTypes'
 
   type Props = {
     benefits: MapBenefit[]
@@ -26,6 +14,8 @@
     userLocation?: MapPosition | null
     routeCoordinates?: [number, number][] | null
     onBenefitSelect?: (benefit: MapBenefit) => void
+    onBenefitOpen?: (benefit: MapBenefit) => void
+    onViewportChange?: (viewport: MapViewport) => void
   }
 
   let {
@@ -38,6 +28,8 @@
     userLocation = null,
     routeCoordinates = null,
     onBenefitSelect,
+    onBenefitOpen,
+    onViewportChange,
   }: Props = $props()
 
   const southAmericaBounds = L.latLngBounds([-45, -78], [10, -34])
@@ -56,6 +48,17 @@
     title.textContent = benefit.name
     category.textContent = benefit.category
     content.append(title, category)
+    if (onBenefitOpen) {
+      const action = document.createElement('button')
+      action.type = 'button'
+      action.className = 'map-popup-action'
+      action.textContent = 'Ver estabelecimento'
+      action.addEventListener('click', () => {
+        const current = benefits.find((item) => item.id === benefit.id)
+        if (current) onBenefitOpen?.(current)
+      })
+      content.append(action)
+    }
     return content
   }
 
@@ -173,6 +176,17 @@
     }
   })
 
+  $effect(() => {
+    const instance = map
+    const nextCenter = center
+    const nextZoom = initialZoom
+    if (!instance) return
+    const current = instance.getCenter()
+    if (Math.abs(current.lat - nextCenter.latitude) > 0.000001 || Math.abs(current.lng - nextCenter.longitude) > 0.000001 || instance.getZoom() !== nextZoom) {
+      instance.setView([nextCenter.latitude, nextCenter.longitude], nextZoom, { animate: false })
+    }
+  })
+
   onMount(() => {
     map = L.map(mapElement, {
       zoomControl: false,
@@ -183,6 +197,14 @@
       minZoom: 4,
       maxZoom: 18,
     }).setView([center.latitude, center.longitude], initialZoom)
+
+    const reportViewport = () => {
+      if (!map) return
+      const current = map.getCenter()
+      onViewportChange?.({ center: { latitude: current.lat, longitude: current.lng }, zoom: map.getZoom() })
+    }
+    map.on('moveend zoomend', reportViewport)
+    reportViewport()
 
     if (showTiles) {
       const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

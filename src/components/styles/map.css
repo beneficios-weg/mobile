@@ -147,6 +147,20 @@
   filter: drop-shadow(0 1px 2px rgb(255 255 255 / 80%));
 }
 
+.benefits-map .map-popup-action {
+  display: block;
+  min-height: 36px;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #00579d;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+.benefits-map .map-popup-action:focus-visible { outline: 3px solid #0878e8; outline-offset: 2px; }
+
 @media (max-width: 620px) {
   .benefits-map {
     padding: 20px 14px 104px;

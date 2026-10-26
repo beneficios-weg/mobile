@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
   import FavoriteButton from '../components/atoms/FavoriteButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
@@ -12,6 +12,9 @@
   import Map from '../components/Map.svelte'
   import { previewEstablishment, type EstablishmentDetails } from './establishment'
   import './styles/EstablishmentInfoPage.css'
+  import { directoryView, goBack, navigateTab, openMap, openEstablishment } from '../lib/navigation.svelte'
+  import { categoryPath, type TabId } from '../lib/routes'
+  import { findPlace } from './catalog'
 
   type Props = {
     establishment?: EstablishmentDetails
@@ -21,10 +24,9 @@
 
   let { establishment = previewEstablishment, liked = $bindable(false), onlikedchange }: Props = $props()
   let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
-  let expandedCard = $state<string | null>(null)
+  const view = untrack(() => directoryView(`detail:${establishment.id}`))
   let scrollElement: HTMLDivElement
   let contentElement: HTMLDivElement
-  let mapElement: HTMLDivElement
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
 
@@ -41,23 +43,21 @@
   ])
 
   function updateScrollShadows() {
+    view.scrollTop = scrollElement.scrollTop
     showTopShadow = scrollElement.scrollTop > 1
     showBottomShadow = scrollElement.scrollTop + scrollElement.clientHeight < scrollElement.scrollHeight - 1
   }
 
-  function goBack() {
-    const referrer = document.referrer ? new URL(document.referrer) : null
-    if (window.history.length > 1 && referrer?.origin === window.location.origin) window.history.back()
-    else window.location.assign('/categoria/saude-e-bem-estar')
+  function returnToOrigin() {
+    goBack(categoryPath(findPlace(establishment.id)?.categorySlug ?? 'saude-e-bem-estar'))
   }
 
-  function navigate(tab: 'home' | 'map' | 'favorites' | 'history') {
-    if (tab === 'home') window.location.assign('/')
-    else if (tab === 'favorites') window.location.assign('/favoritos')
-    else if (tab === 'map') mapElement.querySelector<HTMLElement>('.leaflet-container')?.focus()
-    else {
-      window.location.assign('/visitados')
-    }
+  function handleNavigation(tab: TabId) {
+    if (tab === 'map') openMap({ title: establishment.name, benefits: mapBenefits, center: view.mapViewport?.center ?? position,
+      initialZoom: view.mapViewport?.zoom ?? 15, onviewportchange: (viewport) => { view.mapViewport = viewport },
+      selectedBenefitId: establishment.id, onclose: () => { selectedTab = 'home' },
+    })
+    else navigateTab(tab)
   }
 
   function openDirections() {
@@ -66,6 +66,7 @@
   }
 
   onMount(() => {
+    scrollElement.scrollTop = view.scrollTop
     const observer = new ResizeObserver(updateScrollShadows)
     observer.observe(scrollElement)
     observer.observe(contentElement)
@@ -80,12 +81,12 @@
 </svelte:head>
 
 <svelte:window onkeydown={(event) => {
-  if (event.key === 'Escape') expandedCard = null
+  if (event.key === 'Escape') view.expandedCard = null
 }} />
 
 <main class="establishment-page">
   <header class="establishment-page__header">
-    <BackButton onclick={goBack} />
+    <BackButton onclick={returnToOrigin} />
     <h1>{establishment.name}</h1>
   </header>
 
@@ -93,8 +94,8 @@
     <FavoriteButton bind:liked {onlikedchange} />
   </div>
 
-  <div class="establishment-page__map" bind:this={mapElement}>
-    <Map benefits={mapBenefits} variant="category" center={position} initialZoom={15} selectedBenefitId={establishment.id} />
+  <div class="establishment-page__map">
+    <Map benefits={mapBenefits} variant="category" center={view.mapViewport?.center ?? position} initialZoom={view.mapViewport?.zoom ?? 15} onViewportChange={(viewport) => view.mapViewport = viewport} selectedBenefitId={establishment.id} onBenefitOpen={(place) => openEstablishment(place.id)} />
   </div>
 
   <section class="establishment-page__details" aria-labelledby="establishment-info-title">
@@ -123,12 +124,12 @@
           <section class="establishment-page__supplementary" aria-label="Sobre a unidade e serviços" data-about-unit-area>
             <div class="about-unit-card-grid">
               {#each supplementaryCards as card (card.id)}
-                {@const hidden = expandedCard !== null && expandedCard !== card.id}
+                {@const hidden = view.expandedCard !== null && view.expandedCard !== card.id}
                 <div class="about-unit-card-grid__item about-unit-card-visibility" class:is-hidden={hidden} inert={hidden} aria-hidden={hidden}>
                   <ExpandableAboutUnitCard title={card.title} description={card.description}
                     expansionMode={card.id === 'about' ? 'content' : 'area'}
-                    expanded={expandedCard === card.id}
-                    onclick={() => expandedCard = expandedCard === card.id ? null : card.id} />
+                    expanded={view.expandedCard === card.id}
+                    onclick={() => view.expandedCard = view.expandedCard === card.id ? null : card.id} />
                 </div>
               {/each}
             </div>
@@ -140,6 +141,6 @@
   </section>
 
   <div class="establishment-page__navigation">
-    <FloatingTabBar bind:selected={selectedTab} ontabchange={navigate} />
+    <FloatingTabBar bind:selected={selectedTab} ontabchange={handleNavigation} />
   </div>
 </main>

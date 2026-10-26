@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import CategoryButton, { type CategoryButtonTone } from '../components/atoms/CategoryButton.svelte'
+  import CategoryButton from '../components/atoms/CategoryButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
   import Map from '../components/Map.svelte'
@@ -13,78 +13,39 @@
   import leisureIcon from '../assets/leisure.svg'
   import apparelIcon from '../assets/aesthetics-apparel.svg'
   import './MainPage.css'
+  import { categories, homePlaces, findCategory } from './catalog'
+  import { directoryView, navigate, navigateTab, openMap, openCategory, openEstablishment } from '../lib/navigation.svelte'
+  import type { TabId } from '../lib/routes'
 
-  type Category = {
-    label: string
-    icon: string
-    tone: CategoryButtonTone
-    href?: string
-  }
+  const icons = { clients: clientsIcon, education: educationIcon, languages: languagesIcon, training: trainingIcon,
+    health: healthIcon, leisure: leisureIcon, apparel: apparelIcon }
+  const view = directoryView('home')
+  const mapBenefits = homePlaces.map(place => ({ id: place.id, name: place.name,
+    category: findCategory(place.categorySlug)?.label ?? '', latitude: place.latitude, longitude: place.longitude }))
 
-  const categories: Category[] = [
-    { label: 'Clientes WEG', icon: clientsIcon, tone: 'sky' },
-    { label: 'Educação', icon: educationIcon, tone: 'lavender' },
-    { label: 'Idiomas', icon: languagesIcon, tone: 'mint' },
-    { label: 'Cursos e Treinamentos', icon: trainingIcon, tone: 'amber' },
-    { label: 'Saúde e Bem-Estar', icon: healthIcon, tone: 'coral', href: '/categoria/saude-e-bem-estar' },
-    { label: 'Lazer', icon: leisureIcon, tone: 'rose' },
-    { label: 'Estética e Vestuário', icon: apparelIcon, tone: 'slate' },
-  ]
-
-  // Dados de apresentação locais; não representam o contrato da API.
-  const demoBenefits = [
-    { id: 'home-1', name: 'Academia Move', category: 'Saúde e Bem-Estar', latitude: -26.294, longitude: -48.87 },
-    { id: 'home-2', name: 'Centro Educacional', category: 'Educação', latitude: -26.306, longitude: -48.84 },
-    { id: 'home-3', name: 'Clube de Idiomas', category: 'Idiomas', latitude: -26.289, longitude: -48.824 },
-    { id: 'home-4', name: 'Espaço Bem-Estar', category: 'Saúde e Bem-Estar', latitude: -26.312, longitude: -48.855 },
-    { id: 'home-5', name: 'Cursos WEG', category: 'Cursos e Treinamentos', latitude: -26.28, longitude: -48.852 },
-    { id: 'home-6', name: 'Loja Parceira', category: 'Clientes WEG', latitude: -26.303, longitude: -48.813 },
-  ]
-
-  let selectedCategory = $state<string | null>(null)
   let activeTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
-  let selectedBenefitId = $state<string | null>(null)
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
-  let navigationMessage = $state('')
   let categoryList: HTMLDivElement
   let categoryGrid: HTMLDivElement
-  let mapElement: HTMLDivElement
   const userLocation = { latitude: -26.3, longitude: -48.846 }
-  const visibleBenefits = $derived(selectedCategory
-    ? demoBenefits.filter((benefit) => benefit.category === selectedCategory)
-    : demoBenefits)
-
-  function selectCategory(category: Category) {
-    if (category.href) {
-      window.location.assign(category.href)
-      return
-    }
-    selectedCategory = selectedCategory === category.label ? null : category.label
-    selectedBenefitId = null
-    navigationMessage = selectedCategory && !visibleBenefits.length
-      ? 'Nenhum estabelecimento encontrado nesta categoria.'
-      : ''
-  }
-
-  function navigate(tab: 'home' | 'map' | 'favorites' | 'history') {
-    navigationMessage = ''
-    if (tab === 'favorites') window.location.assign('/favoritos')
-    else if (tab === 'map') mapElement.querySelector<HTMLElement>('.leaflet-container')?.focus()
-    else if (tab === 'home') {
-      selectedCategory = null
-      selectedBenefitId = null
-    } else {
-      window.location.assign('/visitados')
-    }
+  function handleNavigation(tab: TabId) {
+    if (tab === 'map') openMap({ title: 'Mapa de benefícios', benefits: mapBenefits, center: view.mapViewport?.center ?? userLocation, userLocation,
+      initialZoom: view.mapViewport?.zoom ?? 13, onviewportchange: (viewport) => { view.mapViewport = viewport },
+      selectedBenefitId: view.selectedPlaceId, onselect: (id) => { view.selectedPlaceId = id },
+      onclose: () => { activeTab = 'home' },
+    })
+    else navigateTab(tab)
   }
 
   function updateScrollShadows() {
+    view.scrollTop = categoryList.scrollTop
     showTopShadow = categoryList.scrollTop > 1
     showBottomShadow = categoryList.scrollTop + categoryList.clientHeight < categoryList.scrollHeight - 1
   }
 
   onMount(() => {
+    categoryList.scrollTop = view.scrollTop
     const observer = new ResizeObserver(updateScrollShadows)
     observer.observe(categoryList)
     observer.observe(categoryGrid)
@@ -102,20 +63,28 @@
   <section class="directory-map-column main-page__map-column" aria-label="Benefícios próximos">
     <header class="directory-map-header main-page__header">
       <img class="main-page__logo" src={logo} alt="WEG Benefits" />
+      <a class="main-page__login" href="/login" onclick={(event) => {
+        if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+        event.preventDefault()
+        navigate('/login')
+      }}>Entrar</a>
     </header>
 
-    <div class="directory-map main-page__map" bind:this={mapElement}>
+    <div class="directory-map main-page__map">
       <Map
-        benefits={visibleBenefits}
+        benefits={mapBenefits}
         variant="default"
-        center={userLocation}
+        center={view.mapViewport?.center ?? userLocation}
+        initialZoom={view.mapViewport?.zoom ?? 13}
+        onViewportChange={(viewport) => view.mapViewport = viewport}
         {userLocation}
-        {selectedBenefitId}
-        onBenefitSelect={(benefit) => selectedBenefitId = benefit.id}
+        selectedBenefitId={view.selectedPlaceId}
+        onBenefitSelect={(benefit) => view.selectedPlaceId = benefit.id}
+        onBenefitOpen={(benefit) => openEstablishment(benefit.id)}
       />
     </div>
 
-    <FloatingTabBar bind:selected={activeTab} ontabchange={navigate} />
+    <FloatingTabBar bind:selected={activeTab} ontabchange={handleNavigation} />
   </section>
 
   <section class="directory-results main-page__categories" aria-labelledby="main-page-categories-title">
@@ -130,10 +99,9 @@
           {#each categories as category (category.label)}
             <CategoryButton
               label={category.label}
-              icon={category.icon}
+              icon={icons[category.icon]}
               tone={category.tone}
-              selected={selectedCategory === category.label}
-              onclick={() => selectCategory(category)}
+              onclick={() => openCategory(category.slug)}
             />
           {/each}
         </div>
@@ -142,5 +110,4 @@
     </div>
   </section>
 
-  <p class="main-page__status" role="status">{navigationMessage}</p>
 </main>
