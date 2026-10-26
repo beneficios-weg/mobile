@@ -23,8 +23,8 @@
     label ?? (expanded ? 'Recolher mapa' : 'Expandir mapa'),
   )
   const buttonClass = $derived(
-    variant === 'category-list' ? 'category-results__expand'
-      : variant === 'favorites-list' ? 'favorites-results__expand'
+    variant === 'category-list' ? 'directory-results__expand category-results__expand'
+      : variant === 'favorites-list' ? 'directory-results__expand favorites-results__expand'
         : 'expand-button',
   )
 

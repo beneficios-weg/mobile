@@ -61,7 +61,6 @@
     items: MapBenefit[],
     onSelect?: (benefit: MapBenefit) => void,
     selectedId: string | null = null,
-    categoryStyle = false,
   ) {
     benefitMarkers ??= L.layerGroup().addTo(mapInstance)
     benefitMarkers.clearLayers()
@@ -69,13 +68,11 @@
     for (const benefit of items) {
       const marker = L.marker([benefit.latitude, benefit.longitude], {
         icon: L.divIcon({
-          className: categoryStyle ? 'benefit-marker-wrapper benefit-marker-wrapper--category' : 'benefit-marker-wrapper',
-          html: categoryStyle
-            ? `<span class="benefit-marker benefit-marker--category${benefit.id === selectedId ? ' is-selected' : ''}"></span>`
-            : '<span class="benefit-marker"></span>',
-          iconSize: categoryStyle ? [24, 24] : [30, 42],
-          iconAnchor: categoryStyle ? [12, 12] : [15, 38],
-          popupAnchor: categoryStyle ? [0, -12] : [0, -36],
+          className: 'benefit-marker-wrapper',
+          html: `<span class="benefit-marker${benefit.id === selectedId ? ' is-selected' : ''}"></span>`,
+          iconSize: [30, 42],
+          iconAnchor: [15, 38],
+          popupAnchor: [0, -36],
         }),
         title: benefit.name,
         alt: benefit.name,
@@ -136,7 +133,6 @@
   $effect(() => {
     const currentMap = map
     const currentBenefits = benefits
-    const currentVariant = variant
     const currentSelectedBenefitId = selectedBenefitId
     const currentLocation = userLocation
     const currentRouteCoordinates = routeCoordinates
@@ -149,7 +145,6 @@
       currentBenefits,
       currentOnBenefitSelect,
       currentSelectedBenefitId,
-      currentVariant === 'category',
     )
     renderUserLocation(currentMap, currentLocation)
     renderRoute(currentMap, currentRouteCoordinates)
@@ -195,29 +190,6 @@
 </script>
 
 <section class="benefits-map" class:benefits-map--category={variant === 'category'} aria-label="Mapa de benefícios">
-  {#if variant === 'category'}
-    <svg class="map-filter-definitions" aria-hidden="true" focusable="false">
-      <defs>
-        <filter id="osm-empty-land-tint" color-interpolation-filters="sRGB">
-          <feColorMatrix
-            in="SourceGraphic"
-            type="matrix"
-            values="1 0 0 0 0
-              0 1 0 0 0
-              0 0 1 0 0
-              2.126 7.152 0.722 0 -9"
-            result="brightness-mask"
-          />
-          <feComponentTransfer in="brightness-mask" result="empty-area-mask">
-            <feFuncA type="table" tableValues="0 0 1 0 0" />
-          </feComponentTransfer>
-          <feFlood flood-color="#001f3f" result="blue-tint" />
-          <feComposite in="blue-tint" in2="empty-area-mask" operator="in" result="tinted-empty-area" />
-          <feBlend in="SourceGraphic" in2="tinted-empty-area" mode="normal" />
-        </filter>
-      </defs>
-    </svg>
-  {/if}
   <div class="map-frame">
     <div
       class="map-canvas"

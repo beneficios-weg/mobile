@@ -144,17 +144,17 @@
   })
 </script>
 
-<main class="category-page" class:list-expanded={listExpanded}>
-  <section class="category-map-column" aria-label="Mapa da categoria">
-    <header class="category-map-header">
+<main class="directory-page category-page" class:list-expanded={listExpanded}>
+  <section class="directory-map-column category-map-column" aria-label="Mapa da categoria">
+    <header class="directory-map-header category-map-header">
       <BackButton onclick={onback} />
-      <h1 class="category-page__title">Saúde e Bem-Estar</h1>
+      <h1 class="directory-page__title category-page__title">Saúde e Bem-Estar</h1>
     </header>
 
-    <div class="category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
+    <div class="directory-map category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
       <Map
+        variant="default"
         benefits={mapBenefits}
-        variant="category"
         center={mapCenter}
         initialZoom={13}
         selectedBenefitId={selectedPlaceId}
@@ -165,13 +165,13 @@
     <FloatingTabBar bind:selected={selectedTab} />
   </section>
 
-  <section class="category-results" aria-labelledby="category-results-title">
-    <div class="category-results__controls">
-      <div class="category-results__expanded-header">
+  <section class="directory-results category-results" aria-labelledby="category-results-title">
+    <div class="directory-results__controls category-results__controls">
+      <div class="directory-results__expanded-header category-results__expanded-header">
         <BackButton label="Voltar para o mapa" onclick={() => (listExpanded = false)} />
-        <h1 class="category-page__title">Saúde e Bem-Estar</h1>
+        <h1 class="directory-page__title category-page__title">Saúde e Bem-Estar</h1>
       </div>
-      <h2 id="category-results-title" class="category-results__title">Estabelecimentos da categoria</h2>
+      <h2 id="category-results-title" class="directory-results__title category-results__title">Estabelecimentos da categoria</h2>
 
       <Search
         bind:value={searchValue}
@@ -181,7 +181,7 @@
 
       <FilterDropdown bind:value={filterSelection} onapply={applyFilters} />
 
-      <div class="category-results__count-row">
+      <div class="directory-results__count-row category-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
         <ExpandButton
           variant="category-list"
@@ -191,11 +191,11 @@
       </div>
     </div>
 
-    <div class="category-results__list-frame">
+    <div class="directory-results__list-frame category-results__list-frame">
       <ScrollShadow edge="top" visible={showTopShadow} />
       <div
         bind:this={listElement}
-        class="category-results__list"
+        class="directory-results__list category-results__list"
         aria-label="Estabelecimentos encontrados"
         onscroll={handleListScroll}
       >
