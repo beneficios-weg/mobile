@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
+  import ExpandButton from '../components/atoms/ExpandButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
@@ -8,7 +9,7 @@
   import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
   import Map from '../components/Map.svelte'
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
-  import healthIcon from '../assets/categories/health-wellbeing.svg'
+  import healthIcon from '../assets/health-wellbeing.svg'
 
   type CategoryPlace = {
     id: string
@@ -143,17 +144,17 @@
   })
 </script>
 
-<main class="category-page" class:list-expanded={listExpanded}>
-  <section class="category-map-column" aria-label="Mapa da categoria">
-    <header class="category-map-header">
+<main class="directory-page category-page" class:list-expanded={listExpanded}>
+  <section class="directory-map-column category-map-column" aria-label="Mapa da categoria">
+    <header class="directory-map-header category-map-header">
       <BackButton onclick={onback} />
-      <h1 class="category-page__title">Saúde e Bem-Estar</h1>
+      <h1 class="directory-page__title category-page__title">Saúde e Bem-Estar</h1>
     </header>
 
-    <div class="category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
+    <div class="directory-map category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
       <Map
+        variant="default"
         benefits={mapBenefits}
-        variant="category"
         center={mapCenter}
         initialZoom={13}
         selectedBenefitId={selectedPlaceId}
@@ -164,13 +165,13 @@
     <FloatingTabBar bind:selected={selectedTab} />
   </section>
 
-  <section class="category-results" aria-labelledby="category-results-title">
-    <div class="category-results__controls">
-      <div class="category-results__expanded-header">
+  <section class="directory-results category-results" aria-labelledby="category-results-title">
+    <div class="directory-results__controls category-results__controls">
+      <div class="directory-results__expanded-header category-results__expanded-header">
         <BackButton label="Voltar para o mapa" onclick={() => (listExpanded = false)} />
-        <h1 class="category-page__title">Saúde e Bem-Estar</h1>
+        <h1 class="directory-page__title category-page__title">Saúde e Bem-Estar</h1>
       </div>
-      <h2 id="category-results-title" class="category-results__title">Estabelecimentos da categoria</h2>
+      <h2 id="category-results-title" class="directory-results__title category-results__title">Estabelecimentos da categoria</h2>
 
       <Search
         bind:value={searchValue}
@@ -180,33 +181,21 @@
 
       <FilterDropdown bind:value={filterSelection} onapply={applyFilters} />
 
-      <div class="category-results__count-row">
+      <div class="directory-results__count-row category-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
-        <button
-          class="category-results__expand"
-          type="button"
-          aria-label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de estabelecimentos'}
-          aria-pressed={listExpanded}
-          onclick={() => (listExpanded = !listExpanded)}
-        >
-          {#if listExpanded}
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M8 3v5H3m18 0h-5V3M3 16h5v5m13-5h-5v5" />
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M14 4h6v6m0-6-7 7M10 20H4v-6m0 6 7-7" />
-            </svg>
-          {/if}
-        </button>
+        <ExpandButton
+          variant="category-list"
+          bind:expanded={listExpanded}
+          label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de estabelecimentos'}
+        />
       </div>
     </div>
 
-    <div class="category-results__list-frame">
+    <div class="directory-results__list-frame category-results__list-frame">
       <ScrollShadow edge="top" visible={showTopShadow} />
       <div
         bind:this={listElement}
-        class="category-results__list"
+        class="directory-results__list category-results__list"
         aria-label="Estabelecimentos encontrados"
         onscroll={handleListScroll}
       >

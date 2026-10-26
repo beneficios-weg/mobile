@@ -22,6 +22,8 @@
   import EstablishmentInfoPage from "./pages/EstablishmentInfoPage.svelte";
   import { previewFavorites, previewFavoritesLocation } from "./pages/favorites";
 
+  import MainPage from "./pages/MainPage.svelte";
+  import { previewFavorites } from "./pages/favorites";
   import './components/styles/style.css'
   let selectedCategory = $state("Alimentação");
   let activeTab = $state<"home" | "map" | "favorites" | "history">("home");
@@ -61,6 +63,7 @@
   const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
   const isLoginRoute = window.location.pathname.replace(/\/$/, "") === "/login";
   const isEstablishmentRoute = window.location.pathname.replace(/\/$/, "") === "/estabelecimento/academia-move";
+  const isComponentPreviewRoute = window.location.pathname.replace(/\/$/, "") === "/componentes-preview";
   let favoritePlaces = $state([...previewFavorites]);
 
   function returnToHome() {
@@ -88,7 +91,7 @@
   />
 {:else if isCategoryRoute}
   <CategoryPage onback={returnToHome} />
-{:else}
+{:else if isComponentPreviewRoute}
 <main class="component-preview">
   <header class="preview-header">
     <div>
@@ -222,6 +225,8 @@
 
   <FloatingTabBar bind:selected={activeTab} />
 </main>
+{:else}
+  <MainPage />
 {/if}
 
 <style>

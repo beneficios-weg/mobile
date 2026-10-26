@@ -75,6 +75,15 @@
   max-width: 100%;
   min-width: 0;
   vertical-align: top;
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.benefit-details-card .benefit-details-card__value {
+  flex: 0 1 auto;
+  min-width: 0;
   color: #009b6a;
   font-size: 18px;
   font-weight: 600;
@@ -95,6 +104,24 @@
 
 .benefit-details-card .benefit-details-card__description-text {
   display: block;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  color: #667e95;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.benefit-details-card .benefit-details-card__description.concealed {
+  visibility: hidden;
+}
+
+.benefit-details-card .benefit-details-card__full-description {
+  display: block;
+  margin-top: 4px;
+  color: #667e95;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .benefit-details-card .benefit-details-card__audience {

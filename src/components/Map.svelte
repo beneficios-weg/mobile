@@ -19,6 +19,7 @@
   type Props = {
     benefits: MapBenefit[]
     variant?: 'default' | 'category'
+    showTiles?: boolean
     center?: MapPosition
     initialZoom?: number
     selectedBenefitId?: string | null
@@ -30,6 +31,7 @@
   let {
     benefits,
     variant = 'default',
+    showTiles = true,
     center = { latitude: -26.483, longitude: -49.078 },
     initialZoom = 13,
     selectedBenefitId = null,
@@ -61,7 +63,6 @@
     mapInstance: L.Map,
     items: MapBenefit[],
     selectedId: string | null = null,
-    categoryStyle = false,
   ) {
     benefitMarkers ??= L.layerGroup().addTo(mapInstance)
     const visibleIds = new Set(items.map((benefit) => benefit.id))
@@ -99,6 +100,17 @@
         const wasCategory = marker.options.icon?.options.className?.includes('benefit-marker-wrapper--category') ?? false
         if (wasCategory !== categoryStyle) marker.setIcon(createIcon())
       }
+      const marker = L.marker([benefit.latitude, benefit.longitude], {
+        icon: L.divIcon({
+          className: 'benefit-marker-wrapper',
+          html: `<span class="benefit-marker${benefit.id === selectedId ? ' is-selected' : ''}"></span>`,
+          iconSize: [30, 42],
+          iconAnchor: [15, 38],
+          popupAnchor: [0, -36],
+        }),
+        title: benefit.name,
+        alt: benefit.name,
+      }).addTo(benefitMarkers)
 
       marker.bindPopup(createBenefitPopup(benefit))
       const element = marker.getElement()
@@ -158,7 +170,6 @@
   $effect(() => {
     const currentMap = map
     const currentBenefits = benefits
-    const currentVariant = variant
     const currentSelectedBenefitId = selectedBenefitId
     const currentLocation = userLocation
     const currentRouteCoordinates = routeCoordinates
@@ -169,7 +180,6 @@
       currentMap,
       currentBenefits,
       currentSelectedBenefitId,
-      currentVariant === 'category',
     )
     renderUserLocation(currentMap, currentLocation)
     renderRoute(currentMap, currentRouteCoordinates)
@@ -182,7 +192,7 @@
   onMount(() => {
     map = L.map(mapElement, {
       zoomControl: false,
-      attributionControl: variant !== 'category',
+      attributionControl: showTiles && variant !== 'category',
       preferCanvas: true,
       maxBounds: southAmericaBounds,
       maxBoundsViscosity: 2,
@@ -190,15 +200,17 @@
       maxZoom: 18,
     }).setView([center.latitude, center.longitude], initialZoom)
 
-    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-    L.tileLayer(tileUrl, {
-      maxZoom: 18,
-      noWrap: true,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map)
+    if (showTiles) {
+      const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      L.tileLayer(tileUrl, {
+        maxZoom: 18,
+        noWrap: true,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map)
+    }
 
-    if (variant === 'category') {
+    if (variant === 'category' && showTiles) {
       L.control.attribution({ position: 'topright', prefix: false }).addTo(map)
     }
     if (variant === 'default') L.control.zoom({ position: 'bottomright' }).addTo(map)

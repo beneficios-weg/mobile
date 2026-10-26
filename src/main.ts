@@ -1,6 +1,7 @@
 import { mount } from 'svelte'
 import './app.css'
 import './components/styles/index.css'
+import './pages/styles/DirectoryPage.css'
 import './pages/styles/CategoryPage.css'
 import App from './App.svelte'
 

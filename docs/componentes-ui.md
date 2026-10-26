@@ -31,6 +31,7 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 | Componente implementado | Arquivo | Uso atual |
 |---|---|---|
 | `BackButton` | `src/components/atoms/BackButton.svelte` | Categoria e prévia de componentes |
+| `ExpandButton` | `src/components/atoms/ExpandButton.svelte` | Categoria, Favoritos e prévia de componentes |
 | `Input` | `src/components/atoms/Input.svelte` | Login e prévia de componentes |
 | `Search` | `src/components/atoms/Search.svelte` | Categoria e prévia de componentes |
 | `PrimaryButton` | `src/components/atoms/PrimaryButton.svelte` | Login e prévia de componentes |
@@ -43,12 +44,16 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 | `FilterButton` | `src/components/atoms/FilterButton.svelte` | Usado por `FilterDropdown` |
 | `BenefitLocationCard` | `src/components/atoms/BenefitLocationCard.svelte` | Prévia de componentes |
 | `FilterDropdown` | `src/components/molecules/FilterDropdown.svelte` | Categoria; ordena os resultados e pode restringir a estabelecimentos em horário de funcionamento |
-| `EstablishmentCard` | `src/components/molecules/EstablishmentCard.svelte` | Categoria |
+| `EstablishmentCard` | `src/components/molecules/EstablishmentCard.svelte` | Categoria e Favoritos, com variantes que preservam os estilos de cada página |
 | `EstablishmentFacadeCard` | `src/components/atoms/EstablishmentFacadeCard.svelte` | Prévia temporária de componentes; recebe campos prontos por props e não acessa a API |
 | `AboutUnitCard` | `src/components/atoms/AboutUnitCard.svelte` | Prévia temporária; exibição larga com título h3 |
 | `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; destaque e ocultação dos irmãos preservam as dimensões da grade |
 | `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
 | `Map` | `src/components/Map.svelte` | Categoria, Favoritos e prévia de componentes |
+| `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; truncamento, expansão e recolhimento são controlados por estado da composição |
+| `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes; clique no mapa abre tela cheia, e Voltar ou Escape fecha |
+| `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
+| `Map` | `src/components/Map.svelte` | Categoria e prévia de componentes |
 
 ### Card de Benefício
 
@@ -93,11 +98,18 @@ font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif
 
 Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribuir SF Pro. A indicação anterior de Inter como fonte obrigatória foi substituída por esta decisão. Não adicionar fontes externas nem alterar a tipografia dos componentes compartilhados para atender uma única página: aplicar o padrão na composição da página. Se faltar informação no protótipo ou no padrão existente, confirmar antes de escolher.
 
+### Reutilização sem alteração de layout
+
+`ExpandButton` mantém a apresentação original da prévia na variante padrão `map`. As variantes `category-list` e `favorites-list` preservam as classes, os ícones e os atributos de acessibilidade dos botões de expansão que já existiam nas respectivas páginas. Favoritos mantém também a referência ao botão para devolver o foco ao recolher a lista.
+
+`EstablishmentCard` usa a variante `category` por padrão; a variante `favorites` preserva as classes `favorites-card`, a formatação do texto, o estado selecionado e a opção de desabilitar a remoção. As folhas de estilo das páginas continuam definindo suas dimensões, posições e espaçamentos.
+
 ### Página de Favoritos
 
 `src/pages/FavoritesPage.svelte` compõe `Map`, `BackButton`, `Search`, `ResultsCount`, `FavoriteButton`, `FloatingTabBar` e `ScrollShadow`. Seus estilos ficam em `src/pages/styles/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
 
 O mapa usa os tiles reais do OpenStreetMap, nas cores originais, e recebe as coordenadas de `FavoritePlace` (`latitude` e `longitude`). Busca e remoção atualizam a lista, o contador e os pins juntos. Selecionar um pin destaca e traz seu card para a área visível; selecionar um card destaca seu pin e o traz para o mapa quando necessário. Os marcadores existentes são preservados nas mudanças de seleção para manter foco e popups. A localização é opcional e recebida por `userLocation`; a rota fornece uma posição de demonstração, sem solicitar GPS. Os dados de estabelecimentos e coordenadas continuam sendo demonstrativos.
+`src/pages/FavoritesPage.svelte` compõe `BackButton`, `Search`, `ResultsCount`, `ExpandButton`, `EstablishmentCard`, `FloatingTabBar` e `ScrollShadow`. `EstablishmentCard` compõe `FavoriteButton`. Seus estilos ficam em `src/pages/styles/FavoritesPage.css`, limitados à classe `.favorites-page`. A tela é acessível diretamente em `/favoritos`, sem ser exibida na tela inicial.
 
 Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores dos estabelecimentos permanecem vermelhos em todos eles; a localização de demonstração permanece azul.
 
