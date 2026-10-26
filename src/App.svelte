@@ -57,9 +57,7 @@
   const categoryRoute = "/categoria/saude-e-bem-estar";
   const isCategoryRoute = window.location.pathname === categoryRoute;
   const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
-  const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
-  const isHomePreviewRoute = currentPath === "/" || currentPath === "/inicio-preview";
-  const isComponentPreviewRoute = currentPath === "/componentes-preview";
+  const isComponentPreviewRoute = window.location.pathname.replace(/\/$/, "") === "/componentes-preview";
   let favoritePlaces = $state([...previewFavorites]);
 
   function returnToHome() {
@@ -68,12 +66,10 @@
 </script>
 
 <svelte:head>
-  <title>{isHomePreviewRoute ? "Início — WEG Benefits" : isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
+  <title>{isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
-{#if isHomePreviewRoute}
-  <MainPage />
-{:else if isFavoritesRoute}
+{#if isFavoritesRoute}
   <FavoritesPage
     places={favoritePlaces}
     onback={returnToHome}

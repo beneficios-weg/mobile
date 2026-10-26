@@ -54,7 +54,13 @@
   </header>
 
   <section class="main-page__map" aria-label="Benefícios próximos">
-    <Map />
+    <Map
+      benefits={demoBenefits}
+      variant="category"
+      showTiles={false}
+      center={userLocation}
+      {userLocation}
+    />
   </section>
 
   <section class="main-page__categories" aria-labelledby="main-page-categories-title">
