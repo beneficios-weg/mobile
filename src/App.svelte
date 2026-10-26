@@ -16,6 +16,7 @@
   import Search from "./components/atoms/Search.svelte";
   import { demoBenefits } from "./services/benefitsService";
   import CategoryPage from "./pages/CategoryPage.svelte";
+  import VisitedPage from "./pages/VisitedPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
   import Login from "./pages/Login.svelte";
   import EstablishmentInfoPage from "./pages/EstablishmentInfoPage.svelte";
@@ -58,6 +59,7 @@
   const categoryRoute = "/categoria/saude-e-bem-estar";
   const isCategoryRoute = window.location.pathname === categoryRoute;
   const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
+  const isVisitedRoute = window.location.pathname.replace(/\/$/, "") === "/visitados";
   const isLoginRoute = window.location.pathname.replace(/\/$/, "") === "/login";
   const isEstablishmentRoute = window.location.pathname.replace(/\/$/, "") === "/estabelecimento/academia-move";
   const isComponentPreviewRoute = window.location.pathname.replace(/\/$/, "") === "/componentes-preview";
@@ -69,7 +71,7 @@
 </script>
 
 <svelte:head>
-  <title>{isLoginRoute ? "Entrar — WEG Benefits" : isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
+  <title>{isVisitedRoute ? "Visitados — WEG Benefits" : isLoginRoute ? "Entrar — WEG Benefits" : isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
 {#if isEstablishmentRoute}
@@ -84,10 +86,17 @@
     onremovefavorite={(id) => (favoritePlaces = favoritePlaces.filter((place) => place.id !== id))}
     onnavigate={(tab) => {
       if (tab === "home") returnToHome();
+      if (tab === "history") window.location.assign("/visitados");
     }}
   />
+{:else if isVisitedRoute}
+  <VisitedPage onback={returnToHome} />
 {:else if isCategoryRoute}
-  <CategoryPage onback={returnToHome} />
+  <CategoryPage onback={returnToHome} onnavigate={(tab) => {
+    if (tab === "home") returnToHome();
+    if (tab === "favorites") window.location.assign("/favoritos");
+    if (tab === "history") window.location.assign("/visitados");
+  }} />
 {:else if isComponentPreviewRoute}
 <main class="component-preview">
   <header class="preview-header">

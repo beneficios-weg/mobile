@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
   import ExpandButton from '../components/atoms/ExpandButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
@@ -27,10 +27,34 @@
   }
   type Props = {
     onback?: () => void
+    variant?: 'category' | 'visited'
+    onnavigate?: (tab: 'home' | 'map' | 'favorites' | 'history') => void
   }
 
-  let { onback }: Props = $props()
+  let { onback, variant = 'category', onnavigate }: Props = $props()
+  const text = $derived(variant === 'visited' ? {
+    title: 'Visitados',
+    resultsTitle: 'Estabelecimentos visitados',
+    mapColumnLabel: 'Mapa de estabelecimentos visitados',
+    mapLabel: 'Mapa dos estabelecimentos visitados',
+    listLabel: 'Estabelecimentos visitados encontrados',
+    expandLabel: 'Expandir lista de estabelecimentos visitados',
+    emptyTitle: 'Nenhum estabelecimento visitado encontrado',
+    resultsTitleId: 'visited-results-title',
+    searchContext: '',
+  } : {
+    title: 'Saúde e Bem-Estar',
+    resultsTitle: 'Estabelecimentos da categoria',
+    mapColumnLabel: 'Mapa da categoria',
+    mapLabel: 'Mapa dos estabelecimentos da categoria',
+    listLabel: 'Estabelecimentos encontrados',
+    expandLabel: 'Expandir lista de estabelecimentos',
+    emptyTitle: 'Nenhum estabelecimento encontrado',
+    resultsTitleId: 'category-results-title',
+    searchContext: 'saúde bem-estar',
+  })
 
+  // Exemplos locais da composição; na variante Visitados não representam visitas reais.
   const places: CategoryPlace[] = [
     { id: 'move', name: 'Academia Move', neighborhood: 'Centro', distanceKm: 0.8, discount: 20, latitude: -26.3043, longitude: -48.8464 },
     { id: 'visao', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 0.8, discount: 12, latitude: -26.3051, longitude: -48.8448 },
@@ -59,7 +83,7 @@
   let currentTime = $state(new Date())
   let selectedPlaceId = $state<string | null>(null)
   let favoriteIds = $state<string[]>([])
-  let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
+  let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>(untrack(() => variant === 'visited' ? 'history' : 'home'))
   let listExpanded = $state(false)
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
@@ -68,7 +92,7 @@
   const visiblePlaces = $derived.by(() => {
     const query = searchValue.trim().toLocaleLowerCase('pt-BR')
     const filtered = places.filter((place) => {
-      const matchesSearch = `${place.name} ${place.neighborhood} saúde bem-estar`
+      const matchesSearch = `${place.name} ${place.neighborhood} ${text.searchContext}`
         .toLocaleLowerCase('pt-BR')
         .includes(query)
       return matchesSearch && (!appliedFilters.includes('open-now') || isPlaceOpen(place.id, currentTime))
@@ -144,14 +168,18 @@
   })
 </script>
 
-<main class="directory-page category-page" class:list-expanded={listExpanded}>
-  <section class="directory-map-column category-map-column" aria-label="Mapa da categoria">
+<svelte:head>
+  <title>{text.title} — WEG Benefits</title>
+</svelte:head>
+
+<main class="directory-page category-page" class:visited-page={variant === 'visited'} class:list-expanded={listExpanded}>
+  <section class="directory-map-column category-map-column" aria-label={text.mapColumnLabel}>
     <header class="directory-map-header category-map-header">
       <BackButton onclick={onback} />
-      <h1 class="directory-page__title category-page__title">Saúde e Bem-Estar</h1>
+      <h1 class="directory-page__title category-page__title">{text.title}</h1>
     </header>
 
-    <div class="directory-map category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
+    <div class="directory-map category-map" role="region" aria-label={text.mapLabel}>
       <Map
         variant="default"
         benefits={mapBenefits}
@@ -162,16 +190,16 @@
       />
     </div>
 
-    <FloatingTabBar bind:selected={selectedTab} />
+    <FloatingTabBar bind:selected={selectedTab} ontabchange={onnavigate} />
   </section>
 
-  <section class="directory-results category-results" aria-labelledby="category-results-title">
+  <section class="directory-results category-results" aria-labelledby={text.resultsTitleId}>
     <div class="directory-results__controls category-results__controls">
       <div class="directory-results__expanded-header category-results__expanded-header">
         <BackButton label="Voltar para o mapa" onclick={() => (listExpanded = false)} />
-        <h1 class="directory-page__title category-page__title">Saúde e Bem-Estar</h1>
+        <h1 class="directory-page__title category-page__title">{text.title}</h1>
       </div>
-      <h2 id="category-results-title" class="directory-results__title category-results__title">Estabelecimentos da categoria</h2>
+      <h2 id={text.resultsTitleId} class="directory-results__title category-results__title">{text.resultsTitle}</h2>
 
       <Search
         bind:value={searchValue}
@@ -186,7 +214,7 @@
         <ExpandButton
           variant="category-list"
           bind:expanded={listExpanded}
-          label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de estabelecimentos'}
+          label={listExpanded ? 'Voltar para o mapa' : text.expandLabel}
         />
       </div>
     </div>
@@ -196,7 +224,7 @@
       <div
         bind:this={listElement}
         class="directory-results__list category-results__list"
-        aria-label="Estabelecimentos encontrados"
+        aria-label={text.listLabel}
         onscroll={handleListScroll}
       >
         {#if visiblePlaces.length}
@@ -215,7 +243,7 @@
         {:else}
           <div class="category-results__empty" role="status">
             <img src={healthIcon} alt="" aria-hidden="true" />
-            <strong>Nenhum estabelecimento encontrado</strong>
+            <strong>{text.emptyTitle}</strong>
             <span>Tente buscar por outro nome ou região.</span>
           </div>
         {/if}

@@ -4,6 +4,14 @@
 
 O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
 
+## Página de Visitados — 2026-10-26
+
+`/visitados` reutiliza `CategoryPage` com a variante de textos de Visitados. `npm run check` passou sem erros ou avisos, os sete testes de regressão passaram e `npm run build` gerou a aplicação.
+
+No Chrome, os layouts normal e expandido foram comparados com Categorias nas quatro medidas (390 × 844, 844 × 390, 834 × 1194 e 1194 × 834): oito comparações com as mesmas posições, dimensões e fontes de cabeçalho, mapa, controles, lista, cards e navegação. Não houve transbordamento da página nem erros JavaScript. Capturas foram inspecionadas.
+
+Foram conferidos título/subtítulo, aba Histórico ativa, pins azuis, busca, filtro por desconto, estado sem resultados, seleção de pin/card, expansão/recolhimento e a independência entre favoritar e manter um card na lista de visitados. As abas Histórico de Início, Categorias, Favoritos e detalhe abrem a nova rota; retorno e aba Favoritos também foram verificados, assim como `/visitados/` com barra final. Os dados são demonstrativos. O solicitante aprovou visualmente a página e autorizou o envio ao remoto.
+
 ## Padronização do Início — 2026-10-26
 
 `MainPage` passou a compartilhar o layout de Categoria/Favoritos e reutilizar os componentes existentes sem as reduções específicas da página. No Chrome, 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834 tiveram mapa, cabeçalho, título e navegação comparados com Favoritos; tamanhos, posições e fonte compartilhados coincidiram. Também foram verificadas 320 × 568 e 568 × 320, sem transbordamento da página.
