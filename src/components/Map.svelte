@@ -19,6 +19,7 @@
   type Props = {
     benefits: MapBenefit[]
     variant?: 'default' | 'category'
+    showTiles?: boolean
     center?: MapPosition
     initialZoom?: number
     selectedBenefitId?: string | null
@@ -30,6 +31,7 @@
   let {
     benefits,
     variant = 'default',
+    showTiles = true,
     center = { latitude: -26.483, longitude: -49.078 },
     initialZoom = 13,
     selectedBenefitId = null,
@@ -158,7 +160,7 @@
   onMount(() => {
     map = L.map(mapElement, {
       zoomControl: false,
-      attributionControl: variant !== 'category',
+      attributionControl: showTiles && variant !== 'category',
       preferCanvas: true,
       maxBounds: southAmericaBounds,
       maxBoundsViscosity: 2,
@@ -166,15 +168,17 @@
       maxZoom: 18,
     }).setView([center.latitude, center.longitude], initialZoom)
 
-    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-    L.tileLayer(tileUrl, {
-      maxZoom: 18,
-      noWrap: true,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map)
+    if (showTiles) {
+      const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      L.tileLayer(tileUrl, {
+        maxZoom: 18,
+        noWrap: true,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map)
+    }
 
-    if (variant === 'category') {
+    if (variant === 'category' && showTiles) {
       L.control.attribution({ position: 'topright', prefix: false }).addTo(map)
     }
     if (variant === 'default') L.control.zoom({ position: 'bottomright' }).addTo(map)

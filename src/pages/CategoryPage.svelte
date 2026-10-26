@@ -8,7 +8,7 @@
   import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
   import Map from '../components/Map.svelte'
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
-  import healthIcon from '../assets/categories/health-wellbeing.svg'
+  import healthIcon from '../assets/health-wellbeing.svg'
 
   type CategoryPlace = {
     id: string

@@ -18,6 +18,7 @@
   import './components/styles/style.css'
   import CategoryPage from "./pages/CategoryPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
+  import MainPage from "./pages/MainPage.svelte";
   import { previewFavorites } from "./pages/favorites";
   import './components/styles/style.css'
   let selectedCategory = $state("Alimentação");
@@ -56,6 +57,9 @@
   const categoryRoute = "/categoria/saude-e-bem-estar";
   const isCategoryRoute = window.location.pathname === categoryRoute;
   const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
+  const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
+  const isHomePreviewRoute = currentPath === "/" || currentPath === "/inicio-preview";
+  const isComponentPreviewRoute = currentPath === "/componentes-preview";
   let favoritePlaces = $state([...previewFavorites]);
 
   function returnToHome() {
@@ -64,10 +68,12 @@
 </script>
 
 <svelte:head>
-  <title>{isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
+  <title>{isHomePreviewRoute ? "Início — WEG Benefits" : isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
-{#if isFavoritesRoute}
+{#if isHomePreviewRoute}
+  <MainPage />
+{:else if isFavoritesRoute}
   <FavoritesPage
     places={favoritePlaces}
     onback={returnToHome}
@@ -78,7 +84,7 @@
   />
 {:else if isCategoryRoute}
   <CategoryPage onback={returnToHome} />
-{:else}
+{:else if isComponentPreviewRoute}
 <main class="component-preview">
   <header class="preview-header">
     <div>
@@ -194,6 +200,8 @@
 
   <FloatingTabBar bind:selected={activeTab} />
 </main>
+{:else}
+  <MainPage />
 {/if}
 
 <style>
