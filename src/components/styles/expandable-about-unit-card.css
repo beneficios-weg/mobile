@@ -100,7 +100,7 @@
   opacity: 1;
   visibility: visible;
   transition:
-    opacity 260ms ease,
+    opacity 180ms ease,
     visibility 0s;
 }
 
@@ -109,8 +109,8 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 260ms ease,
-    visibility 0s linear 260ms;
+    opacity 180ms ease,
+    visibility 0s linear 180ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
