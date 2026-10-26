@@ -59,14 +59,6 @@ function isPlaceOpen(place: FavoritePlace, at: Date) {
 
 // Dados locais de demonstração do protótipo; não representam um contrato de API.
 export const previewFavorites: FavoritePlace[] = [
-  { id: 'pao-centro', name: 'Pão & Cia', neighborhood: 'Centro', distanceKm: 0.8, discount: 15, latitude: -26.3043, longitude: -48.8464 },
-  { id: 'move-vila', name: 'Academia Move', neighborhood: 'Vila Nova', distanceKm: 1.2, discount: 20, latitude: -26.2948, longitude: -48.8587 },
-  { id: 'otica-centro', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 1.6, discount: 12, latitude: -26.3051, longitude: -48.8448 },
-  { id: 'pao-vila', name: 'Pão & Cia', neighborhood: 'Centro', distanceKm: 1.8, discount: 15, latitude: -26.3071, longitude: -48.8496 },
-  { id: 'move-centro', name: 'Academia Move', neighborhood: 'Vila Nova', distanceKm: 2.1, discount: 20, latitude: -26.3088, longitude: -48.8428 },
-  { id: 'otica-vila', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 2.4, discount: 12, latitude: -26.3103, longitude: -48.8549 },
-  { id: 'clinica-america', name: 'Clínica Bem Viver', neighborhood: 'América', distanceKm: 2.8, discount: 15, latitude: -26.2965, longitude: -48.8505 },
-  { id: 'farmacia-centro', name: 'Farmácia Saúde', neighborhood: 'Centro', distanceKm: 3.2, discount: 10, latitude: -26.3009, longitude: -48.8526 },
   { id: 'pao-centro', name: 'Pão & Cia', neighborhood: 'Centro', distanceKm: 0.8, discount: 15, latitude: -26.478, longitude: -49.071, openingHours: { days: [1, 2, 3, 4, 5, 6], opensAt: '06:00', closesAt: '22:00' } },
   { id: 'move-vila', name: 'Academia Move', neighborhood: 'Vila Nova', distanceKm: 1.2, discount: 20, latitude: -26.482, longitude: -49.091, openingHours: { days: [1, 2, 3, 4, 5, 6], opensAt: '06:00', closesAt: '22:00' } },
   { id: 'otica-centro', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 1.6, discount: 12, latitude: -26.487, longitude: -49.073, openingHours: { days: [1, 2, 3, 4, 5, 6], opensAt: '09:00', closesAt: '19:00' } },
@@ -77,4 +69,4 @@ export const previewFavorites: FavoritePlace[] = [
   { id: 'farmacia-centro', name: 'Farmácia Saúde', neighborhood: 'Centro', distanceKm: 3.2, discount: 10, latitude: -26.493, longitude: -49.085, openingHours: { days: [0, 1, 2, 3, 4, 5, 6], opensAt: '08:00', closesAt: '22:00' } },
 ]
 
-export const previewFavoritesLocation = { latitude: -26.3045, longitude: -48.8487 }
+export const previewFavoritesLocation = { latitude: -26.483, longitude: -49.078 }

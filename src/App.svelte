@@ -15,7 +15,6 @@
   import ResultsCount from "./components/atoms/ResultsCount.svelte";
   import Search from "./components/atoms/Search.svelte";
   import { demoBenefits } from "./services/benefitsService";
-  import './components/styles/style.css'
   import CategoryPage from "./pages/CategoryPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
   import Login from "./pages/Login.svelte";
@@ -23,8 +22,6 @@
   import { previewFavorites, previewFavoritesLocation } from "./pages/favorites";
 
   import MainPage from "./pages/MainPage.svelte";
-  import { previewFavorites } from "./pages/favorites";
-  import './components/styles/style.css'
   let selectedCategory = $state("Alimentação");
   let activeTab = $state<"home" | "map" | "favorites" | "history">("home");
   let favorite = $state(false);
@@ -204,7 +201,7 @@
 
   <section class="preview-section" aria-labelledby="benefits-title">
     <div class="preview-title-row">
-      <h2 class="page-title">Perto de você</h2>
+      <h2 id="benefits-title" class="page-title">Perto de você</h2>
     </div>
     <BenefitLocationCard benefit={demoBenefits[0]} distance="800 m" selected />
     <BenefitLocationCard benefit={demoBenefits[1]} distance="1,2 km" />

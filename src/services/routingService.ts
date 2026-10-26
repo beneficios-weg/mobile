@@ -1,5 +1,4 @@
 import type { Coordinates } from './geolocationService'
-import type { Benefit } from './benefitsService'
 
 export type RouteResult = {
   coordinates: [number, number][]
@@ -25,7 +24,7 @@ const OSRM_BASE_URL = (import.meta.env.VITE_OSRM_URL || 'https://router.project-
 /** Consulta o serviço de rotas OSRM. OSRM recebe coordenadas na ordem longitude,latitude. */
 export async function getDrivingRoute(
   origin: Coordinates,
-  destination: Pick<Benefit, 'latitude' | 'longitude'>,
+  destination: Pick<Coordinates, 'latitude' | 'longitude'>,
   signal?: AbortSignal,
 ): Promise<RouteResult> {
   const coordinates = [

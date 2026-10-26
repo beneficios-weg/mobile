@@ -1,8 +1,8 @@
-import type { Benefit } from './benefitsService'
+import type { BenefitLocation } from './benefitsService'
 
 const STORAGE_KEY = 'weg-benefits-manual-points'
 
-export function getManualBenefits(): Benefit[] {
+export function getManualBenefits(): BenefitLocation[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
@@ -11,7 +11,7 @@ export function getManualBenefits(): Benefit[] {
     if (!Array.isArray(value)) return []
 
     return value.filter(
-      (item): item is Benefit =>
+      (item): item is BenefitLocation =>
         typeof item?.id === 'string' &&
         typeof item?.name === 'string' &&
         typeof item?.category === 'string' &&
@@ -24,7 +24,7 @@ export function getManualBenefits(): Benefit[] {
   }
 }
 
-export function saveManualBenefits(benefits: Benefit[]) {
+export function saveManualBenefits(benefits: BenefitLocation[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(benefits))
   } catch {

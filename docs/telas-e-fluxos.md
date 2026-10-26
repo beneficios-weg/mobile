@@ -1,6 +1,6 @@
 # Telas e fluxos
 
-Os elementos descritos são requisitos funcionais; os protótipos não estão versionados e a implementação ainda não existe. Não interpretar detalhes desta página como substitutos do contrato do Backend ou do design vigente.
+Os elementos descritos combinam requisitos funcionais com interfaces já implementadas. As páginas atuais usam dados demonstrativos; API, autenticação e persistência continuam pendentes. Não interpretar detalhes desta página como substitutos do contrato do Backend ou do design vigente.
 
 ## Fluxo principal
 
@@ -15,6 +15,10 @@ Mapa em tela cheia, Favoritos e Lojas visitadas são destinos adicionais. Primei
 Autentica o colaborador conforme regras e payloads do Backend. Deve oferecer acesso aos fluxos de primeiro acesso e recuperação de senha. Estados mínimos: envio em andamento, credenciais rejeitadas, indisponibilidade de rede e falha inesperada. Não há regra confirmada de autenticação offline.
 
 ## 02 — Landing / Início
+
+A rota `/` renderiza `src/pages/MainPage.svelte`, com logo, mapa Leaflet com tiles OpenStreetMap, categorias e navegação flutuante. Reutiliza `Map`, `CategoryButton`, `FloatingTabBar` e `ScrollShadow`, usando o layout compartilhado de `DirectoryPage.css` e os tamanhos padrão dos componentes. Em pé, mapa e categorias ficam empilhados; deitado, mapa/navegação ficam à esquerda e as categorias à direita, com rolagem quando necessário. A galeria permanece em `/componentes-preview`.
+
+Saúde e Bem-Estar abre `/categoria/saude-e-bem-estar`; Favoritos abre `/favoritos`. A aba Mapa foca o mapa atual e Início restaura todos os exemplos. Categorias sem rota implementada filtram os pins locais, com mensagem quando não há resultados; selecionar novamente remove o filtro. Histórico informa sua indisponibilidade. Dados e localização continuam demonstrativos, sem API ou coleta de GPS.
 
 Ponto de entrada após autenticação. Combina mapa de estabelecimentos próximos e navegação por categorias. Deve comunicar permissão de localização negada, ausência de resultados, conteúdo em cache e falha da API sem bloquear toda a navegação quando houver dados locais úteis.
 
@@ -36,9 +40,9 @@ Exibe os detalhes fornecidos pelo Backend e destaca um benefício principal no M
 
 Lista estabelecimentos marcados pelo usuário e pode apresentar contexto de mapa conforme o design. Favoritar é uma ação explícita e independente de visita. A autoridade, o endpoint e a política de sincronização dos favoritos são **DECISÃO PENDENTE** até confirmação do Backend.
 
-A implementação de UI está em `src/pages/FavoritesPage.svelte`, na rota `/favoritos`, sem substituir a tela inicial. A prévia usa dados fictícios mantidos em memória na rota: permite buscar por nome, bairro ou desconto, ordenar por proximidade, nome ou desconto, selecionar um estabelecimento no mapa ou na lista, remover favoritos e expandir/recolher a lista. Recarregar a página restaura os exemplos; isso não representa persistência ou sincronização. O mapa é demonstrativo, sem solicitar geolocalização nem carregar um provedor externo. A navegação para telas ainda não implementadas não integra esta entrega.
+A implementação de UI está em `src/pages/FavoritesPage.svelte`, na rota `/favoritos`, sem substituir a tela inicial. A prévia usa dados fictícios mantidos em memória na rota: permite buscar por nome, bairro ou desconto, ordenar por proximidade, nome ou desconto, selecionar um estabelecimento no mapa ou na lista, remover favoritos e expandir/recolher a lista. Recarregar a página restaura os exemplos; isso não representa persistência ou sincronização. O mapa usa Leaflet e tiles externos do OpenStreetMap, com localização demonstrativa opcional e sem solicitar GPS. A navegação para telas ainda não implementadas não integra esta entrega.
 
-O layout segue as quatro referências fornecidas, com marcadores vermelhos em todas as orientações e tipografia de sistema idêntica à página de categorias. Ver detalhes em [Componentes de UI](componentes-ui.md).
+O layout segue as quatro referências fornecidas, com o padrão compartilhado de pins azuis e tipografia de sistema idêntica à página de categorias. Ver detalhes em [Componentes de UI](componentes-ui.md).
 
 ## 06 — Mapa em tela cheia
 
