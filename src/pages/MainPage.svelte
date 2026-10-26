@@ -75,8 +75,7 @@
       selectedCategory = null
       selectedBenefitId = null
     } else {
-      activeTab = 'home'
-      navigationMessage = 'O histórico de visitas ainda não está disponível.'
+      window.location.assign('/visitados')
     }
   }
 

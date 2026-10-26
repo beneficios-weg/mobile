@@ -34,6 +34,8 @@ Os dados continuam demonstrativos, sem contrato da API integrado nem persistênc
 
 ## Regras para futuras mudanças
 
+Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizando `CategoryPage` na variante `visited`. Não duplicar CSS ou a implementação de busca/filtros para manter essa página igual a Categorias. A aba Histórico abre essa rota a partir de Início, Categorias, Favoritos e detalhe. Os oito exemplos da prévia não representam visitas detectadas ou sincronizadas; favoritar não altera a lista de visitados.
+
 1. Use `docs/modelo-dados.md` como modelo lógico para a UI; os tipos em `src/lib/domain.ts` não são payloads oficiais.
 2. Verifique o contrato publicado pelo Backend antes de criar serviços ou mocks de integração.
 3. Não transforme exemplos de endpoints desta documentação em contrato.

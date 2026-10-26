@@ -27,7 +27,6 @@
   let mapElement: HTMLDivElement
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
-  let navigationMessage = $state('')
 
   const position = $derived({ latitude: establishment.latitude, longitude: establishment.longitude })
   const mapBenefits = $derived([{
@@ -53,13 +52,11 @@
   }
 
   function navigate(tab: 'home' | 'map' | 'favorites' | 'history') {
-    navigationMessage = ''
     if (tab === 'home') window.location.assign('/')
     else if (tab === 'favorites') window.location.assign('/favoritos')
     else if (tab === 'map') mapElement.querySelector<HTMLElement>('.leaflet-container')?.focus()
     else {
-      selectedTab = 'home'
-      navigationMessage = 'O histórico de visitas ainda não está disponível.'
+      window.location.assign('/visitados')
     }
   }
 
@@ -145,5 +142,4 @@
   <div class="establishment-page__navigation">
     <FloatingTabBar bind:selected={selectedTab} ontabchange={navigate} />
   </div>
-  <p class="establishment-page__status" role="status">{navigationMessage}</p>
 </main>

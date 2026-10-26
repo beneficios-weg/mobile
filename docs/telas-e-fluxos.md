@@ -18,7 +18,7 @@ Autentica o colaborador conforme regras e payloads do Backend. Deve oferecer ace
 
 A rota `/` renderiza `src/pages/MainPage.svelte`, com logo, mapa Leaflet com tiles OpenStreetMap, categorias e navegação flutuante. Reutiliza `Map`, `CategoryButton`, `FloatingTabBar` e `ScrollShadow`, usando o layout compartilhado de `DirectoryPage.css` e os tamanhos padrão dos componentes. Em pé, mapa e categorias ficam empilhados; deitado, mapa/navegação ficam à esquerda e as categorias à direita, com rolagem quando necessário. A galeria permanece em `/componentes-preview`.
 
-Saúde e Bem-Estar abre `/categoria/saude-e-bem-estar`; Favoritos abre `/favoritos`. A aba Mapa foca o mapa atual e Início restaura todos os exemplos. Categorias sem rota implementada filtram os pins locais, com mensagem quando não há resultados; selecionar novamente remove o filtro. Histórico informa sua indisponibilidade. Dados e localização continuam demonstrativos, sem API ou coleta de GPS.
+Saúde e Bem-Estar abre `/categoria/saude-e-bem-estar`; Favoritos abre `/favoritos`; Histórico abre `/visitados`. A aba Mapa foca o mapa atual e Início restaura todos os exemplos. Categorias sem rota implementada filtram os pins locais, com mensagem quando não há resultados; selecionar novamente remove o filtro. Dados e localização continuam demonstrativos, sem API ou coleta de GPS.
 
 Ponto de entrada após autenticação. Combina mapa de estabelecimentos próximos e navegação por categorias. Deve comunicar permissão de localização negada, ausência de resultados, conteúdo em cache e falha da API sem bloquear toda a navegação quando houver dados locais úteis.
 
@@ -32,7 +32,7 @@ A página de apresentação `src/pages/EstablishmentInfoPage.svelte` está dispo
 
 Reutiliza `BackButton`, `FavoriteButton`, `Map`, `FloatingTabBar`, `EstablishmentFacadeCard`, `PrimaryButton`, `BenefitCard`, `AboutUnitCard`, `ExpandableAboutUnitCard` e `ScrollShadow`, preservando os estilos atuais desses componentes. Sobre a unidade mantém a expansão lateral e aumenta a altura conforme necessário para mostrar toda a descrição sem rolagem interna; Serviços mantém a expansão em área existente. Escape recolhe o card aberto. O mapa mantém os tiles originais do OpenStreetMap e pins azuis.
 
-Os dados de `src/pages/establishment.ts` são demonstrativos e não representam payload da API. Favoritar altera o estado da prévia, com callback disponível para integração; não há persistência. O contato abre a ligação e Como chegar abre um provedor externo de direções com o destino selecionado. A foto da fachada não foi fornecida: o botão segue desabilitado pelo componente existente até receber `facadeImageUrl`. A navegação abre Início/Favoritos, foca o mapa local ou informa que Histórico ainda não está disponível. O retorno usa a página de origem da mesma aplicação, quando disponível, com alternativa para Categorias.
+Os dados de `src/pages/establishment.ts` são demonstrativos e não representam payload da API. Favoritar altera o estado da prévia, com callback disponível para integração; não há persistência. O contato abre a ligação e Como chegar abre um provedor externo de direções com o destino selecionado. A foto da fachada não foi fornecida: o botão segue desabilitado pelo componente existente até receber `facadeImageUrl`. A navegação abre Início, Favoritos e Visitados ou foca o mapa local. O retorno usa a página de origem da mesma aplicação, quando disponível, com alternativa para Categorias.
 
 Exibe os detalhes fornecidos pelo Backend e destaca um benefício principal no MVP. A tela deve permitir favoritar/desfavoritar sem inferir uma visita. Informações como endereço, horário e ação de rota só podem ser mostradas se fizerem parte do design e dos dados disponíveis.
 
@@ -49,6 +49,10 @@ O layout segue as quatro referências fornecidas, com o padrão compartilhado de
 Expande o mapa mantendo o contexto da tela de origem, seus filtros e a seleção atual. Deve tratar falta de permissão, posição indisponível e ausência de estabelecimentos. O mapa não implica rastreamento permanente.
 
 ## 07 — Lojas visitadas
+
+A interface está disponível em `/visitados`, com título “Visitados” e subtítulo “Estabelecimentos visitados”. `VisitedPage.svelte` reutiliza a composição de `CategoryPage.svelte` por `variant="visited"`: mapa, busca, filtro, contador, cards, sombras, navegação e expansão são os mesmos de Categorias. A aba Histórico começa ativa. Não há CSS específico de Visitados.
+
+Os oito estabelecimentos são exemplos locais reaproveitados da prévia de Categorias para validar o layout; não são visitas reais nem eventos produzidos por geolocalização. Não são criados endpoints, datas de visita, persistência ou regras de detecção. Favoritar um card não o remove do histórico. O retorno abre Início; as abas Início/Favoritos abrem suas rotas, e Mapa foca o mapa da página.
 
 Apresenta visitas reconhecidas e sincronizadas, com os campos que o Backend definir. Não confundir candidatos locais ainda pendentes com visitas confirmadas. A tela deve distinguir ausência de histórico, falha de atualização e conteúdo em cache.
 

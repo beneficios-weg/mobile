@@ -8,7 +8,7 @@ O produto responde à pergunta: **“Quais benefícios tenho perto de mim agora?
 
 ## Estado atual
 
-Este checkout implementa interfaces em Svelte 5, TypeScript e Vite, com um projeto Android do Capacitor. Há páginas de Início, Login, Categoria, Favoritos, Informações do Estabelecimento e uma galeria de componentes. Os dados são demonstrativos: autenticação, API, persistência de favoritos e sincronização ainda não estão integradas. React Native aparece como requisito histórico; não é a implementação encontrada neste repositório.
+Este checkout implementa interfaces em Svelte 5, TypeScript e Vite, com um projeto Android do Capacitor. Há páginas de Início, Login, Categoria, Favoritos, Visitados, Informações do Estabelecimento e uma galeria de componentes. Os dados são demonstrativos: autenticação, API, persistência de favoritos, histórico real de visitas e sincronização ainda não estão integrados. React Native aparece como requisito histórico; não é a implementação encontrada neste repositório.
 
 - tipografia de sistema conforme a página de categorias, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes visuais/funcionais;
 - o modelo lógico para categorias, marcas, estabelecimentos, benefícios, serviços, horários, favoritos, visitas e avaliações está em [Modelo de dados](docs/modelo-dados.md);
@@ -43,7 +43,7 @@ A estrutura atual e a arquitetura planejada estão em [Arquitetura mobile](docs/
 
 Use `npm ci` para instalar as dependências, `npm run dev` para iniciar o servidor, `npm run check` para validar Svelte/TypeScript, `npm test` para os testes de regressão e `npm run build` para gerar `dist/`.
 
-Rotas disponíveis: `/`, `/login`, `/categoria/saude-e-bem-estar`, `/favoritos`, `/estabelecimento/academia-move` e `/componentes-preview`. A galeria de componentes possui sua própria rota e não substitui o Início.
+Rotas disponíveis: `/`, `/login`, `/categoria/saude-e-bem-estar`, `/favoritos`, `/visitados`, `/estabelecimento/academia-move` e `/componentes-preview`. A galeria de componentes possui sua própria rota e não substitui o Início. Visitados reutiliza a composição de Categorias, alterando os textos e a aba ativa, com exemplos locais para revisão visual.
 
 ## Variáveis de ambiente
 
