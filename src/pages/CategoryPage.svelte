@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
+  import ExpandButton from '../components/atoms/ExpandButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
@@ -182,23 +183,11 @@
 
       <div class="category-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
-        <button
-          class="category-results__expand"
-          type="button"
-          aria-label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de estabelecimentos'}
-          aria-pressed={listExpanded}
-          onclick={() => (listExpanded = !listExpanded)}
-        >
-          {#if listExpanded}
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M8 3v5H3m18 0h-5V3M3 16h5v5m13-5h-5v5" />
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M14 4h6v6m0-6-7 7M10 20H4v-6m0 6 7-7" />
-            </svg>
-          {/if}
-        </button>
+        <ExpandButton
+          variant="category-list"
+          bind:expanded={listExpanded}
+          label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de estabelecimentos'}
+        />
       </div>
     </div>
 

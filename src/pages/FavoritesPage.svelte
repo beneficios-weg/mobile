@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
-  import FavoriteButton from '../components/atoms/FavoriteButton.svelte'
+  import ExpandButton from '../components/atoms/ExpandButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
   import Search from '../components/atoms/Search.svelte'
+  import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
   import { filterFavorites, type FavoritePlace, type FavoritesSortOrder } from './favorites'
   import './styles/FavoritesPage.css'
 
@@ -26,7 +27,7 @@
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
   let listElement = $state<HTMLDivElement>()
-  let expandButton: HTMLButtonElement
+  let expandButton = $state<HTMLButtonElement>()
   let expandedHeader: HTMLDivElement
 
   const visiblePlaces = $derived(filterFavorites(places, searchValue, sortOrder))
@@ -39,6 +40,10 @@
 
   async function toggleExpanded() {
     listExpanded = !listExpanded
+    await updateExpandedFocus()
+  }
+
+  async function updateExpandedFocus() {
     await tick()
     if (listExpanded) expandedHeader?.querySelector('button')?.focus()
     else expandButton?.focus()
@@ -140,19 +145,14 @@
 
       <div class="favorites-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
-        <button
-          bind:this={expandButton}
-          class="favorites-results__expand"
-          type="button"
-          aria-label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de favoritos'}
-          aria-expanded={listExpanded}
-          aria-controls="favorites-list"
-          onclick={toggleExpanded}
-        >
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M14 4h6v6m0-6-7 7M10 20H4v-6m0 6 7-7" />
-          </svg>
-        </button>
+        <ExpandButton
+          variant="favorites-list"
+          bind:element={expandButton}
+          bind:expanded={listExpanded}
+          label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de favoritos'}
+          controls="favorites-list"
+          onclick={updateExpandedFocus}
+        />
       </div>
     </div>
 
@@ -167,17 +167,18 @@
         onscroll={updateScrollShadows}
       >
         {#each visiblePlaces as place (place.id)}
-          <article class="favorites-card" class:selected={selectedPlaceId === place.id} data-selected={selectedPlaceId === place.id} aria-label={place.name}>
-            <button class="favorites-card__main" type="button" aria-pressed={selectedPlaceId === place.id} onclick={() => selectPlace(place.id)}>
-              <span class="favorites-card__avatar" aria-hidden="true">{place.name.charAt(0).normalize('NFD').replace(/\p{Diacritic}/gu, '')}</span>
-              <span class="favorites-card__content">
-                <strong>{place.name}</strong>
-                <span>{place.neighborhood} · {place.distanceKm.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km</span>
-                <span class="favorites-card__offer">{place.discount}% OFF</span>
-              </span>
-            </button>
-            <FavoriteButton liked disabled={!onremovefavorite} onlikedchange={() => onremovefavorite?.(place.id)} />
-          </article>
+          <EstablishmentCard
+            variant="favorites"
+            name={place.name}
+            neighborhood={place.neighborhood}
+            distanceKm={place.distanceKm}
+            discount={place.discount}
+            selected={selectedPlaceId === place.id}
+            liked
+            favoriteDisabled={!onremovefavorite}
+            onselect={() => selectPlace(place.id)}
+            onlikedchange={() => onremovefavorite?.(place.id)}
+          />
         {:else}
           <div class="favorites-results__empty" role="status">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 8.8c0 4.3-8.8 10.1-8.8 10.1S3.2 13.1 3.2 8.8a4.6 4.6 0 0 1 8.8-1.7 4.6 4.6 0 0 1 8.8 1.7Z" /></svg>
