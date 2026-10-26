@@ -2,7 +2,9 @@
 
 ## Estado
 
-A arquitetura abaixo é **planejada** para a futura implementação mobile. Este checkout contém um starter Svelte/Vite e Capacitor, mas ainda não implementa as telas do produto. O contrato conceitual das entidades está em [Modelo de dados](modelo-dados.md), e os tipos correspondentes ficam em `src/lib/domain.ts`.
+A arquitetura abaixo é **planejada** para a futura implementação mobile integrada. O checkout atual contém páginas Svelte/Vite e uma configuração Android do Capacitor. As interfaces de Início, Login, Categoria, Favoritos e Informações do Estabelecimento usam dados de apresentação locais; a API do produto não está integrada. O contrato conceitual das entidades está em [Modelo de dados](modelo-dados.md), e os tipos correspondentes ficam em `src/lib/domain.ts`.
+
+Na estrutura executável atual, `src/App.svelte` seleciona as páginas por pathname, `src/pages/` contém suas composições, `src/components/` contém átomos/moléculas e o mapa, `src/lib/` contém tipos e ações de animação e `src/services/` contém exemplos e adaptadores preparados. `src/main.ts` carrega uma única entrada de estilos de componentes; `DirectoryPage.css` compartilha o layout de Categoria/Favoritos. A estrutura planejada abaixo não exige migrar essas páginas para outro framework nesta revisão.
 
 ## Estrutura planejada
 

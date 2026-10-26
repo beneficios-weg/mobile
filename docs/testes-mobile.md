@@ -4,6 +4,18 @@
 
 O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
 
+## Padronização do Início — 2026-10-26
+
+`MainPage` passou a compartilhar o layout de Categoria/Favoritos e reutilizar os componentes existentes sem as reduções específicas da página. No Chrome, 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834 tiveram mapa, cabeçalho, título e navegação comparados com Favoritos; tamanhos, posições e fonte compartilhados coincidiram. Também foram verificadas 320 × 568 e 568 × 320, sem transbordamento da página.
+
+Conferidos: sete categorias, altura mínima padrão de 58 px dos botões, ícones de 20 px, mapa real com tiles e pins azuis, filtro/restauração dos exemplos, estado sem resultados, foco do mapa, informação de Histórico indisponível e navegação para as rotas existentes de Saúde e Bem-Estar/Favoritos. Login, galeria e detalhe receberam verificação de abertura. Não foram observados erros JavaScript. Capturas das composições foram inspecionadas; o solicitante autorizou o envio ao remoto após a apresentação do ajuste.
+
+## Revisão da develop — 2026-10-26
+
+A base `d5fd87d` apresentava 20 erros de compilação decorrentes de implementações sobrepostas. Após a limpeza em `refactor/code-cleanup`, `npm run check` passou sem erros/avisos, `npm test` passou nos sete testes de regressão e `npm run build` gerou a aplicação.
+
+Seis rotas foram verificadas no Chrome nas quatro dimensões de referência, totalizando 24 combinações sem erros JavaScript ou transbordamento horizontal. Foram exercitados mapas, filtros, seleção, remoção, estados vazios, componentes expansíveis, diálogo da fachada e aviso de Login. As posições e dimensões dos controles compartilhados de Categoria/Favoritos foram comparadas; a navegação manteve sua geometria durante a expansão das listas. Capturas foram inspecionadas. O solicitante autorizou o envio da limpeza e da padronização do Início; o Android não foi compilado/testado. Detalhes e pendências em [Revisão do código](revisao-codigo.md).
+
 ## Informações do Estabelecimento — 2026-10-26
 
 Prévia em `/estabelecimento/academia-move`, com dados locais identificados em `src/pages/establishment.ts`. `npm run check` passou sem erros ou avisos e `npm run build` gerou a versão de produção.

@@ -2,7 +2,6 @@
   --establishment-side: 16px;
   --establishment-top: max(16px, env(safe-area-inset-top));
   --establishment-control: 44px;
-  --category-pin-color: #00579d;
   width: 100%;
   height: 100vh;
   height: 100dvh;

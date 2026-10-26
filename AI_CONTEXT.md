@@ -10,7 +10,7 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 
 ## Contexto confirmado
 
-- Aplicativo React Native, mobile-first.
+- Interface atual em Svelte/Vite com Capacitor, mobile-first. React Native é um requisito histórico, não a stack implementada.
 - Equipe de quatro pessoas e cerca de 30 horas totais: evitar overengineering.
 - Tipografia de sistema, seguindo a página de categorias: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif`. Lucide Icons para iconografia.
 - Não substituir a fonte por Inter nem baixar outra fonte por suposição. Se o protótipo ou o padrão existente não esclarecer um detalhe visual, confirmar com o solicitante antes de escolher.
@@ -25,6 +25,12 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 ## Estado do repositório em 2026-10-16
 
 O checkout contém um starter Svelte/Vite com Capacitor, documentação e tipos de domínio em `src/lib/domain.ts`. As telas reais, integração da API, testes de produto e designs versionados ainda não estão implementados. A stack mobile final permanece pendente e não deve ser chamada de React Native na implementação encontrada.
+
+## Estado atual após a revisão de 2026-10-26
+
+Há interfaces de Início, Login, Categoria, Favoritos e Informações do Estabelecimento. `/` renderiza `MainPage`; a galeria permanece em `/componentes-preview`. `DirectoryPage.css` centraliza o layout de Início/Categoria/Favoritos, e `src/components/styles/index.css` é a única entrada dos estilos dos componentes em `src/main.ts`. O mapa usa Leaflet com tiles OpenStreetMap e pins azuis nas páginas. O Início reutiliza CategoryButton, FloatingTabBar e ScrollShadow nos tamanhos existentes; Saúde e Bem-Estar e Favoritos abrem suas rotas, enquanto outras categorias filtram os pins demonstrativos.
+
+Os dados continuam demonstrativos, sem contrato da API integrado nem persistência dos favoritos. O tipo visual `BenefitLocation`, em `services/benefitsService.ts`, não é o `Benefit` de domínio de `lib/domain.ts`. Serviços de localização/rota estão preparados, sem consumidores atuais. A revisão e as pendências estão em `docs/revisao-codigo.md`. O estado de 2026-10-16 acima é um registro histórico.
 
 ## Regras para futuras mudanças
 

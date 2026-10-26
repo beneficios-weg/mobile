@@ -1,7 +1,5 @@
 .benefits-map {
   --map-accent: #00579d;
-  --map-route: #0878e8;
-  --map-surface: #fff;
   --map-border: #d8e2ec;
   --map-text: #1b2938;
   --map-muted: #66768a;
@@ -11,83 +9,6 @@
   padding: 28px 20px 120px;
   color: var(--map-text);
   font-family: system-ui, sans-serif;
-}
-
-.benefits-map .map-header {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.benefits-map .eyebrow,
-.benefits-map .intro,
-.benefits-map .status,
-.benefits-map .route-status {
-  margin: 0;
-}
-
-.benefits-map .eyebrow {
-  margin-bottom: 6px;
-  color: var(--map-accent);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.benefits-map h1 {
-  margin: 0;
-  color: var(--map-text);
-  font-size: clamp(23px, 4vw, 32px);
-  line-height: 1.2;
-}
-
-.benefits-map .intro {
-  margin-top: 8px;
-  color: var(--map-muted);
-  font-size: 14px;
-}
-
-.benefits-map .location-button {
-  min-height: 44px;
-  flex: 0 0 auto;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 14px;
-  background: var(--map-accent);
-  color: #fff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.benefits-map .location-button:disabled {
-  opacity: 0.65;
-  cursor: wait;
-}
-
-.benefits-map .benefit-list {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.benefits-map .status,
-.benefits-map .route-status {
-  margin: 0 0 10px;
-  color: var(--map-muted);
-  font-size: 13px;
-}
-
-.benefits-map .route-status {
-  color: var(--map-accent);
-  font-weight: 650;
-}
-
-.benefits-map .status-error {
-  color: #b42318;
 }
 
 .benefits-map .map-frame {
@@ -229,16 +150,6 @@
 @media (max-width: 620px) {
   .benefits-map {
     padding: 20px 14px 104px;
-  }
-
-  .benefits-map .map-header {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .benefits-map .location-button {
-    align-self: flex-start;
   }
 
   .benefits-map .map-canvas {

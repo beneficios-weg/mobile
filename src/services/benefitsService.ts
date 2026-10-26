@@ -1,4 +1,5 @@
-export type Benefit = {
+/** Modelo visual dos cards/pins da prévia, distinto do benefício de domínio. */
+export type BenefitLocation = {
   id: string
   name: string
   category: string
@@ -10,7 +11,7 @@ export type Benefit = {
 }
 
 /** Benefícios fictícios para o protótipo. Troque esta lista pela resposta da API real. */
-export const demoBenefits: Benefit[] = [
+export const demoBenefits: BenefitLocation[] = [
   {
     id: 'benefit-cafe',
     name: 'Café do Centro',
@@ -30,13 +31,5 @@ export const demoBenefits: Benefit[] = [
     longitude: -49.085,
     locationLabel: 'Vila Nova',
     offerLabel: '20% OFF',
-  },
-  {
-    id: 'coisas loucas',
-    name: 'Academia Bem-Estar',
-    category: 'Saúde e bem-estar',
-    description: 'Condição especial no plano mensal.',
-    latitude: 26.4797,
-    longitude: 49.085,
   },
 ]

@@ -74,19 +74,16 @@
     }
 
     for (const benefit of items) {
-      const createIcon = () => L.divIcon({
-        className: categoryStyle ? 'benefit-marker-wrapper benefit-marker-wrapper--category' : 'benefit-marker-wrapper',
-        html: categoryStyle
-          ? '<span class="benefit-marker benefit-marker--category"></span>'
-          : '<span class="benefit-marker"></span>',
-        iconSize: categoryStyle ? [24, 24] : [30, 42],
-        iconAnchor: categoryStyle ? [12, 12] : [15, 38],
-        popupAnchor: categoryStyle ? [0, -12] : [0, -36],
-      })
       let marker = markersById.get(benefit.id)
       if (!marker) {
         marker = L.marker([benefit.latitude, benefit.longitude], {
-          icon: createIcon(),
+          icon: L.divIcon({
+            className: 'benefit-marker-wrapper',
+            html: '<span class="benefit-marker"></span>',
+            iconSize: [30, 42],
+            iconAnchor: [15, 38],
+            popupAnchor: [0, -36],
+          }),
           title: benefit.name,
           alt: benefit.name,
         }).addTo(benefitMarkers)
@@ -97,20 +94,7 @@
         markersById.set(benefit.id, marker)
       } else {
         marker.setLatLng([benefit.latitude, benefit.longitude])
-        const wasCategory = marker.options.icon?.options.className?.includes('benefit-marker-wrapper--category') ?? false
-        if (wasCategory !== categoryStyle) marker.setIcon(createIcon())
       }
-      const marker = L.marker([benefit.latitude, benefit.longitude], {
-        icon: L.divIcon({
-          className: 'benefit-marker-wrapper',
-          html: `<span class="benefit-marker${benefit.id === selectedId ? ' is-selected' : ''}"></span>`,
-          iconSize: [30, 42],
-          iconAnchor: [15, 38],
-          popupAnchor: [0, -36],
-        }),
-        title: benefit.name,
-        alt: benefit.name,
-      }).addTo(benefitMarkers)
 
       marker.bindPopup(createBenefitPopup(benefit))
       const element = marker.getElement()
