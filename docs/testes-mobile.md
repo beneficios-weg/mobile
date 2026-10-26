@@ -4,6 +4,23 @@
 
 O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
 
+## Informações do Estabelecimento — 2026-10-26
+
+Prévia em `/estabelecimento/academia-move`, com dados locais identificados em `src/pages/establishment.ts`. `npm run check` passou sem erros ou avisos e `npm run build` gerou a versão de produção.
+
+Validação automatizada com Chrome isolado, sem interface, nas quatro medidas do protótipo (390 × 844, 844 × 390, 834 × 1194 e 1194 × 834), além de 320 × 568 e 568 × 320:
+
+- página sem transbordamento horizontal ou rolagem externa; mapa preenchendo seu contêiner e navegação dentro do viewport;
+- rolagem dos detalhes, sombra inferior no fim do viewport e atualização das sombras ao chegar ao início/fim do conteúdo;
+- alternância do favorito, link de contato e URL de direções com as coordenadas do estabelecimento;
+- expansão/recolhimento da descrição longa do benefício e acesso ao texto completo;
+- expansão dos cards Sobre a unidade/Serviços e recolhimento por Escape;
+- revisão de Sobre a unidade nas quatro medidas: expansão lateral preservada, altura suficiente para o texto completo sem rolagem interna, altura incluída na rolagem da página e Serviços oculto durante a expansão; recolher restaura as dimensões originais. A expansão padrão da galeria também foi verificada;
+- troca de orientação sem recarregar, mantendo a página sem transbordamento;
+- abertura das rotas existentes de galeria, Categorias e Favoritos; nenhum erro JavaScript observado.
+
+As quatro composições também foram inspecionadas por capturas. O solicitante aprovou visualmente a tela após o ajuste de Sobre a unidade para preservar a expansão lateral e mostrar todo o texto sem rolagem interna. As quatro imagens temporárias de referência foram removidas após essa aprovação, mantendo a galeria inicial intacta. Os testes não validam API, persistência de favoritos, dados reais do estabelecimento ou disponibilidade dos tiles externos. A ação de fachada permanece desabilitada porque nenhuma foto foi fornecida; o diálogo existente será habilitado ao receber `facadeImageUrl`.
+
 ## Revisão do mapa de Favoritos — 2026-10-23
 
 A página anterior exibia um fundo com pins posicionados em porcentagem, sem instanciar `Map.svelte`. A revisão substituiu essa representação pelo mapa Leaflet com tiles do OpenStreetMap nas cores originais, coordenadas de demonstração e seleção compartilhada com os cards. Os estilos antigos dos pins estáticos foram removidos.

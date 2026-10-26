@@ -1,5 +1,6 @@
 type Options = {
   expanded: boolean
+  expansionMode?: 'area' | 'content'
   onsettled?: (expanded: boolean) => void
 }
 
@@ -68,13 +69,16 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
     const previousTextHeight = viewport.getBoundingClientRect().height
     const previousTextWidth = text.getBoundingClientRect().width
     const lateralBounds = lateralArea.getBoundingClientRect()
+    const growsWithContent = options.expansionMode === 'content'
+    viewport.style.scrollbarGutter = growsWithContent ? 'auto' : ''
     const collapsed = measure(false, bounds.width)
     const full = measure(true, lateralBounds.width)
     const targetWidth = expanded ? lateralBounds.width : bounds.width
     const targetLeft = expanded ? lateralBounds.left - bounds.left : 0
     const availableHeight = area ? area.getBoundingClientRect().bottom - bounds.top : full.height
     const fullHeight = Math.max(collapsed.height, full.height)
-    const height = expanded ? Math.min(fullHeight, Math.max(collapsed.height, availableHeight)) : collapsed.height
+    const expandedHeight = growsWithContent ? fullHeight : Math.min(fullHeight, Math.max(collapsed.height, availableHeight))
+    const height = expanded ? expandedHeight : collapsed.height
     const textHeight = expanded ? Math.min(full.textHeight, Math.max(0, height - full.overhead)) : collapsed.textHeight
     const scrollable = expanded && full.textHeight > textHeight + 1
     const current = ++generation
@@ -82,8 +86,8 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
     animations = []
     moving = animate && !preference.matches
 
-    // The slot always occupies the collapsed height, even while the card opens.
-    slot.style.height = `${collapsed.height}px`
+    // Content expansion reserves its full height in the page instead of scrolling inside the card.
+    slot.style.height = `${growsWithContent ? moving ? bounds.height : height : collapsed.height}px`
     Object.assign(card.style, {
       position: 'absolute', top: '0', minHeight: '0', zIndex: expanded || moving ? '2' : '1',
       left: `${moving ? previous.left - bounds.left : targetLeft}px`,
@@ -133,6 +137,7 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
       card.style.width = `${targetWidth}px`
       card.style.left = `${targetLeft}px`
       card.style.height = `${height}px`
+      if (growsWithContent) slot.style.height = `${height}px`
       viewport.style.height = `${textHeight}px`
       // Fix the destination line breaks once; the viewport reveals the text.
       text.style.width = `${targetTextWidth}px`
@@ -153,6 +158,9 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
 
       if (Math.abs(from.width - targetWidth) > 0.5 || Math.abs(from.height - height) > 0.5 || Math.abs(from.left - bounds.left - targetLeft) > 0.5) track(card.animate(cardFrames, timing))
       if (Math.abs(fromTextHeight - textHeight) > 0.5) track(viewport.animate(viewportFrames, timing))
+      if (growsWithContent && Math.abs(bounds.height - height) > 0.5) {
+        track(slot.animate(cardFrames.map((frame) => ({ offset: frame.offset, height: frame.height })), timing))
+      }
 
       if (motion.length) void Promise.all(motion.map((animation) => animation.finished)).then(finish, () => {})
       else finish()
@@ -174,7 +182,7 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
 
   const observer = new ResizeObserver(() => {
     const resized = slot.getBoundingClientRect().width !== lastWidth || lateralArea.getBoundingClientRect().width !== lastAvailableWidth ||
-      (area?.getBoundingClientRect().height ?? 0) !== lastAreaHeight
+      (options.expansionMode !== 'content' && (area?.getBoundingClientRect().height ?? 0) !== lastAreaHeight)
     const contentChanged = text.getBoundingClientRect().height !== lastTextHeight || title.getBoundingClientRect().height !== lastTitleHeight
     if (resized || (!moving && contentChanged)) layout()
   })
@@ -189,8 +197,9 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
 
   return {
     update(value: Options) {
+      const modeChanged = options.expansionMode !== value.expansionMode
       options = value
-      if (expanded === value.expanded) return
+      if (expanded === value.expanded && !modeChanged) return
       expanded = value.expanded
       layout(true)
     },

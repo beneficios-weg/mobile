@@ -19,6 +19,7 @@
   import CategoryPage from "./pages/CategoryPage.svelte";
   import FavoritesPage from "./pages/FavoritesPage.svelte";
   import Login from "./pages/Login.svelte";
+  import EstablishmentInfoPage from "./pages/EstablishmentInfoPage.svelte";
   import { previewFavorites, previewFavoritesLocation } from "./pages/favorites";
 
   import './components/styles/style.css'
@@ -59,6 +60,7 @@
   const isCategoryRoute = window.location.pathname === categoryRoute;
   const isFavoritesRoute = window.location.pathname.replace(/\/$/, "") === "/favoritos";
   const isLoginRoute = window.location.pathname.replace(/\/$/, "") === "/login";
+  const isEstablishmentRoute = window.location.pathname.replace(/\/$/, "") === "/estabelecimento/academia-move";
   let favoritePlaces = $state([...previewFavorites]);
 
   function returnToHome() {
@@ -70,7 +72,9 @@
   <title>{isLoginRoute ? "Entrar — WEG Benefits" : isFavoritesRoute ? "Favoritos — WEG Benefits" : isCategoryRoute ? "Saúde e Bem-Estar — WEG Benefits" : "WEG Benefits — revisão dos componentes"}</title>
 </svelte:head>
 
-{#if isLoginRoute}
+{#if isEstablishmentRoute}
+  <EstablishmentInfoPage />
+{:else if isLoginRoute}
   <Login />
 {:else if isFavoritesRoute}
   <FavoritesPage

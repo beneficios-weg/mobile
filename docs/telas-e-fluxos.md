@@ -24,6 +24,12 @@ Apresenta estabelecimentos associados à categoria escolhida, com contexto de ma
 
 ## 04 — Loja / Estabelecimento
 
+A página de apresentação `src/pages/EstablishmentInfoPage.svelte` está disponível em `/estabelecimento/academia-move`, sem alterar a galeria inicial. Usa as quatro referências locais: celular em pé (390 × 844), celular deitado (844 × 390), tablet em pé (834 × 1194) e tablet deitado (1194 × 834). Em pé, o mapa fica acima dos detalhes; deitado, permanece na coluna esquerda com a navegação, enquanto a coluna direita rola até o fim da página. As sombras indicam conteúdo fora da área visível, sem barra de rolagem visual.
+
+Reutiliza `BackButton`, `FavoriteButton`, `Map`, `FloatingTabBar`, `EstablishmentFacadeCard`, `PrimaryButton`, `BenefitCard`, `AboutUnitCard`, `ExpandableAboutUnitCard` e `ScrollShadow`, preservando os estilos atuais desses componentes. Sobre a unidade mantém a expansão lateral e aumenta a altura conforme necessário para mostrar toda a descrição sem rolagem interna; Serviços mantém a expansão em área existente. Escape recolhe o card aberto. O mapa mantém os tiles originais do OpenStreetMap e pins azuis.
+
+Os dados de `src/pages/establishment.ts` são demonstrativos e não representam payload da API. Favoritar altera o estado da prévia, com callback disponível para integração; não há persistência. O contato abre a ligação e Como chegar abre um provedor externo de direções com o destino selecionado. A foto da fachada não foi fornecida: o botão segue desabilitado pelo componente existente até receber `facadeImageUrl`. A navegação abre Início/Favoritos, foca o mapa local ou informa que Histórico ainda não está disponível. O retorno usa a página de origem da mesma aplicação, quando disponível, com alternativa para Categorias.
+
 Exibe os detalhes fornecidos pelo Backend e destaca um benefício principal no MVP. A tela deve permitir favoritar/desfavoritar sem inferir uma visita. Informações como endereço, horário e ação de rota só podem ser mostradas se fizerem parte do design e dos dados disponíveis.
 
 ## 05 — Favoritos
