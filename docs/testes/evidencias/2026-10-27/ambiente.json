@@ -1,0 +1,27 @@
+﻿{
+    "capturedAt":  "2026-10-27T08:57:20.6297779-03:00",
+    "sourceCommit":  "0c441910a9d5f9b60048ad668a778b286fea4c4a",
+    "documentationBranch":  "docs/system-testing",
+    "platform":  "Microsoft Windows NT 10.0.26200.0",
+    "architecture":  "x64",
+    "node":  "v24.11.1",
+    "npm":  "11.6.2",
+    "dependencies":  "Ja instaladas conforme package-lock.json; npm ci nao reexecutado",
+    "checks":  [
+                   {
+                       "evidence":  "check.txt",
+                       "exitCode":  0,
+                       "command":  "npm run check"
+                   },
+                   {
+                       "evidence":  "testes.txt",
+                       "exitCode":  0,
+                       "command":  "npm test"
+                   },
+                   {
+                       "evidence":  "build.txt",
+                       "exitCode":  0,
+                       "command":  "npm run build"
+                   }
+               ]
+}

@@ -1,151 +1,120 @@
-# Testes mobile
+# Plano de testes do sistema
 
-## Estado
+## Objetivo e versão de referência
 
-O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
+Orientar a verificação do WEG Benefits Mobile, permitir a repetição dos cenários e distinguir resultados obtidos de funcionalidades ainda planejadas. A referência desta edição é o código do commit `0c44191`, com Svelte/Vite, Leaflet e configuração Android do Capacitor. A documentação foi consolidada na branch `docs/system-testing`.
 
-## Dimensões recolhidas de Sobre a unidade e Serviços
+O sistema atual é uma prévia web com dados demonstrativos. Entrar abre o Início sem autenticação real; favoritos e estados de navegação ficam em memória; Visitados não representa visitas detectadas. Não usar esta validação para afirmar que API, autenticação, persistência, modo offline ou aplicação nativa foram homologados.
 
-Branch `fix/equal-collapsed-info-cards`: ambos os cards usam 124 px de altura e a mesma largura na grade quando recolhidos. A prévia limita o texto a linhas completas com reticências, sem permitir que a quantidade de conteúdo altere a altura.
+## Documentos e evidências
 
-No Chrome isolado, foram verificados 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834: dimensões iguais antes do clique e após recolher, expansão lateral dos dois cards e descrição completa de Sobre a unidade sem rolagem interna. Descrições longas também foram testadas para confirmar a expansão vertical. Outro estabelecimento com conteúdo diferente e a galeria de componentes mantiveram a altura padrão. Não houve transbordamento horizontal nem erros JavaScript; capturas foram inspecionadas. `npm run check` terminou sem erros/avisos e `npm run build` concluiu. O solicitante aprovou visualmente o ajuste e autorizou o envio ao remoto.
-
-## Padronização e animação da navegação / busca do mapa — 2026-10-27
-
-As medidas e os estilos computados de Categorias foram registrados antes da mudança. Após centralizar as regras de FloatingTabBar, os valores de referência foram preservados e comparados com Início, Favoritos, Visitados, detalhe e mapa em 390 × 844, 844 × 390, 834 × 1194, 1194 × 834 e 700 × 390. Fonte, dimensões, posição, estilos e transições coincidiram. A lista expandida manteve a mesma barra.
-
-O navegador amostrou quadros durante Início → Favoritos, Favoritos → Mapa e retorno do Mapa: houve transições CSS reais, com a largura da aba selecionada variando, enquanto posição e dimensões do contêiner permaneceram constantes em todos os quadros.
-
-A busca foi conferida por clique e teclado: resultados e pins correspondentes, pesquisa sem acentos, contagem, estado vazio, seleção com setas/Enter, popup do registro selecionado, Escape fechando somente sugestões e restauração por Todos os benefícios. O painel ficou dentro do viewport e acima da navegação nas cinco medidas; a busca de origem não foi alterada. Capturas foram inspecionadas. Nenhum erro JavaScript foi observado. O solicitante aprovou as alterações e autorizou o envio ao remoto. As referências temporárias de imagem e ZIP foram removidas após essa aprovação.
-
-## Mapa em tela cheia conforme referência — 2026-10-27
-
-Referência: `Screen/Mobile/Portrait/Map.svg`, do ZIP fornecido pelo solicitante. Em 390 × 844, as posições e dimensões da busca, retorno, Todos os benefícios e navegação foram comparadas com as coordenadas do SVG. O fundo ocupa o viewport inteiro com os tiles e pins azuis existentes. Capturas também foram inspecionadas em 844 × 390, 834 × 1194 e 1194 × 834.
-
-As cinco origens (Início, Categoria, Favoritos, Visitados e detalhe) foram exercitadas nas quatro medidas: mapa preenchendo todo o viewport, controles dentro da área visível e ausência dos controles/legenda padrão do Leaflet. Conferidos: busca sem acentos, estado vazio, restauração/enquadramento dos resultados, zoom pelos botões e centralização. O histórico preservou a busca do mapa ao avançar, Escape fechou a expansão, as abas navegaram e os popups abriram os detalhes. Nenhum erro JavaScript foi observado.
-
-`npm run check`: zero erros e zero avisos. `npm test`: 12 testes aprovados. `npm run build`: concluído. Validação web com dados demonstrativos; o solicitante aprovou os ajustes e autorizou o envio ao remoto.
-
-## Navegação conectada — 2026-10-27
-
-Branch `feat/site-navigation`. `npm run check` terminou com zero erros e zero avisos de Svelte/TypeScript, os 12 testes de regressão passaram e `npm run build` gerou a versão de produção.
-
-No Chrome isolado, os seguintes fluxos foram exercitados sem erros JavaScript:
-
-- Login de prévia até o Início, sem recarregar o documento;
-- abertura das sete categorias, incluindo estados vazios, e retorno ao Início;
-- busca e filtro, card com detalhes do registro correto, favorito compartilhado e retorno/avanço do navegador preservando os critérios;
-- busca, remoção e detalhes em Favoritos; ausência de link telefônico quando o contato não está informado;
-- Visitados independente dos favoritos, detalhes e retorno;
-- mapa expandido com os resultados filtrados, mesma URL, foco modal e bloqueio de cliques na busca atrás dele;
-- zoom e arraste do mapa, sincronização do viewport com a origem, fechamento por Voltar e restauração por Avançar com o último centro e zoom;
-- abertura de detalhes pelo popup e retorno à origem sem reabrir a entrada intermediária do mapa;
-- acesso direto, barras finais, caminhos/IDs/categorias inexistentes e retorno da galeria;
-- expansão e rolagem da lista preservadas após abrir e voltar dos detalhes.
-
-Início, Categoria, Favoritos, Visitados e detalhe foram conferidos em 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834: 20 combinações sem transbordamento horizontal, com o diálogo do mapa preenchendo o viewport. Capturas foram inspecionadas. A restauração do mapa guarda o contexto reativo para preservar as mudanças ao avançar no histórico.
-
-Esta validação cobre a prévia web com dados locais. Não valida autenticação, persistência após recarregar, visitas reais, API, permissões nativas ou disponibilidade contínua dos tiles externos. O solicitante aprovou a etapa com os ajustes de mapa, busca e navegação descritos acima e autorizou o envio ao remoto.
-
-## Página de Visitados — 2026-10-26
-
-`/visitados` reutiliza `CategoryPage` com a variante de textos de Visitados. `npm run check` passou sem erros ou avisos, os sete testes de regressão passaram e `npm run build` gerou a aplicação.
-
-No Chrome, os layouts normal e expandido foram comparados com Categorias nas quatro medidas (390 × 844, 844 × 390, 834 × 1194 e 1194 × 834): oito comparações com as mesmas posições, dimensões e fontes de cabeçalho, mapa, controles, lista, cards e navegação. Não houve transbordamento da página nem erros JavaScript. Capturas foram inspecionadas.
-
-Foram conferidos título/subtítulo, aba Histórico ativa, pins azuis, busca, filtro por desconto, estado sem resultados, seleção de pin/card, expansão/recolhimento e a independência entre favoritar e manter um card na lista de visitados. As abas Histórico de Início, Categorias, Favoritos e detalhe abrem a nova rota; retorno e aba Favoritos também foram verificados, assim como `/visitados/` com barra final. Os dados são demonstrativos. O solicitante aprovou visualmente a página e autorizou o envio ao remoto.
-
-## Padronização do Início — 2026-10-26
-
-`MainPage` passou a compartilhar o layout de Categoria/Favoritos e reutilizar os componentes existentes sem as reduções específicas da página. No Chrome, 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834 tiveram mapa, cabeçalho, título e navegação comparados com Favoritos; tamanhos, posições e fonte compartilhados coincidiram. Também foram verificadas 320 × 568 e 568 × 320, sem transbordamento da página.
-
-Conferidos: sete categorias, altura mínima padrão de 58 px dos botões, ícones de 20 px, mapa real com tiles e pins azuis, filtro/restauração dos exemplos, estado sem resultados, foco do mapa, informação de Histórico indisponível e navegação para as rotas existentes de Saúde e Bem-Estar/Favoritos. Login, galeria e detalhe receberam verificação de abertura. Não foram observados erros JavaScript. Capturas das composições foram inspecionadas; o solicitante autorizou o envio ao remoto após a apresentação do ajuste.
-
-## Revisão da develop — 2026-10-26
-
-A base `d5fd87d` apresentava 20 erros de compilação decorrentes de implementações sobrepostas. Após a limpeza em `refactor/code-cleanup`, `npm run check` passou sem erros/avisos, `npm test` passou nos sete testes de regressão e `npm run build` gerou a aplicação.
-
-Seis rotas foram verificadas no Chrome nas quatro dimensões de referência, totalizando 24 combinações sem erros JavaScript ou transbordamento horizontal. Foram exercitados mapas, filtros, seleção, remoção, estados vazios, componentes expansíveis, diálogo da fachada e aviso de Login. As posições e dimensões dos controles compartilhados de Categoria/Favoritos foram comparadas; a navegação manteve sua geometria durante a expansão das listas. Capturas foram inspecionadas. O solicitante autorizou o envio da limpeza e da padronização do Início; o Android não foi compilado/testado. Detalhes e pendências em [Revisão do código](revisao-codigo.md).
-
-## Informações do Estabelecimento — 2026-10-26
-
-Prévia em `/estabelecimento/academia-move`, com dados locais identificados em `src/pages/establishment.ts`. `npm run check` passou sem erros ou avisos e `npm run build` gerou a versão de produção.
-
-Validação automatizada com Chrome isolado, sem interface, nas quatro medidas do protótipo (390 × 844, 844 × 390, 834 × 1194 e 1194 × 834), além de 320 × 568 e 568 × 320:
-
-- página sem transbordamento horizontal ou rolagem externa; mapa preenchendo seu contêiner e navegação dentro do viewport;
-- rolagem dos detalhes, sombra inferior no fim do viewport e atualização das sombras ao chegar ao início/fim do conteúdo;
-- alternância do favorito, link de contato e URL de direções com as coordenadas do estabelecimento;
-- expansão/recolhimento da descrição longa do benefício e acesso ao texto completo;
-- expansão dos cards Sobre a unidade/Serviços e recolhimento por Escape;
-- revisão de Sobre a unidade nas quatro medidas: expansão lateral preservada, altura suficiente para o texto completo sem rolagem interna, altura incluída na rolagem da página e Serviços oculto durante a expansão; recolher restaura as dimensões originais. A expansão padrão da galeria também foi verificada;
-- troca de orientação sem recarregar, mantendo a página sem transbordamento;
-- abertura das rotas existentes de galeria, Categorias e Favoritos; nenhum erro JavaScript observado.
-
-As quatro composições também foram inspecionadas por capturas. O solicitante aprovou visualmente a tela após o ajuste de Sobre a unidade para preservar a expansão lateral e mostrar todo o texto sem rolagem interna. As quatro imagens temporárias de referência foram removidas após essa aprovação, mantendo a galeria inicial intacta. Os testes não validam API, persistência de favoritos, dados reais do estabelecimento ou disponibilidade dos tiles externos. A ação de fachada permanece desabilitada porque nenhuma foto foi fornecida; o diálogo existente será habilitado ao receber `facadeImageUrl`.
-
-## Revisão do mapa de Favoritos — 2026-10-23
-
-A página anterior exibia um fundo com pins posicionados em porcentagem, sem instanciar `Map.svelte`. A revisão substituiu essa representação pelo mapa Leaflet com tiles do OpenStreetMap nas cores originais, coordenadas de demonstração e seleção compartilhada com os cards. Os estilos antigos dos pins estáticos foram removidos.
-
-As validações de tipos e build passaram sem erros ou avisos. Asserções Node verificaram busca com acentos e espaços, ordenação, remoção, estado vazio, preservação dos dados de origem e coordenadas distintas dentro dos limites do mapa. Um teste com Leaflet simulado verificou preservação dos marcadores durante a seleção, atualização do callback, estados acessíveis e remoção dos pins filtrados; ele não substitui a validação no navegador.
-
-O navegador de automação não estava disponível nesta revisão. O solicitante aprovou visualmente a entrega em `/favoritos` e autorizou o commit em 2026-10-23. Essa aprovação não representa uma nova inspeção automatizada do navegador. A navegação para as abas Mapa e Histórico ainda depende de telas de destino não implementadas.
-
-## Validação da UI de Favoritos — 2026-10-21
-
-| Verificação | Resultado |
+| Documento | Uso |
 |---|---|
-| `npm run check` e `npm run build` | Aprovados, sem erros nem avisos do Svelte |
-| Celular 390 × 844 e 844 × 390 | Mapa, controles, lista e navegação conferidos; sem transbordamento horizontal |
-| Tablet 834 × 1194 e 1194 × 834 | Mapa, controles, lista e navegação conferidos; sem transbordamento horizontal |
-| Telas menores 320 × 568 e 568 × 320 | Sem transbordamento horizontal e com lista rolável |
-| Tipografia | A fonte computada de Favoritos é idêntica à de Categorias: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif` |
-| Marcadores e aba ativa | Estabelecimentos vermelhos, localização de demonstração azul e aba Favoritos ativa |
-| Busca | Nome sem acentos, espaços nas extremidades, bairro e desconto; lista, mapa e contador acompanham o filtro |
-| Ordenação | Proximidade, nome e desconto; a função não altera a lista de origem |
-| Seleção | Selecionar um pin destaca o card correspondente e o traz para a área visível da lista |
-| Remoção | Contador e mapa atualizados; remover os oito exemplos exibe o estado sem favoritos |
-| Busca sem resultados | Mensagem contextual e contador zerado; limpar pelo teclado restaura a lista |
-| Expansão | Expandir, recolher e usar Escape funcionam; o foco retorna ao controle de expansão |
-| Título no tablet em paisagem | Mantém 24 px e altura de linha de 29 px antes e depois de expandir |
-| Rotas existentes | `/` mantém a prévia original sem Favoritos; `/categoria/saude-e-bem-estar` permanece disponível |
+| [Casos de teste](testes/casos-de-teste.md) | Pré-condições, ações e resultados esperados por funcionalidade |
+| [Relatório de execução](testes/relatorio-execucao.md) | Ambiente, versão, resultados efetivamente executados e limitações |
+| [Evidências da execução](testes/evidencias/2026-10-27/) | Saídas de check, testes e build desta consolidação |
+| [Histórico de validações](testes/historico-validacoes.md) | Registros anteriores preservados, incluindo aprovações visuais |
+| [Navegação](navegacao.md) | Rotas e comportamento da prévia |
+| [Componentes de UI](componentes-ui.md) | Padrões visuais e expansões aprovadas |
 
-As verificações de interação foram executadas no navegador. Busca, ordenação e preservação dos dados também foram conferidas com asserções Node sobre `src/pages/favorites.ts`. O solicitante aprovou visualmente a entrega após o ajuste do título no tablet em paisagem e autorizou a conclusão do cronograma. As quatro imagens temporárias de referência foram removidas. Estes resultados não validam os fluxos de API, autenticação ou sincronização abaixo.
+Os casos definem o que verificar. Somente um relatório com versão, resultado e evidência comprova execução. Um caso documentado não deve ser contado automaticamente como aprovado.
 
-| Cenário | Pré-condição | Passos | Resultado esperado | Resultado obtido | Status |
-|---|---|---|---|---|---|
-| Login válido | Usuário ativo e API disponível | Informar credenciais válidas e enviar | Sessão criada e navegação para Início conforme contrato | Não executado | Bloqueado: sem app/API |
-| Login inválido | API disponível | Enviar credenciais inválidas | Erro contratado, sem criar sessão | Não executado | Bloqueado |
-| Primeiro acesso | Usuário elegível | Abrir fluxo e concluir etapas contratadas | Conta habilitada sem atalhos de validação | Não executado | Bloqueado |
-| Recuperação | Identidade de teste | Solicitar recuperação e seguir retorno contratado | Feedback seguro e conclusão do fluxo | Não executado | Bloqueado |
-| Landing | Sessão válida, dados disponíveis | Abrir Início | Mapa/categorias, estados e benefício próximos coerentes | Não executado | Bloqueado |
-| Categorias | Categorias e lojas disponíveis | Escolher categoria | Lista e mapa refletem o mesmo filtro | Não executado | Bloqueado |
-| Pesquisa | Conjunto conhecido em cache/API | Pesquisar nome existente e inexistente | Resultados corretos e estado vazio contextual | Não executado | Bloqueado |
-| Favoritos | Sessão válida e estabelecimento disponível | Favoritar, navegar e desfavoritar | Estado consistente e independente de visitas | Não executado | Bloqueado |
-| Mapa cheio | Dados e mapa disponíveis | Abrir mapa a partir de uma tela filtrada | Viewport expandido preserva contexto e seleção | Não executado | Bloqueado |
-| Permissão de localização concedida | Localização habilitada | Acionar função e conceder permissão | Posição usada apenas para finalidade informada | Não executado | Bloqueado |
-| Localização negada | Permissão não concedida | Negar ou bloquear permissão | App permanece navegável e orienta alternativa | Não executado | Bloqueado |
-| Detecção de visita válida | Parâmetros aprovados e local simulado controlado | Permanecer no candidato pelo período e condições definidos | Um candidato, sem duplicidade; envio conforme contrato | Não executado | Bloqueado |
-| GPS inconsistente | Amostras imprecisas/oscilantes | Simular proximidade instável | Nenhuma visita confirmada e pontos descartados | Não executado | Bloqueado |
-| Candidatos sobrepostos | Dois estabelecimentos próximos | Simular janela coerente com um dominante | Regra aprovada seleciona no máximo um candidato | Não executado | Bloqueado |
-| Offline com cache | Cache válido e rede desabilitada | Abrir Início/Categoria/Loja | Conteúdo em cache com `lastSyncAt` e aviso | Não executado | Bloqueado |
-| Offline sem cache | App sem cache e rede desabilitada | Abrir tela remota | Estado offline claro, sem conteúdo inventado | Não executado | Bloqueado |
-| Sincronização | Operação permitida na fila e rede restaurada | Voltar online e acionar gatilho | Operação processada uma vez, estado atualizado | Não executado | Bloqueado |
-| Erro 4xx da API | API preparada para erro contratado | Executar a ação | Mensagem/ação coerente; sem retry infinito | Não executado | Bloqueado |
-| Erro 5xx/timeout | API indisponível | Abrir ou atualizar tela | Cache preservado e retry controlado | Não executado | Bloqueado |
-| Logout/troca de usuário | Duas contas de teste | Armazenar cache, sair e entrar com outra conta | Nenhum dado pessoal cruza contas | Não executado | Bloqueado |
+## Escopo
 
-## Verificações transversais
+| Área | Verificação disponível agora | Dependências futuras |
+|---|---|---|
+| Login | Campos obrigatórios, formato de e-mail, aviso e entrada de prévia | Autenticação, sessão, primeiro acesso e recuperação |
+| Início e categorias | Sete categorias, listas, busca, filtros, contador e estados vazios | Dados, filtros e paginação da API |
+| Navegação | Rotas, retorno, histórico, estado em memória e menu animado | Navegação nativa em dispositivo e configuração da hospedagem |
+| Favoritos e Visitados | Favoritos compartilhados na sessão; histórico demonstrativo independente | Persistência, sincronização e visitas reais |
+| Estabelecimento | Dados do registro, favorito, links e cards expansíveis | Dados reais e foto da fachada |
+| Mapa | Tiles/pins atuais, seleção, expansão modal, busca/sugestões e controles | Localização real, regras de proximidade e serviços integrados |
+| Responsividade e acessibilidade | Quatro viewports, foco, teclado e estados acessíveis | Dispositivos físicos, leitores de tela e auditoria completa |
 
-- Android e iOS nas versões suportadas, quando definidas;
-- acessibilidade de ícones, foco, contraste e tamanho de fonte;
-- ausência de tokens, senhas e coordenadas em logs;
-- consumo de bateria e permissões de localização;
-- transições entre loading, vazio, erro, cache e conteúdo atualizado;
-- links e navegação de retorno;
-- deduplicação de visitas e operações offline conforme contrato.
+## Ambiente e preparação
 
-## Automação futura
+1. Registrar branch e commit com `git status -sb` e `git rev-parse HEAD`.
+2. Usar Node/npm compatíveis com o projeto. A execução registrada usou Node `24.11.1` e npm `11.6.2`; essas versões são o ambiente observado, não uma nova política de suporte.
+3. Em uma instalação nova, executar `npm ci` com o `package-lock.json` versionado. A execução registrada utilizou dependências já instaladas; não incluiu uma nova instalação limpa.
+4. Iniciar o servidor e abrir a URL informada pelo Vite. Para os endereços usados nos roteiros:
 
-Ferramentas e divisão entre testes unitários, de componentes e end-to-end são **DECISÃO PENDENTE**. Priorizar funções puras de distância/consistência, adaptadores de API/storage e fluxos críticos. Não adicionar framework antes de existir uma implementação mínima e uma decisão registrada.
+```sh
+npm run dev -- --host 127.0.0.1 --port 5174 --strictPort
+```
+
+5. Abrir as ferramentas de desenvolvimento do navegador, acompanhar erros de console e configurar o viewport conforme a matriz abaixo. Manter conexão para os tiles externos do OpenStreetMap.
+6. Iniciar cada caso independente com recarregamento da rota inicial indicada. Isso restaura os exemplos em memória. Dentro de um caso de navegação, não recarregar, exceto quando o próprio passo solicitar.
+
+Usar somente valores fictícios no Login, como `teste@example.com` e uma senha de exemplo. Não são necessárias credenciais, chaves ou API do produto para testar a prévia.
+
+## Níveis e ferramentas
+
+| Nível | Comando ou método | O que comprova |
+|---|---|---|
+| Análise estática | `npm run check` | Diagnósticos Svelte/TypeScript e configuração TypeScript do projeto |
+| Regressão de funções puras | `npm test` | 12 testes em [regressions.test.mjs](../tests/regressions.test.mjs), com Node Test Runner e compilador TypeScript existente |
+| Compilação | `npm run build` | Geração de `dist/`; não comprova comportamento visual ou integração |
+| Funcional e visual web | Casos manuais e inspeção no navegador | Jornadas, posições, animações, foco e interação entre componentes |
+| Integração/nativo | Casos bloqueados descritos no catálogo | Dependem de contrato, implementação, ambiente e/ou dispositivo |
+
+Executar os comandos abaixo individualmente e registrar o código de saída de cada um:
+
+```sh
+npm run check
+npm test
+npm run build
+```
+
+Não há comando E2E nem suíte permanente de navegador configurados no `package.json`. As verificações anteriores no Chrome foram realizadas com automação temporária e inspeção de capturas; o catálogo permite repeti-las manualmente. Os exemplos JUnit existentes em `android/` não cobrem os fluxos do produto e não foram executados nesta consolidação.
+
+## Matriz de dispositivos e navegadores
+
+| Identificador | Viewport CSS | Uso |
+|---|---|---|
+| CEL-P | 390 × 844 | Celular em pé |
+| CEL-D | 844 × 390 | Celular deitado |
+| TAB-P | 834 × 1194 | Tablet em pé |
+| TAB-D | 1194 × 834 | Tablet deitado |
+
+Repetir os casos responsivos nos quatro tamanhos, mantendo o zoom do navegador em 100%. Conferir também a troca de orientação sem recarregar. `700 × 390`, `320 × 568` e `568 × 320` são tamanhos complementares usados em registros anteriores; não substituem a matriz principal.
+
+Chrome no Windows foi o navegador observado nas validações existentes. Emulação de viewport não equivale a teste em aparelho físico. Firefox, Safari/iOS, Android instalado, teclado virtual, áreas seguras reais e leitor de tela precisam de execuções próprias registradas.
+
+## Dados e cuidados com a interpretação
+
+Os exemplos estão em `src/pages/catalog.ts`, `favorites.ts`, `establishment.ts` e `services/benefitsService.ts`. O catálogo inicial possui oito favoritos e oito registros de Visitados; Saúde e Bem-Estar contém oito estabelecimentos. Lazer e Estética e Vestuário são categorias válidas sem exemplos. Os números são dados da versão de referência, não limites do produto.
+
+- Unidades com o mesmo nome podem ter IDs, bairros e coordenadas diferentes. Comparar o registro selecionado, não apenas o título.
+- Favoritos e mapa normalizam acentos na busca. Categoria/Visitados usam a busca local existente, sem a mesma normalização; usar `Ótica` nesses roteiros. Essa diferença está registrada para alinhamento da equipe, sem alteração de comportamento nesta documentação.
+- Horários são locais e demonstrativos: abertura inclusiva, fechamento exclusivo, sem feriados ou intervalos noturnos. Não inferir regras do Backend.
+- Reload restaura os exemplos e limpa a sessão de prévia. Não registrar isso como falha de persistência antes de a persistência ser implementada.
+- O mapa depende de tiles externos. Diferenciar falha de carregamento dos tiles de erro na lista, pins ou navegação.
+
+## Priorização e critérios de aceite
+
+P0 identifica navegação e fluxos básicos; P1 identifica recursos principais, responsividade e acessibilidade de interação; P2 identifica verificações complementares. A prioridade orienta a ordem de execução, sem dispensar os demais casos aplicáveis à entrega.
+
+Uma alteração pode ser apresentada para revisão quando check, testes relevantes e build passarem; os casos afetados tiverem resultado registrado; não houver falha crítica aberta nos fluxos alterados; e as quatro composições estiverem verificadas quando a alteração atingir layout. Não é necessário repetir casos sem relação com uma alteração já validada.
+
+A aprovação visual pertence ao solicitante. Registrar essa aprovação separadamente do resultado técnico. Um cenário bloqueado por integração não deve ser marcado como aprovado ou como falha de uma funcionalidade que ainda não foi implementada. Publicação em produção ou homologação nativa exige critérios adicionais após definição das integrações.
+
+## Registro de execução e defeitos
+
+Para cada rodada, registrar versão, data/fuso, responsável ou agente executor, ambiente, dados, viewport, IDs executados, resultado obtido e evidências. Estados permitidos: **Aprovado**, **Falhou**, **Não executado**, **Bloqueado** e **Não aplicável**, sempre com justificativa nos dois últimos. Aprovações anteriores ficam no histórico, sem serem apresentadas como uma nova execução.
+
+Modelo de ocorrência:
+
+```text
+Caso / título:
+Commit / branch / data / executor:
+Navegador / sistema / viewport:
+Pré-condições e dados fictícios:
+Passos para reproduzir:
+Resultado esperado:
+Resultado obtido:
+Status / impacto:
+Evidência (arquivo, captura ou saída do comando):
+Correção e resultado do reteste:
+```
+
+Usar identificadores estáveis dos casos, preservar evidências anteriores e evitar dados pessoais, credenciais ou tokens nas capturas. A cobertura atual é descrita por cenários e testes existentes; não foi calculado percentual de cobertura de código.
