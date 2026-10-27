@@ -48,4 +48,4 @@ Não fazem parte da detecção de visitas: QR Code, NFC, confirmação manual, B
 
 ## Situação documental
 
-A documentação descreve o produto solicitado, mas a implementação ainda não existe na branch base. Contrato da API, protótipos versionados e escolhas técnicas devem ser adicionados quando forem disponibilizados. As lacunas estão em [Decisões abertas](decisoes-abertas.md).
+O checkout contém interfaces Svelte/Vite com Capacitor, usando dados demonstrativos. A API do produto, autenticação, persistência, sincronização e detecção de visitas ainda não estão integradas. Os registros que descrevem a branch base sem telas são históricos. As lacunas estão em [Decisões abertas](decisoes-abertas.md), e a revisão da implementação atual está em [Revisão do código](revisao-codigo.md).

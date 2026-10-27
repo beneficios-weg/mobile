@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Benefit } from '../../services/benefitsService'
+  import type { BenefitLocation } from '../../services/benefitsService'
 
   type Props = {
-    benefit: Benefit
+    benefit: BenefitLocation
     distance?: string
     selected?: boolean
     onclick?: (event: MouseEvent) => void

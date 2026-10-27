@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
+  import ExpandButton from '../components/atoms/ExpandButton.svelte'
   import FloatingTabBar from '../components/atoms/FloatingTabBar.svelte'
   import ResultsCount from '../components/atoms/ResultsCount.svelte'
   import ScrollShadow from '../components/atoms/ScrollShadow.svelte'
@@ -8,72 +9,65 @@
   import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
   import Map from '../components/Map.svelte'
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
-  import healthIcon from '../assets/categories/health-wellbeing.svg'
+  import { findCategory, placesForCategory, previewVisitedPlaces } from './catalog'
+  import { directoryView, navigateTab, openMap, openEstablishment, goBack } from '../lib/navigation.svelte'
+  import { siteState, setFavorite } from '../lib/siteState.svelte'
+  import type { TabId } from '../lib/routes'
+  import healthIcon from '../assets/health-wellbeing.svg'
 
-  type CategoryPlace = {
-    id: string
-    name: string
-    neighborhood: string
-    distanceKm: number
-    discount: number
-    latitude: number
-    longitude: number
-  }
-  type OpeningHours = {
-    days: number[]
-    opensAt: string
-    closesAt: string
-  }
   type Props = {
     onback?: () => void
+    variant?: 'category' | 'visited'
+    categorySlug?: string
+    onnavigate?: (tab: 'home' | 'map' | 'favorites' | 'history') => void
   }
 
-  let { onback }: Props = $props()
+  let { onback, variant = 'category', categorySlug = 'saude-e-bem-estar', onnavigate }: Props = $props()
+  const category = $derived(findCategory(categorySlug))
+  const view = untrack(() => directoryView(variant === 'visited' ? 'visited' : `category:${categorySlug}`))
+  const text = $derived(variant === 'visited' ? {
+    title: 'Visitados',
+    resultsTitle: 'Estabelecimentos visitados',
+    mapColumnLabel: 'Mapa de estabelecimentos visitados',
+    mapLabel: 'Mapa dos estabelecimentos visitados',
+    listLabel: 'Estabelecimentos visitados encontrados',
+    expandLabel: 'Expandir lista de estabelecimentos visitados',
+    emptyTitle: 'Nenhum estabelecimento visitado encontrado',
+    resultsTitleId: 'visited-results-title',
+    searchContext: '',
+  } : {
+    title: category?.label ?? 'Categoria',
+    resultsTitle: 'Estabelecimentos da categoria',
+    mapColumnLabel: 'Mapa da categoria',
+    mapLabel: 'Mapa dos estabelecimentos da categoria',
+    listLabel: 'Estabelecimentos encontrados',
+    expandLabel: 'Expandir lista de estabelecimentos',
+    emptyTitle: 'Nenhum estabelecimento encontrado',
+    resultsTitleId: 'category-results-title',
+    searchContext: categorySlug === 'saude-e-bem-estar' ? 'saúde bem-estar' : category?.label ?? '',
+  })
 
-  const places: CategoryPlace[] = [
-    { id: 'move', name: 'Academia Move', neighborhood: 'Centro', distanceKm: 0.8, discount: 20, latitude: -26.3043, longitude: -48.8464 },
-    { id: 'visao', name: 'Ótica Visão', neighborhood: 'Centro', distanceKm: 0.8, discount: 12, latitude: -26.3051, longitude: -48.8448 },
-    { id: 'bem-viver', name: 'Clínica Bem Viver', neighborhood: 'Centro', distanceKm: 0.8, discount: 15, latitude: -26.3029, longitude: -48.8491 },
-    { id: 'move-vila', name: 'Academia Move', neighborhood: 'Vila Nova', distanceKm: 1.4, discount: 20, latitude: -26.2948, longitude: -48.9127 },
-    { id: 'saude-farmacia', name: 'Farmácia Saúde', neighborhood: 'América', distanceKm: 2.1, discount: 10, latitude: -26.2816, longitude: -48.8505 },
-    { id: 'studio-ativa', name: 'Studio Ativa', neighborhood: 'Vila Nova', distanceKm: 2.6, discount: 15, latitude: -26.2972, longitude: -48.9098 },
-    { id: 'vitalis', name: 'Centro Vitalis', neighborhood: 'Centro', distanceKm: 3.4, discount: 18, latitude: -26.3071, longitude: -48.8428 },
-    { id: 'medilife', name: 'MediLife Clínica', neighborhood: 'América', distanceKm: 4.1, discount: 12, latitude: -26.2798, longitude: -48.8474 },
-  ]
-  const mapCenter = { latitude: -26.3045, longitude: -48.8487 }
-  const openingHoursByPlace: Record<string, OpeningHours> = {
-    move: { days: [1, 2, 3, 4, 5, 6], opensAt: '06:00', closesAt: '22:00' },
-    visao: { days: [1, 2, 3, 4, 5, 6], opensAt: '09:00', closesAt: '19:00' },
-    'bem-viver': { days: [1, 2, 3, 4, 5], opensAt: '08:00', closesAt: '18:00' },
-    'move-vila': { days: [0, 1, 2, 3, 4, 5, 6], opensAt: '06:00', closesAt: '22:00' },
-    'saude-farmacia': { days: [0, 1, 2, 3, 4, 5, 6], opensAt: '08:00', closesAt: '22:00' },
-    'studio-ativa': { days: [1, 2, 3, 4, 5, 6], opensAt: '07:00', closesAt: '21:00' },
-    vitalis: { days: [1, 2, 3, 4, 5], opensAt: '08:00', closesAt: '18:00' },
-    medilife: { days: [1, 2, 3, 4, 5], opensAt: '08:00', closesAt: '20:00' },
-  }
+  const places = $derived(variant === 'visited' ? previewVisitedPlaces : placesForCategory(categorySlug))
+  const mapCenter = $derived(categorySlug === 'saude-e-bem-estar' || !places.length
+    ? { latitude: -26.3045, longitude: -48.8487 }
+    : { latitude: places[0].latitude, longitude: places[0].longitude })
 
-  let searchValue = $state('')
-  let filterSelection = $state<EstablishmentFilterState>([])
-  let appliedFilters = $state<EstablishmentFilterState>([])
   let currentTime = $state(new Date())
-  let selectedPlaceId = $state<string | null>(null)
-  let favoriteIds = $state<string[]>([])
-  let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
-  let listExpanded = $state(false)
+  let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>(untrack(() => variant === 'visited' ? 'history' : 'home'))
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
   let listElement: HTMLDivElement
 
   const visiblePlaces = $derived.by(() => {
-    const query = searchValue.trim().toLocaleLowerCase('pt-BR')
+    const query = view.searchValue.trim().toLocaleLowerCase('pt-BR')
     const filtered = places.filter((place) => {
-      const matchesSearch = `${place.name} ${place.neighborhood} saúde bem-estar`
+      const matchesSearch = `${place.name} ${place.neighborhood} ${text.searchContext}`
         .toLocaleLowerCase('pt-BR')
         .includes(query)
-      return matchesSearch && (!appliedFilters.includes('open-now') || isPlaceOpen(place.id, currentTime))
+      return matchesSearch && (!view.appliedFilters.includes('open-now') || isPlaceOpen(place.id, currentTime))
     })
 
-    const sortCriteria = appliedFilters.filter((option) => option !== 'open-now')
+    const sortCriteria = view.appliedFilters.filter((option) => option !== 'open-now')
     if (!sortCriteria.length) return filtered
 
     return [...filtered].sort((a, b) => {
@@ -97,12 +91,13 @@
   })))
 
   function updateScrollShadows(list: HTMLDivElement) {
+    view.scrollTop = list.scrollTop
     showTopShadow = list.scrollTop > 0
     showBottomShadow = list.scrollTop + list.clientHeight < list.scrollHeight - 1
   }
 
   function isPlaceOpen(placeId: string, at: Date) {
-    const hours = openingHoursByPlace[placeId]
+    const hours = places.find(place => place.id === placeId)?.openingHours
     if (!hours || !hours.days.includes(at.getDay())) return false
     const time = at.getHours() * 60 + at.getMinutes()
     const [openHour, openMinute] = hours.opensAt.split(':').map(Number)
@@ -111,20 +106,28 @@
   }
 
   function applyFilters(filters: EstablishmentFilterState) {
-    appliedFilters = [...filters]
+    view.appliedFilters = [...filters]
   }
 
   function handleListScroll(event: Event) {
     updateScrollShadows(event.currentTarget as HTMLDivElement)
   }
 
-  function toggleFavorite(placeId: string, liked: boolean) {
-    favoriteIds = liked
-      ? [...favoriteIds, placeId]
-      : favoriteIds.filter((favoriteId) => favoriteId !== placeId)
+  function handleNavigation(tab: TabId) {
+    if (tab === 'map') {
+      openMap({ title: `Mapa — ${text.title}`, benefits: mapBenefits, center: view.mapViewport?.center ?? mapCenter,
+        initialZoom: view.mapViewport?.zoom ?? 13, onviewportchange: (viewport) => { view.mapViewport = viewport },
+        selectedBenefitId: view.selectedPlaceId,
+        onselect: (id) => { view.selectedPlaceId = id },
+        onclose: () => { selectedTab = variant === 'visited' ? 'history' : 'home' },
+      })
+    } else if (onnavigate) onnavigate(tab)
+    else navigateTab(tab)
   }
 
   onMount(() => {
+    view.filterSelection = [...view.appliedFilters]
+    listElement.scrollTop = view.scrollTop
     const resizeObserver = new ResizeObserver(() => updateScrollShadows(listElement))
     resizeObserver.observe(listElement)
     updateScrollShadows(listElement)
@@ -143,71 +146,65 @@
   })
 </script>
 
-<main class="category-page" class:list-expanded={listExpanded}>
-  <section class="category-map-column" aria-label="Mapa da categoria">
-    <header class="category-map-header">
-      <BackButton onclick={onback} />
-      <h1 class="category-page__title">Saúde e Bem-Estar</h1>
+<svelte:head>
+  <title>{text.title} — WEG Benefits</title>
+</svelte:head>
+
+<main class="directory-page category-page" class:visited-page={variant === 'visited'} class:list-expanded={view.listExpanded}>
+  <section class="directory-map-column category-map-column" aria-label={text.mapColumnLabel}>
+    <header class="directory-map-header category-map-header">
+      <BackButton onclick={onback ?? (() => goBack('/'))} />
+      <h1 class="directory-page__title category-page__title">{text.title}</h1>
     </header>
 
-    <div class="category-map" role="region" aria-label="Mapa dos estabelecimentos da categoria">
+    <div class="directory-map category-map" role="region" aria-label={text.mapLabel}>
       <Map
+        variant="default"
         benefits={mapBenefits}
-        variant="category"
-        center={mapCenter}
-        initialZoom={13}
-        selectedBenefitId={selectedPlaceId}
-        onBenefitSelect={(benefit) => (selectedPlaceId = benefit.id)}
+        center={view.mapViewport?.center ?? mapCenter}
+        initialZoom={view.mapViewport?.zoom ?? 13}
+        onViewportChange={(viewport) => view.mapViewport = viewport}
+        selectedBenefitId={view.selectedPlaceId}
+        onBenefitOpen={(place) => openEstablishment(place.id)}
+        onBenefitSelect={(benefit) => (view.selectedPlaceId = benefit.id)}
       />
     </div>
 
-    <FloatingTabBar bind:selected={selectedTab} />
+    <FloatingTabBar bind:selected={selectedTab} ontabchange={handleNavigation} />
   </section>
 
-  <section class="category-results" aria-labelledby="category-results-title">
-    <div class="category-results__controls">
-      <div class="category-results__expanded-header">
-        <BackButton label="Voltar para o mapa" onclick={() => (listExpanded = false)} />
-        <h1 class="category-page__title">Saúde e Bem-Estar</h1>
+  <section class="directory-results category-results" aria-labelledby={text.resultsTitleId}>
+    <div class="directory-results__controls category-results__controls">
+      <div class="directory-results__expanded-header category-results__expanded-header">
+        <BackButton label="Voltar para o mapa" onclick={() => (view.listExpanded = false)} />
+        <h1 class="directory-page__title category-page__title">{text.title}</h1>
       </div>
-      <h2 id="category-results-title" class="category-results__title">Estabelecimentos da categoria</h2>
+      <h2 id={text.resultsTitleId} class="directory-results__title category-results__title">{text.resultsTitle}</h2>
 
       <Search
-        bind:value={searchValue}
+        bind:value={view.searchValue}
         label="Buscar locais ou benefícios"
         placeholder="Buscar locais ou benefícios"
       />
 
-      <FilterDropdown bind:value={filterSelection} onapply={applyFilters} />
+      <FilterDropdown bind:value={view.filterSelection} onapply={applyFilters} />
 
-      <div class="category-results__count-row">
+      <div class="directory-results__count-row category-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
-        <button
-          class="category-results__expand"
-          type="button"
-          aria-label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de estabelecimentos'}
-          aria-pressed={listExpanded}
-          onclick={() => (listExpanded = !listExpanded)}
-        >
-          {#if listExpanded}
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M8 3v5H3m18 0h-5V3M3 16h5v5m13-5h-5v5" />
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M14 4h6v6m0-6-7 7M10 20H4v-6m0 6 7-7" />
-            </svg>
-          {/if}
-        </button>
+        <ExpandButton
+          variant="category-list"
+          bind:expanded={view.listExpanded}
+          label={view.listExpanded ? 'Voltar para o mapa' : text.expandLabel}
+        />
       </div>
     </div>
 
-    <div class="category-results__list-frame">
+    <div class="directory-results__list-frame category-results__list-frame">
       <ScrollShadow edge="top" visible={showTopShadow} />
       <div
         bind:this={listElement}
-        class="category-results__list"
-        aria-label="Estabelecimentos encontrados"
+        class="directory-results__list category-results__list"
+        aria-label={text.listLabel}
         onscroll={handleListScroll}
       >
         {#if visiblePlaces.length}
@@ -217,16 +214,16 @@
               neighborhood={place.neighborhood}
               distanceKm={place.distanceKm}
               discount={place.discount}
-              selected={selectedPlaceId === place.id}
-              liked={favoriteIds.includes(place.id)}
-              onselect={() => (selectedPlaceId = place.id)}
-              onlikedchange={(liked) => toggleFavorite(place.id, liked)}
+              selected={view.selectedPlaceId === place.id}
+              liked={siteState.favoriteIds.includes(place.id)}
+              onselect={() => { view.selectedPlaceId = place.id; openEstablishment(place.id) }}
+              onlikedchange={(liked) => setFavorite(place.id, liked)}
             />
           {/each}
         {:else}
           <div class="category-results__empty" role="status">
             <img src={healthIcon} alt="" aria-hidden="true" />
-            <strong>Nenhum estabelecimento encontrado</strong>
+            <strong>{text.emptyTitle}</strong>
             <span>Tente buscar por outro nome ou região.</span>
           </div>
         {/if}

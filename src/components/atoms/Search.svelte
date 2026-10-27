@@ -6,7 +6,13 @@
     placeholder?: string
     value?: string
     disabled?: boolean
+    suggestionsId?: string
+    suggestionsExpanded?: boolean
+    activeSuggestionId?: string
     oninput?: (event: Event) => void
+    onkeydown?: (event: KeyboardEvent) => void
+    onfocus?: (event: FocusEvent) => void
+    onblur?: (event: FocusEvent) => void
   }
 
   let {
@@ -16,7 +22,13 @@
     placeholder = 'Buscar benefícios',
     value = $bindable(''),
     disabled = false,
+    suggestionsId,
+    suggestionsExpanded = false,
+    activeSuggestionId,
     oninput,
+    onkeydown,
+    onfocus,
+    onblur,
   }: Props = $props()
 </script>
 
@@ -49,6 +61,14 @@
     {disabled}
     bind:value
     {oninput}
+    {onkeydown}
+    {onfocus}
+    {onblur}
+    role={suggestionsId ? 'combobox' : undefined}
+    aria-autocomplete={suggestionsId ? 'list' : undefined}
+    aria-controls={suggestionsId}
+    aria-expanded={suggestionsId ? suggestionsExpanded : undefined}
+    aria-activedescendant={activeSuggestionId}
     aria-label={label}
   />
 </div>

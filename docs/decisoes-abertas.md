@@ -20,6 +20,8 @@ Todos os itens desta tabela são **DECISÃO PENDENTE**.
 
 ## Registro de decisões pendentes
 
+Os registros da consolidação acima descrevem a branch base histórica. Na revisão de 2026-10-26, foram encontrados Svelte/Vite, TypeScript, Capacitor, Leaflet e interfaces executáveis com dados demonstrativos. Isso atualiza o inventário de implementação, sem confirmar integração com a API nem homologação da stack em produção. As correções e dependências atuais estão em [Revisão do código](revisao-codigo.md).
+
 | ID | Decisão | Opções/restrições conhecidas | Dependência | Recomendação não vinculante |
 |---|---|---|---|---|
 | DP-01 | Stack executável | React Native é obrigatório; Expo/TypeScript ainda não comprovados | Frontend/equipe | Escolher caminho com menor configuração para o prazo |

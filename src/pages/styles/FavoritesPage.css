@@ -1,0 +1,25 @@
+.favorites-page .favorites-results__empty {
+  display: flex;
+  min-height: 170px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: #66768a;
+  text-align: center;
+}
+.favorites-page .favorites-results__empty svg {
+  width: 32px;
+  height: 32px;
+  stroke: #00579d;
+  stroke-width: 1.5;
+}
+.favorites-page .favorites-results__empty strong {
+  color: #14243a;
+  font-size: 16px;
+}
+.favorites-page .favorites-results__empty p {
+  font-size: 14px;
+  line-height: 20px;
+}

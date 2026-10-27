@@ -2,7 +2,9 @@
 
 ## Estado
 
-A arquitetura abaixo é **planejada** para a futura implementação mobile. Este checkout contém um starter Svelte/Vite e Capacitor, mas ainda não implementa as telas do produto. O contrato conceitual das entidades está em [Modelo de dados](modelo-dados.md), e os tipos correspondentes ficam em `src/lib/domain.ts`.
+A arquitetura abaixo é **planejada** para a futura implementação mobile integrada. O checkout atual contém páginas Svelte/Vite e uma configuração Android do Capacitor. As interfaces de Início, Login, Categoria, Favoritos e Informações do Estabelecimento usam dados de apresentação locais; a API do produto não está integrada. O contrato conceitual das entidades está em [Modelo de dados](modelo-dados.md), e os tipos correspondentes ficam em `src/lib/domain.ts`.
+
+Na estrutura executável atual, `src/App.svelte` monta as páginas a partir de `lib/routes.ts` e do estado reativo de `lib/navigation.svelte.ts`, que coordena a History API. `src/pages/` contém as composições e o catálogo demonstrativo, `src/components/` contém átomos/moléculas e o mapa, `src/lib/` contém tipos, navegação, estado de prévia e ações de animação e `src/services/` contém exemplos e adaptadores preparados. `src/main.ts` carrega uma única entrada de estilos de componentes; `DirectoryPage.css` compartilha o layout de Início/Categoria/Favoritos/Visitados. A estrutura planejada abaixo não exige migrar essas páginas para outro framework nesta revisão.
 
 ## Estrutura planejada
 
@@ -45,7 +47,7 @@ Criar somente diretórios que tenham uso imediato. Esta árvore não obriga a ad
 
 ## Navegação
 
-A Floating Tab Bar representa os destinos principais definidos pelo design vigente. Telas de detalhe e mapa expandido devem preservar o contexto de origem. A biblioteca e o mapa exato de rotas são **DECISÃO PENDENTE** até a implementação e os protótipos serem disponibilizados.
+A FloatingTabBar conecta Início, Favoritos e Visitados; Mapa abre um diálogo modal sobre a página atual. A prévia web usa History API e recursos reativos do Svelte, sem biblioteca adicional. Detalhes preservam o contexto de retorno, e a expansão do mapa mantém filtros, seleção, posição e zoom. Rotas, dados demonstrativos e limites estão em [Navegação implementada](navegacao.md). A integração nativa e a estratégia de autenticação continuam pendentes.
 
 ## Decisões técnicas ainda abertas
 

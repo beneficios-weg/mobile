@@ -1,0 +1,109 @@
+.benefit-details-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid #d8e2ec;
+  border-radius: 24px;
+  background: #e5f5ef;
+  color: #14243a;
+  box-shadow: 0 4px 14px rgb(0 110 250 / 10%);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.18px;
+  text-align: left;
+}
+
+.benefit-details-card .benefit-details-card__title,
+.benefit-details-card .benefit-details-card__audience-label {
+  margin: 0;
+  color: #009b6a;
+  font: inherit;
+  font-weight: 500;
+}
+
+.benefit-details-card .benefit-details-card__title {
+  margin-bottom: 4px;
+}
+
+.benefit-details-card .benefit-details-card__discounts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.benefit-details-card .benefit-details-card__row + .benefit-details-card__row {
+  border-top: 1px solid #c1e8d8;
+}
+
+.benefit-details-card .benefit-details-card__discount {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+}
+
+.benefit-details-card button.benefit-details-card__discount {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.benefit-details-card button.benefit-details-card__discount:focus-visible {
+  outline: 2px solid #009b6a;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.benefit-details-card .benefit-details-card__summary {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 25px;
+}
+
+.benefit-details-card .benefit-details-card__value {
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
+  vertical-align: top;
+  color: #009b6a;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 25px;
+  overflow-wrap: anywhere;
+}
+
+.benefit-details-card .benefit-details-card__description {
+  position: absolute;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: #667e95;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.benefit-details-card .benefit-details-card__description-text {
+  display: block;
+}
+
+.benefit-details-card .benefit-details-card__audience {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 2px solid #32bf91;
+}
+
+.benefit-details-card .benefit-details-card__audience-text {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}

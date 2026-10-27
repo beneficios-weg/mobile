@@ -1,0 +1,74 @@
+﻿/* The page reuses DirectoryPage.css for layout, map and navigation. */
+.main-page__logo {
+  display: block;
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+}
+
+.main-page__category-frame {
+  position: relative;
+  min-height: 0;
+  flex: 1 1 auto;
+  margin-inline: -4px;
+}
+
+.main-page__category-list {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 2px 4px calc(104px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+.main-page__category-list::-webkit-scrollbar { display: none; }
+.main-page__category-list:focus-visible { outline: 2px solid #00579d; outline-offset: -2px; }
+
+.main-page__category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.main-page .category-button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.main-page__login { margin-left: auto; padding: 12px 0 12px 12px; color: #00579d; font: inherit; font-size: 14px; text-decoration: none; }
+.main-page__login:hover { text-decoration: underline; }
+.main-page__login:focus-visible { outline: 3px solid rgb(0 87 157 / 30%); outline-offset: 3px; border-radius: 8px; }
+
+@media (min-width: 700px) and (orientation: portrait) {
+  .main-page__logo { width: 180px; }
+  .main-page__category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+}
+
+@media (orientation: landscape) and (min-width: 640px) {
+  .main-page__category-list { padding-bottom: 16px; }
+}
+
+@media (orientation: landscape) and (min-width: 1024px) {
+  .main-page__logo { width: 180px; }
+  .main-page__category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+}
+
+/* Keep the split composition usable below the directory pages' 640px breakpoint. */
+@media (orientation: landscape) and (min-width: 480px) and (max-width: 639px) {
+  .main-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    padding: max(16px, env(safe-area-inset-top)) 3.8vw max(16px, env(safe-area-inset-bottom));
+  }
+  .main-page__map-column {
+    min-height: 0;
+    gap: 12px;
+    padding: 0 16px 80px 0;
+    border-right: 1px solid #d7e1ea;
+  }
+  .main-page__map { height: auto; min-height: 0; flex: 1 1 auto; }
+  .main-page__categories { padding: 14px 0 0 16px; }
+  .main-page__category-list { padding-bottom: 16px; }
+}

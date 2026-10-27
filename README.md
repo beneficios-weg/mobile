@@ -8,12 +8,12 @@ O produto responde à pergunta: **“Quais benefícios tenho perto de mim agora?
 
 ## Estado atual
 
-Este checkout contém um starter Svelte/Vite com Capacitor, documentação do produto e tipos TypeScript para o domínio de dados. As telas do WEG Benefits e a integração com o Backend ainda não estão implementadas. React Native aparece como requisito na documentação anterior, mas não corresponde ao starter encontrado neste checkout; a decisão de stack continua pendente.
+Este checkout implementa interfaces em Svelte 5, TypeScript e Vite, com um projeto Android do Capacitor. Há páginas de Início, Login, Categoria, Favoritos, Visitados, Informações do Estabelecimento e uma galeria de componentes. Os dados são demonstrativos: autenticação, API, persistência de favoritos, histórico real de visitas e sincronização ainda não estão integrados. React Native aparece como requisito histórico; não é a implementação encontrada neste repositório.
 
 - tipografia de sistema conforme a página de categorias, Lucide Icons, componentes reutilizáveis e mapa central são diretrizes visuais/funcionais;
 - o modelo lógico para categorias, marcas, estabelecimentos, benefícios, serviços, horários, favoritos, visitas e avaliações está em [Modelo de dados](docs/modelo-dados.md);
 - os tipos em `src/lib/domain.ts` não definem payloads nem substituem o contrato oficial do Backend;
-- autenticação, endpoints, mapa, armazenamento local e segundo recurso nativo permanecem como **DECISÃO PENDENTE**.
+- o mapa implementado usa Leaflet; autenticação, endpoints, armazenamento local e segundo recurso nativo permanecem como **DECISÃO PENDENTE**.
 
 Consulte [Decisões abertas](docs/decisoes-abertas.md) antes de implementar.
 
@@ -27,22 +27,31 @@ Veja [Telas e fluxos](docs/telas-e-fluxos.md) e [Componentes de UI](docs/compone
 
 | Item | Situação |
 |---|---|
-| React Native | Requisito confirmado |
+| Svelte 5, TypeScript e Vite | Implementados neste checkout |
+| Capacitor | Configuração Android presente; validação nativa separada da validação web |
+| React Native | Requisito histórico; não implementado |
 | Mobile-first | Requisito confirmado |
 | Tipografia | Mesma pilha de Categorias: `-apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif` |
 | Lucide Icons | Diretriz de iconografia confirmada |
-| Expo, TypeScript, React Navigation | Citados em documentação ainda não integrada; validar antes de adotar |
-| Mapas, storage e state management | **DECISÃO PENDENTE** |
+| Expo e React Navigation | Não utilizados neste checkout |
+| Mapas | Leaflet e tiles OpenStreetMap, com o mesmo componente no Início, Categoria, Favoritos e detalhe |
+| Storage e state management de produto | **DECISÃO PENDENTE**; os exemplos usam estado local do Svelte |
 
-A organização planejada e seus limites estão em [Arquitetura mobile](docs/arquitetura-mobile.md). Ela não representa código já existente.
+A estrutura atual e a arquitetura planejada estão em [Arquitetura mobile](docs/arquitetura-mobile.md). A adoção final da stack mobile continua como decisão da equipe.
 
 ## Instalação e execução
 
-Os scripts reais estão em `package.json`. A configuração atual fornece `npm run dev`, `npm run build` e `npm run check` para o starter Svelte/Vite; esses comandos não representam ainda uma aplicação mobile de produto concluída.
+Use `npm ci` para instalar as dependências, `npm run dev` para iniciar o servidor, `npm run check` para validar Svelte/TypeScript, `npm test` para os testes de regressão e `npm run build` para gerar `dist/`.
+
+O [Plano de testes do sistema](docs/testes-mobile.md) reúne preparação, matriz responsiva, critérios de aceite e registro de defeitos. Consulte também os [casos reproduzíveis](docs/testes/casos-de-teste.md) e o [relatório com evidências](docs/testes/relatorio-execucao.md).
+
+Rotas disponíveis: `/`, `/login`, `/categoria/:slug`, `/favoritos`, `/visitados`, `/estabelecimento/:id` e `/componentes-preview`. As sete categorias do Início abrem suas listas e os cards abrem os detalhes correspondentes. A galeria de componentes possui sua própria rota e não substitui o Início. Visitados reutiliza a composição de Categorias, com exemplos locais para revisão visual. Mapa expande a visualização atual sem uma rota própria. Veja os caminhos, retorno e limites em [Navegação](docs/navegacao.md).
+
+Entrar no Login abre o Início como prévia, conforme autorizado pelo solicitante; não autentica nem armazena credenciais. Favoritos e estados de busca/filtro são compartilhados em memória durante a navegação e reiniciados ao recarregar. Para acesso direto às rotas em produção, configure o servidor para entregar `index.html` nos caminhos da aplicação.
 
 ## Variáveis de ambiente
 
-Não há nomes de variáveis definidos nem arquivo `.env.example`. A configuração da URL base da API e quaisquer parâmetros públicos do provedor de mapas dependem das escolhas de implementação e do contrato do Backend. Segredos e tokens privados nunca devem ser versionados.
+`VITE_OSRM_URL` configura o serviço de rotas preparado em `src/services/routingService.ts`; o padrão de demonstração é `https://router.project-osrm.org`. Esse serviço e a geolocalização ainda não são chamados pelas páginas atuais. Não há URL da API do produto definida. Segredos e tokens privados nunca devem ser versionados.
 
 ## API e dados
 
@@ -65,12 +74,14 @@ Há uma referência de Figma registrada na documentação remota anterior: [App 
 - [Visão geral](docs/visao-geral.md)
 - [Arquitetura mobile](docs/arquitetura-mobile.md)
 - [Telas e fluxos](docs/telas-e-fluxos.md)
+- [Navegação implementada](docs/navegacao.md)
 - [Componentes de UI](docs/componentes-ui.md)
 - [Geolocalização](docs/geolocalizacao.md)
 - [Detecção de visitas](docs/deteccao-visitas.md)
 - [Offline e sincronização](docs/offline-sync.md)
 - [Integração com a API](docs/integracao-api.md)
 - [Modelo de dados](docs/modelo-dados.md)
-- [Testes mobile](docs/testes-mobile.md)
+- [Plano de testes do sistema](docs/testes-mobile.md)
 - [Decisões abertas](docs/decisoes-abertas.md)
 - [Contexto para agentes](AI_CONTEXT.md)
+- [Revisão e limpeza do código](docs/revisao-codigo.md)
