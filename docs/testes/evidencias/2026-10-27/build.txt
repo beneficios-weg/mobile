@@ -1,0 +1,15 @@
+﻿
+> weg-benefits@0.0.0 build
+> vite build
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 169 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                   0.47 kB │ gzip:  0.31 kB
+dist/assets/logo-wegbenefits-azul-RLXcdVIB.svg    7.66 kB │ gzip:  3.10 kB
+dist/assets/index-CV6pJLMj.css                   72.63 kB │ gzip: 16.56 kB
+dist/assets/index-Bu5S2Pss.js                   270.30 kB │ gzip: 84.36 kB
+
+✓ built in 410ms

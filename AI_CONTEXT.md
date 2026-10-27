@@ -56,3 +56,4 @@ Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizan
 - `docs/integracao-api.md`
 - `docs/offline-sync.md`
 - `docs/deteccao-visitas.md`
+- `docs/testes-mobile.md`: entrada da documentação de testes; casos em `docs/testes/casos-de-teste.md`, resultados e evidências em `docs/testes/relatorio-execucao.md` e registros anteriores em `docs/testes/historico-validacoes.md`. Caso documentado não equivale a execução aprovada; distinguir funções puras, validação no navegador e integrações ainda pendentes.

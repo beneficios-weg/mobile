@@ -1,0 +1,8 @@
+﻿
+> weg-benefits@0.0.0 check
+> svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json
+
+Loading svelte-check in workspace: c:\Users\eduardo_lino\Documents\ChatGPT\mobile-front
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings

@@ -1,0 +1,24 @@
+﻿
+> weg-benefits@0.0.0 test
+> node --test tests/*.test.mjs
+
+✔ preview map datasets have unique IDs and coordinates inside the map bounds (0.6667ms)
+✔ favorites preview location belongs to the same map region as its pins (0.0979ms)
+✔ favorite search normalizes accents, capitalization and outer whitespace (1.9012ms)
+✔ sorting honors criteria and does not mutate the original dataset (8.3705ms)
+✔ default order is nearest and missing operating hours do not imply open (0.9802ms)
+✔ open-now includes opening time and excludes closing time and closed weekdays (0.2196ms)
+✔ benefit summaries preserve whole words and leave fitting text unchanged (0.1569ms)
+✔ fixed routes and category links resolve to their intended destinations (0.4037ms)
+✔ route parsing handles trailing slashes and queries without falling back to home (0.2022ms)
+✔ internal navigation rejects external and ambiguous targets (0.2134ms)
+✔ each navigable fixture has a unique identity and its own correct details (0.3161ms)
+✔ home and visited cards reference the catalog and favorites do not define visits (0.1073ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 440.4113

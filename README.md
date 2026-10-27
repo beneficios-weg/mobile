@@ -43,6 +43,8 @@ A estrutura atual e a arquitetura planejada estão em [Arquitetura mobile](docs/
 
 Use `npm ci` para instalar as dependências, `npm run dev` para iniciar o servidor, `npm run check` para validar Svelte/TypeScript, `npm test` para os testes de regressão e `npm run build` para gerar `dist/`.
 
+O [Plano de testes do sistema](docs/testes-mobile.md) reúne preparação, matriz responsiva, critérios de aceite e registro de defeitos. Consulte também os [casos reproduzíveis](docs/testes/casos-de-teste.md) e o [relatório com evidências](docs/testes/relatorio-execucao.md).
+
 Rotas disponíveis: `/`, `/login`, `/categoria/:slug`, `/favoritos`, `/visitados`, `/estabelecimento/:id` e `/componentes-preview`. As sete categorias do Início abrem suas listas e os cards abrem os detalhes correspondentes. A galeria de componentes possui sua própria rota e não substitui o Início. Visitados reutiliza a composição de Categorias, com exemplos locais para revisão visual. Mapa expande a visualização atual sem uma rota própria. Veja os caminhos, retorno e limites em [Navegação](docs/navegacao.md).
 
 Entrar no Login abre o Início como prévia, conforme autorizado pelo solicitante; não autentica nem armazena credenciais. Favoritos e estados de busca/filtro são compartilhados em memória durante a navegação e reiniciados ao recarregar. Para acesso direto às rotas em produção, configure o servidor para entregar `index.html` nos caminhos da aplicação.
@@ -79,7 +81,7 @@ Há uma referência de Figma registrada na documentação remota anterior: [App 
 - [Offline e sincronização](docs/offline-sync.md)
 - [Integração com a API](docs/integracao-api.md)
 - [Modelo de dados](docs/modelo-dados.md)
-- [Testes mobile](docs/testes-mobile.md)
+- [Plano de testes do sistema](docs/testes-mobile.md)
 - [Decisões abertas](docs/decisoes-abertas.md)
 - [Contexto para agentes](AI_CONTEXT.md)
 - [Revisão e limpeza do código](docs/revisao-codigo.md)
