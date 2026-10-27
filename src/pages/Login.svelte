@@ -2,15 +2,18 @@
   import logo from '../assets/logo-wegbenefits-azul.svg'
   import Input from '../components/atoms/Input.svelte'
   import PrimaryButton from '../components/atoms/PrimaryButton.svelte'
+  import BackButton from '../components/atoms/BackButton.svelte'
+  import { navigate, goBack } from '../lib/navigation.svelte'
   import './styles/Login.css'
 
   let email = $state('')
   let password = $state('')
-  let notice = $state('')
 
   function handleSubmit(event: SubmitEvent) {
     event.preventDefault()
-    notice = 'A autenticação ainda não está conectada ao aplicativo.'
+    email = ''
+    password = ''
+    navigate('/')
   }
 
 </script>
@@ -21,6 +24,7 @@
 </svelte:head>
 
 <main class="login-page">
+  <div class="login-page__back"><BackButton onclick={() => goBack('/')} /></div>
   <div class="login-layout">
     <section class="brand-block" aria-labelledby="login-title">
       <img class="brand" src={logo} alt="WEG Benefits" />
@@ -51,9 +55,7 @@
         </div>
 
         <PrimaryButton type="submit" label="Entrar" />
-        {#if notice}
-          <p class="form-notice" aria-live="polite">{notice}</p>
-        {/if}
+        <p class="form-notice">Prévia de navegação, sem autenticação real.</p>
       </form>
     </section>
 

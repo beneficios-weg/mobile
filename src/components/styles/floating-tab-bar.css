@@ -1,10 +1,17 @@
+:root {
+  --floating-tab-bar-font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+  --floating-tab-bar-left: 50%;
+  --floating-tab-bar-width: 350px;
+  --floating-tab-bar-bottom: 20px;
+}
+
 .floating-tabs {
   position: fixed;
-  width: 350px;
+  width: var(--floating-tab-bar-width);
   height: 64px;
   z-index: 20;
-  left: 50%;
-  bottom: 20px;
+  left: var(--floating-tab-bar-left);
+  bottom: max(var(--floating-tab-bar-bottom), env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
   gap: 4px;
@@ -15,6 +22,8 @@
   background: #fff;
   box-shadow: 0 8px 28px rgb(22 48 76 / 18%);
   transform: translateX(-50%);
+  font: 400 16px/1.45 var(--floating-tab-bar-font);
+  letter-spacing: 0;
 }
 
 .floating-tabs .tab {
@@ -62,7 +71,7 @@
   overflow: hidden;
   opacity: 0;
   white-space: nowrap;
-  font: 500 13px/1.2 system-ui, sans-serif;
+  font: 500 13px/1.2 var(--floating-tab-bar-font);
   transition:
     max-width 500ms ease,
     opacity 220ms ease;
@@ -80,10 +89,34 @@
 }
 
 @media (max-width: 389px) {
+  :root { --floating-tab-bar-bottom: max(0px, calc(13.3333vw - 32px)); }
   .floating-tabs {
-    bottom: max(0px, calc(13.3333vw - 32px));
     transform: translateX(-50%) scale(clamp(0.5, calc(100vw / 390px), 1));
   }
+}
+
+@media (min-width: 700px) and (orientation: portrait) {
+  :root { --floating-tab-bar-bottom: 30px; }
+}
+
+@media (orientation: landscape) and (min-width: 640px) {
+  :root {
+    --floating-tab-bar-left: calc(3.8vw + (50vw - 3.8vw - 32px) / 2);
+    --floating-tab-bar-width: min(350px, calc(50vw - 3.8vw - 32px));
+    --floating-tab-bar-bottom: 16px;
+  }
+}
+
+@media (orientation: landscape) and (min-width: 1024px) {
+  :root {
+    --floating-tab-bar-left: calc(4vw + (50vw - 4vw - 44px) / 2);
+    --floating-tab-bar-width: min(350px, calc(50vw - 4vw - 44px));
+    --floating-tab-bar-bottom: 40px;
+  }
+}
+
+@media (orientation: landscape) and (min-width: 640px) and (max-width: 740px) {
+  .floating-tabs .tab.active { flex-grow: 44; }
 }
 
 @media (prefers-reduced-motion: reduce) {

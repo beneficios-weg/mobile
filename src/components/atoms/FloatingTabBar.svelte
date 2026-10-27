@@ -1,5 +1,11 @@
-<script lang="ts">
+<script module lang="ts">
   type TabId = 'home' | 'map' | 'favorites' | 'history'
+  let lastSelection: TabId = 'home'
+  let pendingSelection: { from: TabId; to: TabId } | null = null
+</script>
+
+<script lang="ts">
+  import { onMount, untrack } from 'svelte'
   type Tab = { id: TabId; label: string }
   type Props = {
     selected?: TabId
@@ -7,6 +13,30 @@
   }
 
   let { selected = $bindable<TabId>('home'), ontabchange }: Props = $props()
+  let element: HTMLElement
+  let ready = $state(false)
+  let visualSelection = $state<TabId>(untrack(() => {
+    if (pendingSelection?.to === selected) {
+      const previous = pendingSelection.from
+      pendingSelection = null
+      return previous
+    }
+    return lastSelection
+  }))
+
+  onMount(() => {
+    // Establish the previous tab's layout before transitioning on a new page.
+    element.getBoundingClientRect()
+    const frame = requestAnimationFrame(() => { ready = true })
+    return () => cancelAnimationFrame(frame)
+  })
+
+  $effect(() => {
+    const target = selected
+    if (!ready) return
+    visualSelection = target
+    lastSelection = target
+  })
 
   const tabs: Tab[] = [
     { id: 'home', label: 'Início' },
@@ -16,16 +46,17 @@
   ]
 
   function selectTab(tab: TabId) {
+    pendingSelection = { from: visualSelection, to: tab }
     selected = tab
     ontabchange?.(tab)
   }
 </script>
 
-<nav class="floating-tabs" aria-label="Navegação principal">
+<nav class="floating-tabs" bind:this={element} aria-label="Navegação principal">
   {#each tabs as tab (tab.id)}
     <button
       class="tab"
-      class:active={selected === tab.id}
+      class:active={visualSelection === tab.id}
       type="button"
       aria-label={tab.label}
       aria-pressed={selected === tab.id}

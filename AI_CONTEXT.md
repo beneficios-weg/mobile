@@ -32,6 +32,12 @@ Há interfaces de Início, Login, Categoria, Favoritos e Informações do Estabe
 
 Os dados continuam demonstrativos, sem contrato da API integrado nem persistência dos favoritos. O tipo visual `BenefitLocation`, em `services/benefitsService.ts`, não é o `Benefit` de domínio de `lib/domain.ts`. Serviços de localização/rota estão preparados, sem consumidores atuais. A revisão e as pendências estão em `docs/revisao-codigo.md`. O estado de 2026-10-16 acima é um registro histórico.
 
+## Navegação atual — 2026-10-27
+
+As sete categorias abrem `/categoria/:slug`; cards e popups abrem `/estabelecimento/:id` com os dados do registro selecionado. A navegação compartilhada usa History API em `src/lib/navigation.svelte.ts`, resolução em `routes.ts` e composição em `App.svelte`. O catálogo demonstrativo é `src/pages/catalog.ts`; favoritos são compartilhados em memória por `siteState.svelte.ts`. Busca, filtros aplicados, expansão, seleção, rolagem e viewport do mapa são preservados durante a navegação, sem persistência após recarregar. Caminhos/IDs desconhecidos exibem Página não encontrada. O relato de categorias que apenas filtravam pins acima é histórico.
+
+Mapa abre `MapDialog.svelte`, um diálogo nativo modal sem rota própria, com os resultados e o viewport da origem. Não permitir interação com a busca atrás dele. Voltar/Escape fecham a expansão; detalhes abertos pelo popup retornam à página de origem. Não trocar o layout aprovado nem introduzir rotas de expansão. Login abre o Início como prévia, sem autenticação real, por confirmação do solicitante. Detalhes e limites em `docs/navegacao.md`.
+
 ## Regras para futuras mudanças
 
 Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizando `CategoryPage` na variante `visited`. Não duplicar CSS ou a implementação de busca/filtros para manter essa página igual a Categorias. A aba Histórico abre essa rota a partir de Início, Categorias, Favoritos e detalhe. Os oito exemplos da prévia não representam visitas detectadas ou sincronizadas; favoritar não altera a lista de visitados.

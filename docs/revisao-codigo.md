@@ -2,6 +2,8 @@
 
 Base: `develop` atualizada por fast-forward até `d5fd87d`. Branch de trabalho: `refactor/code-cleanup`.
 
+Registro histórico da revisão. A navegação incompleta e os favoritos isolados descritos abaixo foram tratados depois em `feat/site-navigation`: rotas conectadas, catálogo de apresentação unificado e favoritos compartilhados em memória. Os limites de API, persistência e autenticação permanecem. Veja [Navegação atual](navegacao.md).
+
 ## Escopo e evidências
 
 Revisão das páginas e rotas, átomos/moléculas, mapa, animações, serviços, tipos de domínio, estilos, configurações web/Capacitor e configuração/código Android. A documentação foi confrontada com a implementação. O `check` da base retornou 20 erros em cinco arquivos; havia trechos de implementações anteriores misturados ao código integrado, mesmo sem marcadores de conflito.

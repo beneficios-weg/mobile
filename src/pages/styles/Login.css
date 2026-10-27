@@ -13,12 +13,15 @@ body:has(.login-page) {
 }
 
 .login-page {
+  position: relative;
   min-height: 100svh;
   overflow: auto;
   background: #f3f7fa;
   color: #66768a;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
+
+.login-page__back { position: absolute; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); z-index: 1; }
 
 .login-page .login-layout {
   position: relative;

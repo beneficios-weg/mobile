@@ -125,12 +125,6 @@
 
 .establishment-page__navigation { display: contents; }
 
-.establishment-page__navigation .floating-tabs {
-  bottom: max(20px, env(safe-area-inset-bottom));
-  max-width: calc(100vw - 32px);
-  transform: translateX(-50%);
-}
-
 /* Tablet em pé: o mapa mantém a proporção e os controles do protótipo. */
 @media (min-width: 600px) and (orientation: portrait) {
   .establishment-page {
@@ -148,7 +142,6 @@
   .establishment-page__details > h2 { font-size: 22px; line-height: 27px; }
   .establishment-page__content { gap: 20px; }
   .establishment-page .primary-button { min-height: 60px; }
-  .establishment-page__navigation .floating-tabs { bottom: max(30px, env(safe-area-inset-bottom)); }
 }
 
 /* As duas orientações deitadas compartilham a estrutura, sem rotas extras. */
@@ -182,13 +175,6 @@
   }
   .establishment-page__content { padding-bottom: 24px; }
   .establishment-page__navigation { grid-area: 3 / 1; display: flex; justify-content: center; }
-  .establishment-page__navigation .floating-tabs {
-    position: static;
-    transform: none;
-    width: 350px;
-    max-width: 100%;
-    flex-shrink: 0;
-  }
 }
 
 /* A altura diferencia celular deitado de tablet deitado (inclusive 844 × 390). */

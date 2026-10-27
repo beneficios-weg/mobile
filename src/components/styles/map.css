@@ -2,7 +2,6 @@
   --map-accent: #00579d;
   --map-border: #d8e2ec;
   --map-text: #1b2938;
-  --map-muted: #66768a;
   width: min(100%, 1100px);
   box-sizing: border-box;
   margin: 0 auto;
@@ -44,19 +43,22 @@
   background: #e9f5fb;
 }
 
-.benefits-map--category .leaflet-top.leaflet-right .leaflet-control-attribution {
-  margin: 8px;
-  padding: 4px 7px;
-  border: 1px solid rgb(216 226 236 / 78%);
-  border-radius: 8px;
-  background: rgb(255 255 255 / 84%);
-  color: #66768a;
-  font-size: 9px;
-  line-height: 1.2;
+.benefits-map .leaflet-control-attribution {
+  padding: 2px 6px;
+  border-radius: 6px 0 0;
+  background: rgb(255 255 255 / 82%);
+  color: #52616d;
+  font: 400 10px/1.3 system-ui, sans-serif;
 }
 
-.benefits-map--category .leaflet-control-attribution a {
-  color: #00579d;
+.benefits-map .leaflet-control-attribution a {
+  color: inherit;
+}
+
+.benefits-map .leaflet-control-attribution a:hover,
+.benefits-map .leaflet-control-attribution a:focus-visible {
+  color: var(--map-accent);
+  text-decoration: underline;
 }
 
 .benefits-map .map-canvas {
@@ -64,39 +66,6 @@
   height: min(68vh, 680px);
   min-height: 360px;
   background: #e9eff3;
-}
-
-.benefits-map .map-legend {
-  position: absolute;
-  z-index: 500;
-  right: 12px;
-  bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 10px;
-  border: 1px solid rgb(216 226 236 / 85%);
-  border-radius: 12px;
-  background: rgb(255 255 255 / 94%);
-  color: var(--map-muted);
-  font-size: 11px;
-  box-shadow: 0 2px 8px rgb(17 32 51 / 10%);
-}
-
-.benefits-map .legend-benefit,
-.benefits-map .legend-user {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.benefits-map .legend-benefit {
-  background: var(--map-accent);
-}
-
-.benefits-map .legend-user {
-  margin-left: 5px;
-  background: #1684e8;
 }
 
 .benefits-map .benefit-marker-wrapper {
@@ -147,6 +116,20 @@
   filter: drop-shadow(0 1px 2px rgb(255 255 255 / 80%));
 }
 
+.benefits-map .map-popup-action {
+  display: block;
+  min-height: 36px;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #00579d;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+.benefits-map .map-popup-action:focus-visible { outline: 3px solid #0878e8; outline-offset: 2px; }
+
 @media (max-width: 620px) {
   .benefits-map {
     padding: 20px 14px 104px;
@@ -155,13 +138,6 @@
   .benefits-map .map-canvas {
     height: 58vh;
     min-height: 320px;
-  }
-}
-
-@media (max-width: 420px) {
-  .benefits-map .map-legend {
-    right: 8px;
-    bottom: 8px;
   }
 }
 

@@ -20,6 +20,7 @@
   }: Props = $props()
 
   let facadeDialog = $state<HTMLDialogElement>()
+  const phone = $derived(contact.replace(/[^+\d]/g, ''))
 </script>
 
 <article class="establishment-facade-card">
@@ -27,10 +28,14 @@
     <h3 class="establishment-facade-card__name">{name}</h3>
     <p class="establishment-facade-card__address">{neighborhood} · {address}</p>
     <p class="establishment-facade-card__hours">{openingStatus} · {openingHours}</p>
-    <a class="establishment-facade-card__contact" href={`tel:${contact.replace(/[^+\d]/g, '')}`}>
-      <span>Contato</span>
-      <span>{contact}</span>
-    </a>
+    {#if phone}
+      <a class="establishment-facade-card__contact" href={`tel:${phone}`}>
+        <span>Contato</span>
+        <span>{contact}</span>
+      </a>
+    {:else}
+      <div class="establishment-facade-card__contact"><span>Contato</span><span>Não informado</span></div>
+    {/if}
   </div>
 
   <button

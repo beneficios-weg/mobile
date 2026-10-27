@@ -11,6 +11,10 @@
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
   import { filterFavorites, type FavoritePlace } from './favorites'
   import './styles/FavoritesPage.css'
+  import { directoryView, openMap, navigateTab, openEstablishment } from '../lib/navigation.svelte'
+  import type { TabId } from '../lib/routes'
+
+  const view = directoryView('favorites')
 
   type Props = {
     places?: FavoritePlace[]
@@ -22,13 +26,8 @@
 
   let { places = [], userLocation = null, onback, onremovefavorite, onnavigate }: Props = $props()
 
-  let searchValue = $state('')
-  let filterSelection = $state<EstablishmentFilterState>([])
-  let appliedFilters = $state<EstablishmentFilterState>([])
   let currentTime = $state(new Date())
-  let selectedPlaceId = $state<string | null>(null)
   let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>('favorites')
-  let listExpanded = $state(false)
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
   let listElement = $state<HTMLDivElement>()
@@ -39,7 +38,7 @@
     latitude: places[0].latitude,
     longitude: places[0].longitude,
   }))
-  const visiblePlaces = $derived(filterFavorites(places, searchValue, appliedFilters, currentTime))
+  const visiblePlaces = $derived(filterFavorites(places, view.searchValue, view.appliedFilters, currentTime))
   const mapBenefits = $derived(visiblePlaces.map((place) => ({
     id: place.id,
     name: place.name,
@@ -50,36 +49,49 @@
 
   function updateScrollShadows() {
     if (!listElement) return
+    view.scrollTop = listElement.scrollTop
     showTopShadow = listElement.scrollTop > 0
     showBottomShadow = listElement.scrollTop + listElement.clientHeight < listElement.scrollHeight - 1
   }
 
   async function toggleExpanded() {
-    listExpanded = !listExpanded
+    view.listExpanded = !view.listExpanded
     await updateExpandedFocus()
   }
 
   async function updateExpandedFocus() {
     await tick()
-    if (listExpanded) expandedHeader?.querySelector('button')?.focus()
+    if (view.listExpanded) expandedHeader?.querySelector('button')?.focus()
     else expandButton?.focus()
     updateScrollShadows()
   }
 
   async function selectPlace(id: string, scrollToCard = false) {
-    selectedPlaceId = id
+    view.selectedPlaceId = id
     if (scrollToCard) {
       await tick()
       listElement?.querySelector('[data-selected="true"]')?.scrollIntoView({ block: 'nearest' })
     }
   }
 
+  function handleNavigation(tab: TabId) {
+    if (tab === 'map') openMap({ title: 'Mapa de favoritos', benefits: mapBenefits, center: view.mapViewport?.center ?? mapCenter, userLocation,
+      initialZoom: view.mapViewport?.zoom ?? 13, onviewportchange: (viewport) => { view.mapViewport = viewport },
+      selectedBenefitId: view.selectedPlaceId, onselect: (id) => { void selectPlace(id, true) },
+      onclose: () => { selectedTab = 'favorites' },
+    })
+    else if (onnavigate) onnavigate(tab)
+    else navigateTab(tab)
+  }
+
   function applyFilters(filters: EstablishmentFilterState) {
-    appliedFilters = [...filters]
+    view.appliedFilters = [...filters]
   }
 
   onMount(() => {
+    view.filterSelection = [...view.appliedFilters]
     if (!listElement) return
+    listElement.scrollTop = view.scrollTop
     const observer = new ResizeObserver(updateScrollShadows)
     observer.observe(listElement)
     updateScrollShadows()
@@ -92,15 +104,15 @@
 
   $effect(() => {
     visiblePlaces
-    listExpanded
+    view.listExpanded
     if (!listElement) return
     const frame = requestAnimationFrame(updateScrollShadows)
     return () => cancelAnimationFrame(frame)
   })
 
   $effect(() => {
-    if (selectedPlaceId && !visiblePlaces.some((place) => place.id === selectedPlaceId)) {
-      selectedPlaceId = null
+    if (view.selectedPlaceId && !visiblePlaces.some((place) => place.id === view.selectedPlaceId)) {
+      view.selectedPlaceId = null
     }
   })
 </script>
@@ -110,28 +122,31 @@
 </svelte:head>
 
 <svelte:window onkeydown={(event) => {
-  if (event.key === 'Escape' && listExpanded) void toggleExpanded()
+  if (event.key === 'Escape' && view.listExpanded) void toggleExpanded()
 }} />
 
-<main class="directory-page favorites-page" class:list-expanded={listExpanded}>
+<main class="directory-page favorites-page" class:list-expanded={view.listExpanded}>
   <section class="directory-map-column favorites-map-column" aria-label="Mapa de favoritos">
-    <header class="directory-map-header favorites-map-header" inert={listExpanded}>
+    <header class="directory-map-header favorites-map-header" inert={view.listExpanded}>
       <BackButton onclick={onback} />
       <h1 class="directory-page__title">Favoritos</h1>
     </header>
 
-    <div class="directory-map favorites-map" role="region" aria-label="Mapa dos estabelecimentos favoritos" inert={listExpanded}>
+    <div class="directory-map favorites-map" role="region" aria-label="Mapa dos estabelecimentos favoritos" inert={view.listExpanded}>
       <Map
         variant="default"
         benefits={mapBenefits}
-        center={mapCenter}
+        center={view.mapViewport?.center ?? mapCenter}
+        initialZoom={view.mapViewport?.zoom ?? 13}
+        onViewportChange={(viewport) => view.mapViewport = viewport}
         {userLocation}
-        selectedBenefitId={selectedPlaceId}
+        selectedBenefitId={view.selectedPlaceId}
+        onBenefitOpen={(place) => openEstablishment(place.id)}
         onBenefitSelect={(benefit) => void selectPlace(benefit.id, true)}
       />
     </div>
 
-    <FloatingTabBar bind:selected={selectedTab} ontabchange={onnavigate} />
+    <FloatingTabBar bind:selected={selectedTab} ontabchange={handleNavigation} />
   </section>
 
   <section class="directory-results favorites-results" aria-labelledby="favorites-results-title">
@@ -142,17 +157,17 @@
       </div>
       <h2 id="favorites-results-title" class="directory-results__title favorites-results__title">Estabelecimentos favoritos</h2>
 
-      <Search bind:value={searchValue} label="Buscar locais ou benefícios" placeholder="Buscar locais ou benefícios" />
+      <Search bind:value={view.searchValue} label="Buscar locais ou benefícios" placeholder="Buscar locais ou benefícios" />
 
-      <FilterDropdown bind:value={filterSelection} onapply={applyFilters} />
+      <FilterDropdown bind:value={view.filterSelection} onapply={applyFilters} />
 
       <div class="directory-results__count-row favorites-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
         <ExpandButton
           variant="favorites-list"
           bind:element={expandButton}
-          bind:expanded={listExpanded}
-          label={listExpanded ? 'Voltar para o mapa' : 'Expandir lista de favoritos'}
+          bind:expanded={view.listExpanded}
+          label={view.listExpanded ? 'Voltar para o mapa' : 'Expandir lista de favoritos'}
           controls="favorites-list"
           onclick={updateExpandedFocus}
         />
@@ -176,10 +191,10 @@
             neighborhood={place.neighborhood}
             distanceKm={place.distanceKm}
             discount={place.discount}
-            selected={selectedPlaceId === place.id}
+            selected={view.selectedPlaceId === place.id}
             liked
             favoriteDisabled={!onremovefavorite}
-            onselect={() => selectPlace(place.id)}
+            onselect={() => { view.selectedPlaceId = place.id; openEstablishment(place.id) }}
             onlikedchange={() => onremovefavorite?.(place.id)}
           />
         {:else}
