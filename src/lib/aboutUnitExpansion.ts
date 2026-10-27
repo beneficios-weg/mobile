@@ -30,7 +30,7 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
     clone.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'))
     clone.setAttribute('aria-hidden', 'true')
     clone.inert = true
-    clone.style.cssText = `position:fixed;visibility:hidden;pointer-events:none;left:0;top:0;width:${width}px;height:auto;min-height:124px`
+    clone.style.cssText = `position:fixed;visibility:hidden;pointer-events:none;left:0;top:0;width:${width}px;height:${open ? 'auto' : 'var(--about-unit-card-collapsed-height)'};min-height:var(--about-unit-card-collapsed-height)`
     const cloneViewport = clone.querySelector<HTMLElement>('.expandable-about-unit-card__viewport')!
     const cloneText = clone.querySelector<HTMLElement>('.expandable-about-unit-card__description')!
     cloneViewport.style.height = 'auto'
@@ -43,11 +43,16 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
       const bounds = clone.getBoundingClientRect()
       const content = cloneViewport.getBoundingClientRect()
       const style = getComputedStyle(clone)
+      const overhead = content.top - bounds.top + Number.parseFloat(style.paddingBottom) + Number.parseFloat(style.borderBottomWidth)
+      const lineHeight = Number.parseFloat(getComputedStyle(cloneText).lineHeight)
+      const collapsedLines = Math.max(1, Math.min(5, Math.floor((bounds.height - overhead) / lineHeight)))
+      if (!open) cloneText.style.webkitLineClamp = String(collapsedLines)
       return {
         height: bounds.height,
-        textHeight: content.height,
+        textHeight: cloneViewport.getBoundingClientRect().height,
         textWidth: cloneText.getBoundingClientRect().width,
-        overhead: content.top - bounds.top + Number.parseFloat(style.paddingBottom) + Number.parseFloat(style.borderBottomWidth),
+        overhead,
+        collapsedLines,
       }
     } finally {
       clone.remove()
@@ -100,7 +105,7 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
     viewport.setAttribute('role', 'region')
     viewport.setAttribute('aria-label', `Descrição de ${title.textContent ?? 'unidade'}`)
     text.style.display = expanded || moving ? 'block' : ''
-    text.style.webkitLineClamp = expanded || moving ? 'unset' : ''
+    text.style.webkitLineClamp = expanded || moving ? 'unset' : String(collapsed.collapsedLines)
     text.style.overflow = expanded || moving ? 'visible' : ''
     text.style.width = `${moving ? previousTextWidth : expanded ? full.textWidth : collapsed.textWidth}px`
     text.style.opacity = '1'
@@ -110,7 +115,7 @@ export function aboutUnitExpansion(slot: HTMLElement, initial: Options) {
       if (generation !== current) return
       if (!expanded) {
         text.style.display = ''
-        text.style.webkitLineClamp = ''
+        text.style.webkitLineClamp = String(collapsed.collapsedLines)
         text.style.overflow = ''
       }
       card.style.zIndex = expanded ? '2' : '1'

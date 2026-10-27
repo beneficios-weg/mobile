@@ -4,6 +4,12 @@
 
 O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
 
+## Dimensões recolhidas de Sobre a unidade e Serviços
+
+Branch `fix/equal-collapsed-info-cards`: ambos os cards usam 124 px de altura e a mesma largura na grade quando recolhidos. A prévia limita o texto a linhas completas com reticências, sem permitir que a quantidade de conteúdo altere a altura.
+
+No Chrome isolado, foram verificados 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834: dimensões iguais antes do clique e após recolher, expansão lateral dos dois cards e descrição completa de Sobre a unidade sem rolagem interna. Descrições longas também foram testadas para confirmar a expansão vertical. Outro estabelecimento com conteúdo diferente e a galeria de componentes mantiveram a altura padrão. Não houve transbordamento horizontal nem erros JavaScript; capturas foram inspecionadas. `npm run check` terminou sem erros/avisos e `npm run build` concluiu. O solicitante aprovou visualmente o ajuste e autorizou o envio ao remoto.
+
 ## Padronização e animação da navegação / busca do mapa — 2026-10-27
 
 As medidas e os estilos computados de Categorias foram registrados antes da mudança. Após centralizar as regras de FloatingTabBar, os valores de referência foram preservados e comparados com Início, Favoritos, Visitados, detalhe e mapa em 390 × 844, 844 × 390, 834 × 1194, 1194 × 834 e 700 × 390. Fonte, dimensões, posição, estilos e transições coincidiram. A lista expandida manteve a mesma barra.
