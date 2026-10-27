@@ -71,9 +71,4 @@
   .main-page__map { height: auto; min-height: 0; flex: 1 1 auto; }
   .main-page__categories { padding: 14px 0 0 16px; }
   .main-page__category-list { padding-bottom: 16px; }
-  .main-page__map-column .floating-tabs {
-    left: calc(3.8vw + (50vw - 3.8vw - 16px) / 2);
-    bottom: max(16px, env(safe-area-inset-bottom));
-    width: calc(50vw - 3.8vw - 16px);
-  }
 }

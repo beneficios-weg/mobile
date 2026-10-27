@@ -9,6 +9,7 @@ export type MapContext = {
   userLocation?: { latitude: number; longitude: number } | null
   selectedBenefitId?: string | null
   initialZoom?: number
+  searchValue?: string
   onviewportchange?: (viewport: MapViewport) => void
   onselect?: (id: string) => void
   onclose?: () => void
@@ -71,9 +72,9 @@ export function goBack(fallback: string = routes.home) {
 export function openMap(context: MapContext) {
   if (navigation.map) return
   const key = crypto.randomUUID()
-  mapEntries.set(key, context)
   window.history.pushState({ wegMap: key, wegNavigation: true, from: navigation.url }, '', navigation.url)
   navigation.map = context
+  mapEntries.set(key, navigation.map)
 }
 
 export function closeMap() {

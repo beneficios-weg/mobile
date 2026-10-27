@@ -41,6 +41,31 @@
   let routeLayer = $state.raw<L.Polyline | undefined>(undefined)
   const markersById = new globalThis.Map<string, L.Marker>()
 
+  export function changeZoom(delta: number) {
+    map?.setZoom(map.getZoom() + delta)
+  }
+
+  export function recenter(position: MapPosition) {
+    map?.panTo([position.latitude, position.longitude])
+  }
+
+  export function focusBenefit(id: string) {
+    const marker = markersById.get(id)
+    if (!map || !marker) return
+    map.panTo(marker.getLatLng())
+    marker.openPopup()
+    mapElement.focus({ preventScroll: true })
+  }
+
+  export function fitBenefits(items: MapBenefit[] = benefits) {
+    if (!map || !items.length) return
+    map.fitBounds(L.latLngBounds(items.map(item => [item.latitude, item.longitude])), {
+      paddingTopLeft: [32, 132],
+      paddingBottomRight: [64, 160],
+      maxZoom: 15,
+    })
+  }
+
   function createBenefitPopup(benefit: MapBenefit) {
     const content = document.createElement('div')
     const title = document.createElement('strong')
@@ -190,13 +215,14 @@
   onMount(() => {
     map = L.map(mapElement, {
       zoomControl: false,
-      attributionControl: showTiles && variant !== 'category',
+      attributionControl: showTiles,
       preferCanvas: true,
       maxBounds: southAmericaBounds,
       maxBoundsViscosity: 2,
       minZoom: 4,
       maxZoom: 18,
     }).setView([center.latitude, center.longitude], initialZoom)
+    map.attributionControl?.setPrefix(false)
 
     const reportViewport = () => {
       if (!map) return
@@ -215,11 +241,6 @@
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map)
     }
-
-    if (variant === 'category' && showTiles) {
-      L.control.attribution({ position: 'topright', prefix: false }).addTo(map)
-    }
-    if (variant === 'default') L.control.zoom({ position: 'bottomright' }).addTo(map)
 
     const resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }))
     resizeObserver.observe(mapElement)
@@ -245,13 +266,5 @@
       aria-label="Mapa interativo com benefícios no Brasil."
       role="application"
     ></div>
-    {#if variant === 'default'}
-    <div class="map-legend" aria-hidden="true">
-      <span class="legend-benefit"></span> Benefício
-      {#if userLocation}
-        <span class="legend-user"></span> Você
-      {/if}
-    </div>
-    {/if}
   </div>
 </section>

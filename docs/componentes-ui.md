@@ -48,7 +48,14 @@ O código contém os componentes abaixo. Os itens da tabela anterior continuam r
 | `AboutUnitCard` | `src/components/atoms/AboutUnitCard.svelte` | Prévia temporária; exibição larga com título h3 |
 | `ExpandableAboutUnitCard` | `src/components/atoms/ExpandableAboutUnitCard.svelte` | Prévia temporária; destaque e ocultação dos irmãos preservam as dimensões da grade |
 | `BenefitCard` | `src/components/molecules/BenefitCard.svelte` | Card detalhado com uma ou mais linhas de desconto e público, disponível para composição de telas |
-| `Map` | `src/components/Map.svelte` | Categoria, Favoritos e prévia de componentes |
+| `Map` | `src/components/Map.svelte` | Início, Categoria, Favoritos, Visitados, detalhe e galeria |
+| `MapDialog` | `src/components/MapDialog.svelte` | Expansão modal do mapa com os dados e o viewport da origem |
+
+### Navegação compartilhada
+
+`FloatingTabBar` usa uma única regra responsiva em `floating-tab-bar.css`, extraída do padrão de Categorias. Posição, largura, margens inferiores, tipografia, ícones e transições são os mesmos em Início, Categoria, Favoritos, Visitados, detalhe e mapa expandido. As páginas não sobrescrevem a geometria da barra. Ao expandir a lista, muda somente o empilhamento necessário para manter a navegação acessível.
+
+A seleção visual parte da aba anterior ao montar a barra em outra página, permitindo que a transição existente continue funcionando entre rotas e ao abrir/fechar o mapa. O contêiner mantém posição e dimensões durante a animação; somente as abas internas e seus rótulos transitam. A aba anunciada por `aria-pressed` acompanha imediatamente o destino selecionado. A preferência por movimento reduzido continua respeitada pelo CSS.
 
 ### Card de Benefício
 
@@ -67,9 +74,9 @@ A preferência `prefers-reduced-motion` desativa as animações. Os dois cards e
 ## Páginas e telas no código
 
 - `/` renderiza `MainPage`, a interface de Início com dados demonstrativos e o mesmo layout de mapa/navegação de Categoria/Favoritos. A grade usa CategoryButton sem reduções locais de fonte, ícone ou escala; a galeria de componentes fica em `/componentes-preview`.
-- `/estabelecimento/academia-move` renderiza `EstablishmentInfoPage`, com os componentes existentes de mapa, fachada, contato, benefícios e cards expansíveis.
+- `/estabelecimento/:id` renderiza `EstablishmentInfoPage`, com os componentes existentes de mapa, fachada, contato, benefícios e cards expansíveis. O ID determina o registro do catálogo; `academia-move` mantém compatibilidade com o exemplo anterior.
 - `/visitados` renderiza `VisitedPage`, que reutiliza a composição de `CategoryPage` na variante `visited`. Mudam os textos da página e a aba ativa; componentes e estilos são compartilhados, inclusive na expansão das quatro versões responsivas. Os exemplos não representam histórico real de visitas.
-- `/categoria/saude-e-bem-estar` renderiza `CategoryPage`. A ordenação, os cards e o mapa Leaflet usam componentes reutilizáveis. O mapa exibe tiles reais do OpenStreetMap e sincroniza a seleção entre pins e cards; os estabelecimentos e suas coordenadas ainda são dados locais demonstrativos, sem conexão com a API do produto.
+- `/categoria/:slug` renderiza `CategoryPage`, atendendo às sete categorias do Início. A ordenação, os cards e o mapa Leaflet usam componentes reutilizáveis. O mapa exibe tiles reais do OpenStreetMap e compartilha a seleção com a lista; os estabelecimentos e suas coordenadas ainda são dados locais demonstrativos, sem conexão com a API do produto.
 - `/login` renderiza `src/pages/Login.svelte`, que compõe os átomos `Input` e `PrimaryButton`. Os estilos e as regras responsivas ficam em `src/pages/styles/Login.css`, importado pela própria página; os seletores ficam limitados ao Login para não afetar as demais telas. A autenticação ainda não está integrada ao Backend.
 - `FilterDropdown` salva as opções durante a edição e aplica os critérios quando o painel fecha. Crescente e decrescente não podem ficar ativos juntos; as demais opções podem ser combinadas. Quando há mais de uma ordenação, a prioridade segue a ordem de seleção. O horário de funcionamento atua como filtro adicional; os horários da tela atual são demonstrativos.
 
@@ -105,15 +112,15 @@ Essa pilha usa a fonte disponível no sistema; não implica instalar ou distribu
 
 `src/pages/FavoritesPage.svelte` compõe `Map`, `BackButton`, `Search`, `FilterDropdown`, `ResultsCount`, `ExpandButton`, `EstablishmentCard`, `FloatingTabBar` e `ScrollShadow`. `EstablishmentCard` compõe `FavoriteButton`. O layout compartilhado fica em `DirectoryPage.css` e o estado vazio em `FavoritesPage.css`. A tela é acessível diretamente em `/favoritos`.
 
-O mapa usa os tiles reais do OpenStreetMap, nas cores originais, e recebe as coordenadas de `FavoritePlace` (`latitude` e `longitude`). Busca e remoção atualizam a lista, o contador e os pins juntos. Selecionar um pin destaca e traz seu card para a área visível; selecionar um card destaca seu pin e o traz para o mapa quando necessário. Os marcadores existentes são preservados nas mudanças de seleção para manter foco e popups. A localização é opcional e recebida por `userLocation`; a rota fornece uma posição de demonstração, sem solicitar GPS. Os dados de estabelecimentos e coordenadas continuam sendo demonstrativos.
+O mapa usa os tiles reais do OpenStreetMap, nas cores originais, e recebe as coordenadas de `FavoritePlace` (`latitude` e `longitude`). Busca e remoção atualizam a lista, o contador e os pins juntos. Selecionar um pin destaca e traz seu card para a área visível; selecionar um card abre os detalhes do registro correspondente. O popup também oferece acesso aos detalhes. Os marcadores existentes são preservados nas mudanças de seleção para manter foco e popups. A localização é opcional e recebida por `userLocation`; a rota fornece uma posição de demonstração, sem solicitar GPS. Os dados de estabelecimentos e coordenadas continuam sendo demonstrativos.
 
 Os quatro layouts são celular em retrato (390 × 844), celular em paisagem (844 × 390), tablet em retrato (834 × 1194) e tablet em paisagem (1194 × 834). Os marcadores usam o padrão azul compartilhado do mapa, conforme a revisão aprovada de Categoria/Favoritos; a localização de demonstração também aparece em azul.
 
 As imagens de paisagem apresentam divergências de conteúdo: o celular usa o título “Estabelecimentos da categoria” e o tablet marca a aba “Início”. O solicitante confirmou manter “Estabelecimentos favoritos” e a aba “Favoritos” ativa nas quatro versões.
 
-A página recebe os favoritos e callbacks por propriedades. Busca, ordenação, seleção e expansão são locais à UI; a remoção é delegada ao callback. Os dados de demonstração de `src/pages/favorites.ts` são fornecidos pela rota e não representam integração com o Backend, cache ou persistência.
+A página recebe os favoritos e callbacks por propriedades. Busca, ordenação, seleção, expansão e rolagem são guardadas em memória pelo estado da navegação; a remoção é delegada ao callback. Os exemplos são reunidos em `src/pages/catalog.ts` e o estado compartilhado fica em `src/lib/siteState.svelte.ts`. Não representam integração com o Backend, cache ou persistência.
 
-Na composição atual de `src/App.svelte`, o retorno e a aba Início navegam para `/`. As abas Mapa e Histórico continuam dependendo de telas de destino ainda não implementadas; a troca para o mapa real de Favoritos não cria essas rotas.
+O retorno usa o histórico interno com alternativa para `/`. As abas abrem Início, mapa expandido, Favoritos e Visitados. A expansão usa diálogo nativo modal e preserva os dados da origem; ver [Navegação](navegacao.md).
 
 ## Contratos dos componentes
 
@@ -132,7 +139,6 @@ Componentes visuais recebem dados já preparados e callbacks; não devem conhece
 ## DECISÃO PENDENTE
 
 - tokens definitivos do design;
-- conteúdo e ordem da Floating Tab Bar;
 - comportamento de clustering e seleção de pins;
 - estados exatos previstos nos protótipos;
 - nomenclatura real após a implementação.

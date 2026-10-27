@@ -4,6 +4,43 @@
 
 O checkout atual contém uma aplicação Svelte/Vite executável com `npm run dev`, `npm run check` e `npm run build`. A interface de Favoritos pode ser validada em `/favoritos` com dados fictícios em memória; ela ainda não integra autenticação, API, persistência ou sincronização. A matriz abaixo permanece como roteiro de aceite dos fluxos de produto que dependem dessas integrações.
 
+## Padronização e animação da navegação / busca do mapa — 2026-10-27
+
+As medidas e os estilos computados de Categorias foram registrados antes da mudança. Após centralizar as regras de FloatingTabBar, os valores de referência foram preservados e comparados com Início, Favoritos, Visitados, detalhe e mapa em 390 × 844, 844 × 390, 834 × 1194, 1194 × 834 e 700 × 390. Fonte, dimensões, posição, estilos e transições coincidiram. A lista expandida manteve a mesma barra.
+
+O navegador amostrou quadros durante Início → Favoritos, Favoritos → Mapa e retorno do Mapa: houve transições CSS reais, com a largura da aba selecionada variando, enquanto posição e dimensões do contêiner permaneceram constantes em todos os quadros.
+
+A busca foi conferida por clique e teclado: resultados e pins correspondentes, pesquisa sem acentos, contagem, estado vazio, seleção com setas/Enter, popup do registro selecionado, Escape fechando somente sugestões e restauração por Todos os benefícios. O painel ficou dentro do viewport e acima da navegação nas cinco medidas; a busca de origem não foi alterada. Capturas foram inspecionadas. Nenhum erro JavaScript foi observado. O solicitante aprovou as alterações e autorizou o envio ao remoto. As referências temporárias de imagem e ZIP foram removidas após essa aprovação.
+
+## Mapa em tela cheia conforme referência — 2026-10-27
+
+Referência: `Screen/Mobile/Portrait/Map.svg`, do ZIP fornecido pelo solicitante. Em 390 × 844, as posições e dimensões da busca, retorno, Todos os benefícios e navegação foram comparadas com as coordenadas do SVG. O fundo ocupa o viewport inteiro com os tiles e pins azuis existentes. Capturas também foram inspecionadas em 844 × 390, 834 × 1194 e 1194 × 834.
+
+As cinco origens (Início, Categoria, Favoritos, Visitados e detalhe) foram exercitadas nas quatro medidas: mapa preenchendo todo o viewport, controles dentro da área visível e ausência dos controles/legenda padrão do Leaflet. Conferidos: busca sem acentos, estado vazio, restauração/enquadramento dos resultados, zoom pelos botões e centralização. O histórico preservou a busca do mapa ao avançar, Escape fechou a expansão, as abas navegaram e os popups abriram os detalhes. Nenhum erro JavaScript foi observado.
+
+`npm run check`: zero erros e zero avisos. `npm test`: 12 testes aprovados. `npm run build`: concluído. Validação web com dados demonstrativos; o solicitante aprovou os ajustes e autorizou o envio ao remoto.
+
+## Navegação conectada — 2026-10-27
+
+Branch `feat/site-navigation`. `npm run check` terminou com zero erros e zero avisos de Svelte/TypeScript, os 12 testes de regressão passaram e `npm run build` gerou a versão de produção.
+
+No Chrome isolado, os seguintes fluxos foram exercitados sem erros JavaScript:
+
+- Login de prévia até o Início, sem recarregar o documento;
+- abertura das sete categorias, incluindo estados vazios, e retorno ao Início;
+- busca e filtro, card com detalhes do registro correto, favorito compartilhado e retorno/avanço do navegador preservando os critérios;
+- busca, remoção e detalhes em Favoritos; ausência de link telefônico quando o contato não está informado;
+- Visitados independente dos favoritos, detalhes e retorno;
+- mapa expandido com os resultados filtrados, mesma URL, foco modal e bloqueio de cliques na busca atrás dele;
+- zoom e arraste do mapa, sincronização do viewport com a origem, fechamento por Voltar e restauração por Avançar com o último centro e zoom;
+- abertura de detalhes pelo popup e retorno à origem sem reabrir a entrada intermediária do mapa;
+- acesso direto, barras finais, caminhos/IDs/categorias inexistentes e retorno da galeria;
+- expansão e rolagem da lista preservadas após abrir e voltar dos detalhes.
+
+Início, Categoria, Favoritos, Visitados e detalhe foram conferidos em 390 × 844, 844 × 390, 834 × 1194 e 1194 × 834: 20 combinações sem transbordamento horizontal, com o diálogo do mapa preenchendo o viewport. Capturas foram inspecionadas. A restauração do mapa guarda o contexto reativo para preservar as mudanças ao avançar no histórico.
+
+Esta validação cobre a prévia web com dados locais. Não valida autenticação, persistência após recarregar, visitas reais, API, permissões nativas ou disponibilidade contínua dos tiles externos. O solicitante aprovou a etapa com os ajustes de mapa, busca e navegação descritos acima e autorizou o envio ao remoto.
+
 ## Página de Visitados — 2026-10-26
 
 `/visitados` reutiliza `CategoryPage` com a variante de textos de Visitados. `npm run check` passou sem erros ou avisos, os sete testes de regressão passaram e `npm run build` gerou a aplicação.

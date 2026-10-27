@@ -387,10 +387,6 @@
     gap: 16px;
   }
 
-  .directory-map-column .floating-tabs {
-    bottom: max(30px, env(safe-area-inset-bottom));
-  }
-
   .directory-page.list-expanded .directory-results {
     width: 100%;
     max-width: none;
@@ -476,18 +472,6 @@
     border-radius: 24px;
   }
 
-  .directory-map-column .floating-tabs {
-    position: fixed;
-    right: auto;
-    bottom: max(16px, env(safe-area-inset-bottom));
-    left: calc(3.8vw + (50vw - 3.8vw - 32px) / 2);
-    z-index: 20;
-    align-self: auto;
-    flex: 0 0 64px;
-    width: min(350px, calc(50vw - 3.8vw - 32px));
-    transform: translateX(-50%);
-  }
-
   .directory-results {
     padding: 14px 0 0 32px;
     gap: 14px;
@@ -542,12 +526,6 @@
   .directory-map-column {
     gap: 32px;
     padding: 0 44px 96px 0;
-  }
-
-  .directory-map-column .floating-tabs {
-    left: calc(4vw + (50vw - 4vw - 44px) / 2);
-    bottom: max(40px, env(safe-area-inset-bottom));
-    width: min(350px, calc(50vw - 4vw - 44px));
   }
 
   .directory-map-header {
@@ -822,14 +800,4 @@
 
 .directory-page .filter-dropdown__header h2 {
   letter-spacing: 0;
-}
-
-.directory-page .floating-tabs .label {
-  font-family: var(--directory-font-family);
-}
-
-@media (orientation: landscape) and (min-width: 640px) and (max-width: 740px) {
-  .directory-page .floating-tabs .tab.active {
-    flex-grow: 44;
-  }
 }
