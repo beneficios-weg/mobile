@@ -3,17 +3,26 @@
   import Input from '../components/atoms/Input.svelte'
   import PrimaryButton from '../components/atoms/PrimaryButton.svelte'
   import BackButton from '../components/atoms/BackButton.svelte'
+  import { login, siteState, discardBlockedQueue } from '../lib/siteState.svelte'
+  import { ApiError } from '../api/client'
   import { navigate, goBack } from '../lib/navigation.svelte'
   import './styles/Login.css'
 
   let email = $state('')
   let password = $state('')
 
-  function handleSubmit(event: SubmitEvent) {
+  let submitting = $state(false)
+  let error = $state('')
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault()
-    email = ''
-    password = ''
-    navigate('/')
+    if (submitting) return
+    submitting = true; error = ''
+    try {
+      await login(email.trim(), password)
+      if (siteState.user) navigate('/', { replace: true })
+    } catch (failure) {
+      error = failure instanceof ApiError ? failure.message : 'Não foi possível entrar. Tente novamente.'
+    } finally { password = ''; submitting = false }
   }
 
 </script>
@@ -28,7 +37,7 @@
   <div class="login-layout">
     <section class="brand-block" aria-labelledby="login-title">
       <img class="brand" src={logo} alt="WEG Benefits" />
-      <h1 id="login-title">Entre com seu e-mail corporativo <br>e acesse seus benefícios.</h1>
+      <h1 id="login-title">Entre com seu usuário ou e-mail <br>e acesse seus benefícios.</h1>
     </section>
 
     <section class="form-panel" aria-label="Acesso à conta">
@@ -38,7 +47,7 @@
             id="login-email"
             label="Usuário / E-mail "
             name="email"
-            type="email"
+            type="text"
             autocomplete="username"
             required
             bind:value={email}
@@ -54,8 +63,9 @@
           />
         </div>
 
-        <PrimaryButton type="submit" label="Entrar" />
-        <p class="form-notice">Prévia de navegação, sem autenticação real.</p>
+        <PrimaryButton type="submit" label={submitting ? 'Entrando…' : 'Entrar'} disabled={submitting} />
+        <p class="form-notice" role="status">{error || siteState.message || (submitting ? 'Conectando. O primeiro acesso pode demorar alguns minutos.' : 'Use as credenciais enviadas ao seu e-mail.')}</p>
+        {#if siteState.blockedAccount !== null}<button type="button" onclick={discardBlockedQueue}>Apagar favoritos pendentes desta conta</button>{/if}
       </form>
     </section>
 

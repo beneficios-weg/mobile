@@ -8,8 +8,9 @@ export type EstablishmentDetails = {
   openingHours: string
   contact: string
   facadeImageUrl?: string
-  latitude: number
-  longitude: number
+  latitude: number | null
+  longitude: number | null
+  mappable?: boolean
   discounts: { value: string; description: string }[]
   audience: string
   participation: string[]

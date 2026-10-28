@@ -14,15 +14,17 @@
   import './styles/EstablishmentInfoPage.css'
   import { directoryView, goBack, navigateTab, openMap, openEstablishment } from '../lib/navigation.svelte'
   import { categoryPath, type TabId } from '../lib/routes'
-  import { findPlace } from './catalog'
+  import { findPlace } from '../lib/siteState.svelte'
+  import { mapPlaces } from '../lib/apiAdapters'
 
   type Props = {
     establishment?: EstablishmentDetails
     liked?: boolean
+    controlledFavorite?: boolean
     onlikedchange?: (liked: boolean) => void
   }
 
-  let { establishment = previewEstablishment, liked = $bindable(false), onlikedchange }: Props = $props()
+  let { establishment = previewEstablishment, liked = $bindable(false), onlikedchange, controlledFavorite = false }: Props = $props()
   let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
   const view = untrack(() => directoryView(`detail:${establishment.id}`))
   let scrollElement: HTMLDivElement
@@ -30,13 +32,8 @@
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
 
-  const position = $derived({ latitude: establishment.latitude, longitude: establishment.longitude })
-  const mapBenefits = $derived([{
-    id: establishment.id,
-    name: establishment.name,
-    category: establishment.neighborhood,
-    ...position,
-  }])
+  const mapBenefits = $derived(mapPlaces([establishment]))
+  const position = $derived(mapBenefits[0])
   const supplementaryCards = $derived([
     { id: 'about', title: 'Sobre a unidade', description: establishment.description },
     { id: 'services', title: 'Serviços', description: establishment.services.map((service) => `• ${service}`).join('\n') },
@@ -53,6 +50,7 @@
   }
 
   function handleNavigation(tab: TabId) {
+    if (tab === 'map' && !position) { selectedTab = 'home'; return }
     if (tab === 'map') openMap({ title: establishment.name, benefits: mapBenefits, center: view.mapViewport?.center ?? position,
       initialZoom: view.mapViewport?.zoom ?? 15, onviewportchange: (viewport) => { view.mapViewport = viewport },
       selectedBenefitId: establishment.id, onclose: () => { selectedTab = 'home' },
@@ -61,6 +59,7 @@
   }
 
   function openDirections() {
+    if (!position) return
     const destination = encodeURIComponent(`${establishment.latitude},${establishment.longitude}`)
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank', 'noopener,noreferrer')
   }
@@ -84,19 +83,22 @@
   if (event.key === 'Escape') view.expandedCard = null
 }} />
 
-<main class="establishment-page">
+<main class="establishment-page" class:online={!position}>
   <header class="establishment-page__header">
     <BackButton onclick={returnToOrigin} />
     <h1>{establishment.name}</h1>
   </header>
 
   <div class="establishment-page__favorite">
-    <FavoriteButton bind:liked {onlikedchange} />
+    <FavoriteButton bind:liked controlled={controlledFavorite} {onlikedchange} />
   </div>
 
+  {#if position}
   <div class="establishment-page__map">
     <Map benefits={mapBenefits} variant="category" center={view.mapViewport?.center ?? position} initialZoom={view.mapViewport?.zoom ?? 15} onViewportChange={(viewport) => view.mapViewport = viewport} selectedBenefitId={establishment.id} onBenefitOpen={(place) => openEstablishment(place.id)} />
   </div>
+
+  {/if}
 
   <section class="establishment-page__details" aria-labelledby="establishment-info-title">
     <h2 id="establishment-info-title">Informações do estabelecimento</h2>
@@ -116,10 +118,10 @@
             contact={establishment.contact}
             facadeImageUrl={establishment.facadeImageUrl}
           />
-          <PrimaryButton label="Como chegar" onclick={openDirections} />
+          {#if position}<PrimaryButton label="Como chegar" onclick={openDirections} />{/if}
           <BenefitCard discounts={establishment.discounts} audience={establishment.audience} />
           <div class="establishment-page__participation">
-            <AboutUnitCard title="Como participar" description={establishment.participation.map((step, index) => `${index + 1}. ${step}`).join('\n')} />
+            <AboutUnitCard title="Como participar" description={establishment.participation.join('\n')} />
           </div>
           <section class="establishment-page__supplementary" aria-label="Sobre a unidade e serviços" data-about-unit-area>
             <div class="about-unit-card-grid">

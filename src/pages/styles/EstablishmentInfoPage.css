@@ -208,3 +208,14 @@
 @media (orientation: landscape) and (max-width: 659px) {
   .establishment-page .establishment-facade-card__contact { padding-right: 8px; gap: 6px; flex-wrap: wrap; }
 }
+
+/* Online offers have no physical map or directions. Retain the existing detail cards. */
+.establishment-page.online { grid-template-rows: var(--establishment-control) minmax(0, 1fr); }
+.establishment-page.online .establishment-page__details { grid-area: 2 / 1 / 3 / -1; }
+@media (orientation: landscape) and (min-width: 480px) {
+  .establishment-page.online {
+    grid-template-columns: minmax(0, 1fr) var(--establishment-control);
+    grid-template-rows: var(--establishment-control) minmax(0, 1fr) 64px;
+  }
+  .establishment-page.online .establishment-page__navigation { grid-area: 3 / 1 / 4 / -1; }
+}

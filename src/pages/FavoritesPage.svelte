@@ -9,6 +9,7 @@
   import Search from '../components/atoms/Search.svelte'
   import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
+  import { mapPlaces } from '../lib/apiAdapters'
   import { filterFavorites, type FavoritePlace } from './favorites'
   import './styles/FavoritesPage.css'
   import { directoryView, openMap, navigateTab, openEstablishment } from '../lib/navigation.svelte'
@@ -34,18 +35,9 @@
   let expandButton = $state<HTMLButtonElement>()
   let expandedHeader: HTMLDivElement
 
-  const mapCenter = $derived(userLocation ?? (places[0] && {
-    latitude: places[0].latitude,
-    longitude: places[0].longitude,
-  }))
+  const mapCenter = $derived(userLocation ?? mapPlaces(places)[0])
   const visiblePlaces = $derived(filterFavorites(places, view.searchValue, view.appliedFilters, currentTime))
-  const mapBenefits = $derived(visiblePlaces.map((place) => ({
-    id: place.id,
-    name: place.name,
-    category: place.neighborhood,
-    latitude: place.latitude,
-    longitude: place.longitude,
-  })))
+  const mapBenefits = $derived(mapPlaces(visiblePlaces))
 
   function updateScrollShadows() {
     if (!listElement) return
@@ -159,7 +151,7 @@
 
       <Search bind:value={view.searchValue} label="Buscar locais ou benefícios" placeholder="Buscar locais ou benefícios" />
 
-      <FilterDropdown bind:value={view.filterSelection} onapply={applyFilters} />
+      <FilterDropdown available={['name-asc', 'name-desc']} bind:value={view.filterSelection} onapply={applyFilters} />
 
       <div class="directory-results__count-row favorites-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
@@ -191,8 +183,10 @@
             neighborhood={place.neighborhood}
             distanceKm={place.distanceKm}
             discount={place.discount}
+            offerLabel={place.offerLabel}
             selected={view.selectedPlaceId === place.id}
             liked
+            controlledFavorite
             favoriteDisabled={!onremovefavorite}
             onselect={() => { view.selectedPlaceId = place.id; openEstablishment(place.id) }}
             onlikedchange={() => onremovefavorite?.(place.id)}

@@ -13,24 +13,36 @@
   import leisureIcon from '../assets/leisure.svg'
   import apparelIcon from '../assets/aesthetics-apparel.svg'
   import './MainPage.css'
-  import { categories, homePlaces, findCategory } from './catalog'
-  import { directoryView, navigate, navigateTab, openMap, openCategory, openEstablishment } from '../lib/navigation.svelte'
+  import { categories, homePlaces, logout, siteState } from '../lib/siteState.svelte'
+  import { mapPlaces } from '../lib/apiAdapters'
+  import { directoryView, navigateTab, openMap, openCategory, openEstablishment } from '../lib/navigation.svelte'
   import type { TabId } from '../lib/routes'
+  import { categoryIcons } from '../lib/icons.svelte'
 
   const icons = { clients: clientsIcon, education: educationIcon, languages: languagesIcon, training: trainingIcon,
     health: healthIcon, leisure: leisureIcon, apparel: apparelIcon }
+  function categoryIcon(label: string) {
+    const name = label.toLocaleLowerCase('pt-BR')
+    if (name.includes('saúde') || name.includes('saude')) return icons.health
+    if (name.includes('educa')) return icons.education
+    if (name.includes('idioma')) return icons.languages
+    if (name.includes('treina')) return icons.training
+    if (name.includes('lazer')) return icons.leisure
+    if (name.includes('estética') || name.includes('vestu')) return icons.apparel
+    return icons.clients
+  }
   const view = directoryView('home')
-  const mapBenefits = homePlaces.map(place => ({ id: place.id, name: place.name,
-    category: findCategory(place.categorySlug)?.label ?? '', latitude: place.latitude, longitude: place.longitude }))
+  const mapBenefits = $derived(mapPlaces(homePlaces()))
 
   let activeTab = $state<'home' | 'map' | 'favorites' | 'history'>('home')
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
   let categoryList: HTMLDivElement
   let categoryGrid: HTMLDivElement
-  const userLocation = { latitude: -26.3, longitude: -48.846 }
+  const userLocation = null
+  const initialCenter = { latitude: -26.483, longitude: -49.078 }
   function handleNavigation(tab: TabId) {
-    if (tab === 'map') openMap({ title: 'Mapa de benefícios', benefits: mapBenefits, center: view.mapViewport?.center ?? userLocation, userLocation,
+    if (tab === 'map') openMap({ title: 'Mapa de benefícios', benefits: mapBenefits, center: view.mapViewport?.center ?? initialCenter, userLocation,
       initialZoom: view.mapViewport?.zoom ?? 13, onviewportchange: (viewport) => { view.mapViewport = viewport },
       selectedBenefitId: view.selectedPlaceId, onselect: (id) => { view.selectedPlaceId = id },
       onclose: () => { activeTab = 'home' },
@@ -63,18 +75,14 @@
   <section class="directory-map-column main-page__map-column" aria-label="Benefícios próximos">
     <header class="directory-map-header main-page__header">
       <img class="main-page__logo" src={logo} alt="WEG Benefits" />
-      <a class="main-page__login" href="/login" onclick={(event) => {
-        if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
-        event.preventDefault()
-        navigate('/login')
-      }}>Entrar</a>
+      <button type="button" class="main-page__login" style="border:0; background:transparent; cursor:pointer" disabled={siteState.pendingLogout} onclick={() => { void logout() }}>{siteState.pendingLogout ? 'Saindo…' : 'Sair'}</button>
     </header>
 
     <div class="directory-map main-page__map">
       <Map
         benefits={mapBenefits}
         variant="default"
-        center={view.mapViewport?.center ?? userLocation}
+        center={view.mapViewport?.center ?? initialCenter}
         initialZoom={view.mapViewport?.zoom ?? 13}
         onViewportChange={(viewport) => view.mapViewport = viewport}
         {userLocation}
@@ -96,10 +104,11 @@
       <div class="main-page__category-list" bind:this={categoryList} onscroll={updateScrollShadows}
         role="region" aria-label="Categorias de benefícios" tabindex="0">
         <div class="main-page__category-grid" bind:this={categoryGrid}>
-          {#each categories as category (category.label)}
+          {#each categories() as category (category.slug)}
             <CategoryButton
               label={category.label}
-              icon={icons[category.icon]}
+              icon={categoryIcons[`${category.iconKey}:${category.colorHex}`] ?? categoryIcon(category.label)}
+              colorHex={category.colorHex}
               tone={category.tone}
               onclick={() => openCategory(category.slug)}
             />

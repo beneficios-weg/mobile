@@ -9,7 +9,8 @@
   import FilterDropdown, { type EstablishmentFilterState } from '../components/molecules/FilterDropdown.svelte'
   import Map from '../components/Map.svelte'
   import EstablishmentCard from '../components/molecules/EstablishmentCard.svelte'
-  import { findCategory, placesForCategory, previewVisitedPlaces } from './catalog'
+  import { findCategory, placesForCategory, visitedPlaces } from '../lib/siteState.svelte'
+  import { mapPlaces } from '../lib/apiAdapters'
   import { directoryView, navigateTab, openMap, openEstablishment, goBack } from '../lib/navigation.svelte'
   import { siteState, setFavorite } from '../lib/siteState.svelte'
   import type { TabId } from '../lib/routes'
@@ -47,10 +48,8 @@
     searchContext: categorySlug === 'saude-e-bem-estar' ? 'saúde bem-estar' : category?.label ?? '',
   })
 
-  const places = $derived(variant === 'visited' ? previewVisitedPlaces : placesForCategory(categorySlug))
-  const mapCenter = $derived(categorySlug === 'saude-e-bem-estar' || !places.length
-    ? { latitude: -26.3045, longitude: -48.8487 }
-    : { latitude: places[0].latitude, longitude: places[0].longitude })
+  const places = $derived(variant === 'visited' ? visitedPlaces() : placesForCategory(categorySlug))
+  const mapCenter = $derived(mapPlaces(places)[0] ?? { latitude: -26.483, longitude: -49.078 })
 
   let currentTime = $state(new Date())
   let selectedTab = $state<'home' | 'map' | 'favorites' | 'history'>(untrack(() => variant === 'visited' ? 'history' : 'home'))
@@ -61,7 +60,7 @@
   const visiblePlaces = $derived.by(() => {
     const query = view.searchValue.trim().toLocaleLowerCase('pt-BR')
     const filtered = places.filter((place) => {
-      const matchesSearch = `${place.name} ${place.neighborhood} ${text.searchContext}`
+      const matchesSearch = `${place.name} ${place.neighborhood} ${place.offerLabel ?? ""} ${text.searchContext}`
         .toLocaleLowerCase('pt-BR')
         .includes(query)
       return matchesSearch && (!view.appliedFilters.includes('open-now') || isPlaceOpen(place.id, currentTime))
@@ -75,20 +74,14 @@
         let comparison = 0
         if (criterion === 'name-asc') comparison = a.name.localeCompare(b.name, 'pt-BR')
         if (criterion === 'name-desc') comparison = b.name.localeCompare(a.name, 'pt-BR')
-        if (criterion === 'discount') comparison = b.discount - a.discount
-        if (criterion === 'nearest') comparison = a.distanceKm - b.distanceKm
+        if (criterion === 'discount') comparison = (b.discount ?? -Infinity) - (a.discount ?? -Infinity)
+        if (criterion === 'nearest') comparison = (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity)
         if (comparison !== 0) return comparison
       }
       return 0
     })
   })
-  const mapBenefits = $derived(visiblePlaces.map((place) => ({
-    id: place.id,
-    name: place.name,
-    category: place.neighborhood,
-    latitude: place.latitude,
-    longitude: place.longitude,
-  })))
+  const mapBenefits = $derived(mapPlaces(visiblePlaces))
 
   function updateScrollShadows(list: HTMLDivElement) {
     view.scrollTop = list.scrollTop
@@ -187,7 +180,7 @@
         placeholder="Buscar locais ou benefícios"
       />
 
-      <FilterDropdown bind:value={view.filterSelection} onapply={applyFilters} />
+      <FilterDropdown available={['name-asc', 'name-desc']} bind:value={view.filterSelection} onapply={applyFilters} />
 
       <div class="directory-results__count-row category-results__count-row">
         <ResultsCount count={visiblePlaces.length} />
@@ -214,8 +207,10 @@
               neighborhood={place.neighborhood}
               distanceKm={place.distanceKm}
               discount={place.discount}
+              offerLabel={place.offerLabel}
               selected={view.selectedPlaceId === place.id}
               liked={siteState.favoriteIds.includes(place.id)}
+              controlledFavorite
               onselect={() => { view.selectedPlaceId = place.id; openEstablishment(place.id) }}
               onlikedchange={(liked) => setFavorite(place.id, liked)}
             />
