@@ -95,7 +95,7 @@
 
   {#if position}
   <div class="establishment-page__map">
-    <Map benefits={mapBenefits} variant="category" center={view.mapViewport?.center ?? position} initialZoom={view.mapViewport?.zoom ?? 15} onViewportChange={(viewport) => view.mapViewport = viewport} selectedBenefitId={establishment.id} onBenefitOpen={(place) => openEstablishment(place.id)} />
+    <Map benefits={mapBenefits} variant="category" center={view.mapViewport?.center ?? position} initialZoom={view.mapViewport?.zoom ?? 15} onViewportChange={(viewport) => { view.mapViewport = viewport }} selectedBenefitId={establishment.id} onBenefitOpen={(place) => openEstablishment(place.id)} />
   </div>
 
   {/if}

@@ -7,9 +7,9 @@ transforming...
 ✓ 174 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                                   0.47 kB │ gzip:  0.30 kB
+dist/index.html                                   0.47 kB │ gzip:  0.31 kB
 dist/assets/logo-wegbenefits-azul-RLXcdVIB.svg    7.66 kB │ gzip:  3.10 kB
 dist/assets/index-1l0fbtOE.css                   73.50 kB │ gzip: 16.71 kB
-dist/assets/index-DGkFgn8a.js                   287.56 kB │ gzip: 90.82 kB
+dist/assets/index-RXpDJKzZ.js                   287.57 kB │ gzip: 90.82 kB
 
-✓ built in 402ms
+✓ built in 387ms

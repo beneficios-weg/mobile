@@ -84,7 +84,7 @@
         variant="default"
         center={view.mapViewport?.center ?? initialCenter}
         initialZoom={view.mapViewport?.zoom ?? 13}
-        onViewportChange={(viewport) => view.mapViewport = viewport}
+        onViewportChange={(viewport) => { view.mapViewport = viewport }}
         {userLocation}
         selectedBenefitId={view.selectedPlaceId}
         onBenefitSelect={(benefit) => view.selectedPlaceId = benefit.id}

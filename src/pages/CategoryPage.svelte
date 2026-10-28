@@ -156,7 +156,7 @@
         benefits={mapBenefits}
         center={view.mapViewport?.center ?? mapCenter}
         initialZoom={view.mapViewport?.zoom ?? 13}
-        onViewportChange={(viewport) => view.mapViewport = viewport}
+        onViewportChange={(viewport) => { view.mapViewport = viewport }}
         selectedBenefitId={view.selectedPlaceId}
         onBenefitOpen={(place) => openEstablishment(place.id)}
         onBenefitSelect={(benefit) => (view.selectedPlaceId = benefit.id)}
