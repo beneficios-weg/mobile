@@ -1,5 +1,7 @@
 # Offline e sincronização
 
+> **Atualização de 2026-10-28:** integração implementada conforme [contrato atual e execução](integracao-api-2026-10-28.md). As afirmações abaixo sobre contrato/autenticação/storage ainda não definidos descrevem o planejamento histórico; a atualização ligada prevalece para a entrega atual. Parâmetros nativos de visitas continuam pendentes.
+
 ## Objetivo
 
 Manter o aplicativo útil em conectividade limitada sem confundir cache com a fonte oficial. A solução deve ser simples e proporcional ao MVP. Nenhuma tecnologia de armazenamento foi escolhida.

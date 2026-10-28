@@ -4,12 +4,14 @@
   type Props = {
     name: string
     neighborhood: string
-    distanceKm: number
-    discount: number
+    distanceKm?: number
+    discount?: number
+    offerLabel?: string
     selected: boolean
     liked: boolean
     variant?: 'category' | 'favorites'
     favoriteDisabled?: boolean
+    controlledFavorite?: boolean
     onselect: () => void
     onlikedchange: (liked: boolean) => void
   }
@@ -19,10 +21,12 @@
     neighborhood,
     distanceKm,
     discount,
+    offerLabel,
     selected,
     liked,
     variant = 'category',
     favoriteDisabled = false,
+    controlledFavorite = false,
     onselect,
     onlikedchange,
   }: Props = $props()
@@ -31,7 +35,7 @@
   const initial = $derived(variant === 'favorites'
     ? name.charAt(0).normalize('NFD').replace(/\p{Diacritic}/gu, '')
     : name.charAt(0))
-  const distance = $derived(variant === 'favorites'
+  const distance = $derived(distanceKm === undefined ? null : variant === 'favorites'
     ? distanceKm.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
     : distanceKm.toFixed(1).replace('.', ','))
 </script>
@@ -51,9 +55,9 @@
     <span class={`directory-card__avatar ${cardClass}__avatar`} aria-hidden="true">{initial}</span>
     <span class={`directory-card__content ${cardClass}__content`}>
       <strong>{name}</strong>
-      <span>{neighborhood} · {distance} km</span>
-      <span class={`directory-card__offer ${cardClass}__offer`}>{discount}% OFF</span>
+      <span>{neighborhood}{#if distance !== null} · {distance} km{/if}</span>
+      <span class={`directory-card__offer ${cardClass}__offer`}>{offerLabel ?? (discount === undefined ? 'Ver benefício' : `${discount}% OFF`)}</span>
     </span>
   </button>
-  <FavoriteButton {liked} disabled={favoriteDisabled} {onlikedchange} />
+  <FavoriteButton controlled={controlledFavorite} {liked} disabled={favoriteDisabled} {onlikedchange} />
 </article>

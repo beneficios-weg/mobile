@@ -2,16 +2,18 @@
   type Props = {
     liked?: boolean
     disabled?: boolean
+    controlled?: boolean
     onlikedchange?: (liked: boolean) => void
   }
 
-  let { liked = $bindable(false), disabled = false, onlikedchange }: Props = $props()
+  let { liked = $bindable(false), disabled = false, controlled = false, onlikedchange }: Props = $props()
 
   const label = $derived(liked ? 'Remover dos favoritos' : 'Adicionar aos favoritos')
 
   function toggleFavorite() {
-    liked = !liked
-    onlikedchange?.(liked)
+    const next = !liked
+    if (!controlled) liked = next
+    onlikedchange?.(next)
   }
 </script>
 

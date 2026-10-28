@@ -1,0 +1,8 @@
+√ Copying web assets from dist to android\app\src\main\assets\public in 6.57ms
+√ Creating capacitor.config.json in android\app\src\main\assets in 515.10μs
+√ copy android in 16.36ms
+√ Updating Android plugins in 1.41ms
+[info] Found 1 Capacitor plugin for android:
+       @capacitor/geolocation@8.2.4
+√ update android in 26.50ms
+[info] Sync finished in 0.054s

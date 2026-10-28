@@ -2,10 +2,12 @@ export type FavoritePlace = {
   id: string
   name: string
   neighborhood: string
-  distanceKm: number
-  discount: number
-  latitude: number
-  longitude: number
+  distanceKm?: number
+  discount?: number
+  latitude: number | null
+  longitude: number | null
+  offerLabel?: string
+  mappable?: boolean
   openingHours?: {
     days: number[]
     opensAt: string
@@ -28,7 +30,7 @@ export function filterFavorites(
 ) {
   const query = normalizeSearch(search.trim())
   const filtered = places.filter((place) => {
-    const matchesSearch = normalizeSearch(`${place.name} ${place.neighborhood} ${place.discount}% OFF`).includes(query)
+    const matchesSearch = normalizeSearch(`${place.name} ${place.neighborhood} ${place.offerLabel ?? (place.discount === undefined ? '' : `${place.discount}% OFF`)}`).includes(query)
     return matchesSearch && (!filters.includes('open-now') || isPlaceOpen(place, currentTime))
   })
 
@@ -40,8 +42,8 @@ export function filterFavorites(
       let comparison = 0
       if (criterion === 'name-asc') comparison = a.name.localeCompare(b.name, 'pt-BR')
       if (criterion === 'name-desc') comparison = b.name.localeCompare(a.name, 'pt-BR')
-      if (criterion === 'discount') comparison = b.discount - a.discount
-      if (criterion === 'nearest') comparison = a.distanceKm - b.distanceKm
+      if (criterion === 'discount') comparison = (b.discount ?? -Infinity) - (a.discount ?? -Infinity)
+      if (criterion === 'nearest') comparison = (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity)
       if (comparison !== 0) return comparison
     }
     return 0

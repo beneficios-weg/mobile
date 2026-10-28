@@ -92,3 +92,10 @@ export function navigateTab(tab: TabId, map?: MapContext) {
 
 export function openCategory(slug: string) { navigate(categoryPath(slug)) }
 export function openEstablishment(id: string) { navigate(establishmentPath(id)) }
+
+/** Remove account-specific selections, map callbacks and history-restored directory state. */
+export function resetNavigation() {
+  dismissMap()
+  mapEntries.clear()
+  for (const key of Object.keys(views)) delete views[key]
+}
