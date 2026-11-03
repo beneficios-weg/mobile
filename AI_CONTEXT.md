@@ -26,6 +26,10 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 
 O checkout contém um starter Svelte/Vite com Capacitor, documentação e tipos de domínio em `src/lib/domain.ts`. As telas reais, integração da API, testes de produto e designs versionados ainda não estão implementados. A stack mobile final permanece pendente e não deve ser chamada de React Native na implementação encontrada.
 
+## Integração com a API — 2026-10-28
+
+O usuário solicitou integrar a versão atual do GitHub. Esta entrega consome o Backend publicado, usa login real por username/e-mail e cookie, catálogo paginado, favoritos persistidos e histórico. Cache/fila de favoritos em IndexedDB separados por conta; não armazena credenciais nem cookie em JavaScript. DTOs e transporte estão em `src/api`, orquestração em `siteState.svelte.ts`, adaptação em `apiAdapters.ts`. ONLINE nunca vai ao mapa. Não inventar horários, distâncias ou posição. Nenhum detector/POST de visita foi adicionado. A implementação anterior com prévias descrita abaixo é histórica. Leia `docs/integracao-api-2026-10-28.md`, `docs/implementation-log.md` e o relatório de testes antes de continuar. Validação autenticada nativa ainda pendente; não afirmar que o Android foi homologado.
+
 ## Estado atual após a revisão de 2026-10-26
 
 Há interfaces de Início, Login, Categoria, Favoritos e Informações do Estabelecimento. `/` renderiza `MainPage`; a galeria permanece em `/componentes-preview`. `DirectoryPage.css` centraliza o layout de Início/Categoria/Favoritos, e `src/components/styles/index.css` é a única entrada dos estilos dos componentes em `src/main.ts`. O mapa usa Leaflet com tiles OpenStreetMap e pins azuis nas páginas. O Início reutiliza CategoryButton, FloatingTabBar e ScrollShadow nos tamanhos existentes; Saúde e Bem-Estar e Favoritos abrem suas rotas, enquanto outras categorias filtram os pins demonstrativos.

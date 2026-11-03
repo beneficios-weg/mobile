@@ -1,5 +1,7 @@
 # Decisões abertas e inconsistências
 
+> **Atualização de 2026-10-28:** integração implementada conforme [contrato atual e execução](integracao-api-2026-10-28.md). As afirmações abaixo sobre contrato/autenticação/storage ainda não definidos descrevem o planejamento histórico; a atualização ligada prevalece para a entrega atual. Parâmetros nativos de visitas continuam pendentes.
+
 ## Como usar
 
 Cada item marcado como **DECISÃO PENDENTE** precisa de responsável e registro da decisão antes que a documentação seja promovida de “planejada” para “implementada”. Recomendações não são decisões.
@@ -61,3 +63,7 @@ Registrar data, participantes, alternativa escolhida, justificativa e documentos
 - **Divergência corrigida:** a documentação indicava Inter como obrigatória, enquanto a página de categorias já usava fontes de sistema. Aplicar Inter mudaria o padrão visual solicitado.
 - **Aplicação:** estilos locais de Favoritos, diretrizes em `docs/componentes-ui.md`, contexto para agentes, README, instruções de design e comentário da árvore de arquitetura. Não alterar os estilos de outras telas nesta tarefa.
 - **Limite:** esta confirmação resolve a tipografia dessas páginas; os demais tokens e itens de DP-12 continuam pendentes. Em caso de dúvida sobre o protótipo, perguntar antes de escolher uma alternativa.
+
+## Resoluções de integração — 2026-10-28
+
+Por solicitação do usuário de integrar o Mobile à API atual, DP-04 é resolvida tecnicamente com IndexedDB para cache e fila; DP-05 usa os recursos nativos de estado do Svelte já adotados pelo projeto; DP-09/DP-10 usam o contrato já aprovado do Backend, sessão server-side e cookie HttpOnly; DP-13 usa GET/PUT/DELETE de favoritos e DP-14 mantém filas separadas por conta, sem prazo até reconexão e bloqueio com oferta de descarte após 401. Não há redefinição ou cadastro próprio. O transporte Android usa CapacitorHttp existente no core e o navegador local usa proxy de mesma origem. Justificativa, limites de validação e arquivos em [Integração atual](integracao-api-2026-10-28.md). DP-08 é atendida apenas para favoritos; o envio de novas visitas não faz parte desta entrega. Os demais itens não são encerrados por esta entrega, especialmente DP-11 (raio, precisão, intervalos e desempate).

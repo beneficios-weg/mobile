@@ -8,7 +8,20 @@ Aplicativo corporativo mobile para colaboradores da WEG descobrirem benefícios 
 
 O produto responde à pergunta: **“Quais benefícios tenho perto de mim agora?”**. A solução planejada reúne descoberta por proximidade, busca e categorias, consulta do benefício principal de cada estabelecimento, favoritos independentes de visitas e detecção automática de visitas.
 
-## Estado atual
+## Integração com a API — 2026-10-28
+
+Login por username/e-mail, catálogo, detalhes, favoritos e histórico agora consomem a API. A entrega inclui paginação, ofertas ONLINE sem pins, cache/favoritos offline por conta e ícones selecionados em cache. Não foram implementados detector de visitas, leitura da localização atual nem administração no Mobile. Consulte [como executar e limites](docs/integracao-api-2026-10-28.md), [diário](docs/implementation-log.md) e [testes desta integração](docs/testes/integracao-api-2026-10-28.md). Os registros de prévia abaixo são históricos; a atualização ligada prevalece.
+
+```powershell
+npm ci
+# Na primeira execução, se .env.local ainda não existir:
+Copy-Item .env.example .env.local
+npm run dev
+```
+
+O navegador local usa o proxy do Vite em `http://127.0.0.1:5173`; Android usa `VITE_API_URL`. Não é necessário mudar o Backend nem cadastrar outra conta se já houver um usuário ativo. Um site publicado precisa configurar um proxy HTTPS próprio; só hospedar dist não basta.
+
+## Estado anterior à integração (histórico)
 
 Este checkout implementa interfaces em Svelte 5, TypeScript e Vite, com um projeto Android do Capacitor. Há páginas de Início, Login, Categoria, Favoritos, Visitados, Informações do Estabelecimento e uma galeria de componentes. Os dados são demonstrativos: autenticação, API, persistência de favoritos, histórico real de visitas e sincronização ainda não estão integrados. React Native aparece como requisito histórico; não é a implementação encontrada neste repositório.
 
@@ -21,7 +34,7 @@ Consulte [Decisões abertas](docs/decisoes-abertas.md) antes de implementar.
 
 ## Escopo funcional
 
-As sete telas previstas são Login, Início, Categoria, Loja/Estabelecimento, Favoritos, Mapa em tela cheia e Lojas visitadas. Recuperação de senha e primeiro acesso são fluxos auxiliares. A navegação principal utiliza uma Floating Tab Bar.
+As sete telas previstas são Login, Início, Categoria, Loja/Estabelecimento, Favoritos, Mapa em tela cheia e Lojas visitadas. O contrato atual não oferece cadastro próprio, recuperação de senha ou troca forçada no primeiro acesso. A navegação principal utiliza uma Floating Tab Bar.
 
 Veja [Telas e fluxos](docs/telas-e-fluxos.md) e [Componentes de UI](docs/componentes-ui.md).
 
@@ -53,7 +66,7 @@ Entrar no Login abre o Início como prévia, conforme autorizado pelo solicitant
 
 ## Variáveis de ambiente
 
-`VITE_OSRM_URL` configura o serviço de rotas em `src/services/routingService.ts`; o padrão de demonstração é `https://router.project-osrm.org`. Como chegar usa uma localização pontual para mostrar primeiro a rota no minimapa; tocar nele abre a comparação de trajetos de carro, a pé ou de bicicleta em tela cheia, com distância e tempo estimado. Iniciar rota aproxima a partida e apresenta um painel compacto. O cálculo não possui trânsito ou acompanhamento contínuo. Veja [Rotas internas](docs/rotas-internas.md). Não há URL da API do produto definida. Segredos e tokens privados nunca devem ser versionados.
+`VITE_OSRM_URL` configura o serviço de rotas em `src/services/routingService.ts`; o padrão de demonstração é `https://router.project-osrm.org`. Como chegar usa a partida fictícia do usuário para mostrar primeiro as rotas no minimapa; tocar nele abre a comparação de trajetos de carro, a pé ou de bicicleta em tela cheia, com distância e tempo estimado. Iniciar rota aproxima a partida e apresenta um painel compacto. O cálculo não possui trânsito ou acompanhamento contínuo. O destino vem do estabelecimento carregado pela API; ofertas online não exibem mapa nem Como chegar. Veja [Rotas internas](docs/rotas-internas.md) e as variáveis da API em [Integração](docs/integracao-api-2026-10-28.md). Segredos e tokens privados nunca devem ser versionados.
 
 ## API e dados
 

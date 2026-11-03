@@ -1,5 +1,7 @@
 # Integração com a API
 
+> **Atualização de 2026-10-28:** integração implementada conforme [contrato atual e execução](integracao-api-2026-10-28.md). As afirmações abaixo sobre contrato/autenticação/storage ainda não definidos descrevem o planejamento histórico; a atualização ligada prevalece para a entrega atual. Parâmetros nativos de visitas continuam pendentes.
+
 ## Regra de autoridade
 
 O Backend é a fonte de verdade para endpoints, métodos, payloads, códigos HTTP, autenticação, validações, modelos e campos calculados. Na consolidação, o contrato publicado não estava disponível e os nomes de repositório backend consultados não puderam ser acessados. Portanto, esta página não cria um contrato alternativo.

@@ -7,7 +7,13 @@
 - Ambiente: Windows, Node Test Runner, Svelte/TypeScript e Chrome isolado sem interface; mesma aplicação local na porta 5174.
 - Massa: unidade Move em Joinville e posição fictícia próxima, fornecida pela emulação de geolocalização do navegador. Nenhuma localização pessoal foi usada.
 
-## Comandos
+## Integração com develop após aprovação — 2026-11-03
+
+Incorporado `origin/develop` em `faf6bd3`, incluindo a integração com API e a correção de callbacks do mapa. O conflito no detalhe foi resolvido combinando as rotas internas com `mapPlaces`, favoritos controlados pela API e ausência de mapa/Como chegar para ofertas online. Nenhum contrato do Backend ou layout da feature foi alterado para resolver o conflito.
+
+Validação do resultado: `npm run check` sem erros/avisos; `npm test` com 39 testes aprovados (21 de regressão/rotas e 18 de API); `npm run build` concluído. Chrome isolado nos quatro viewports, com respostas simuladas de sessão, catálogo, favoritos e rotas, confirmou destino recebido da API, partida fictícia do usuário, cálculo no minimapa, plano reutilizado, troca de alternativa, iniciar/visão geral/encerrar, retorno e reabertura pela navegação sem consulta duplicada. Favoritar enviou mutação pela API; ofertas online ficaram sem mapa/rota e sessão inválida exibiu Login. Zero exceções JavaScript. Não foram usadas credenciais pessoais nem foi homologado login real nesta revisão.
+
+## Resultados anteriores à integração
 
 Atualização mais recente da revisão: 21 testes automatizados aprovados. Foram acrescentados dois cenários para alternativas distintas/deduplicação e servidores próprios de caminhada/bicicleta. Os resultados de 19 testes abaixo registram a etapa inicial da mesma funcionalidade.
 

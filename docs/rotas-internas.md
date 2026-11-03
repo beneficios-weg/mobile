@@ -43,6 +43,6 @@ A duração é estimada **sem trânsito em tempo real**. Iniciar aproxima a part
 
 Origem e destino são enviados ao serviço de roteamento para atender à ação solicitada. No padrão atual, a origem é fictícia, não a posição real do usuário. A posição e a geometria permanecem no estado transitório do diálogo e são descartadas ao desmontá-lo; não são gravados trajetos em storage, logs ou histórico de visitas. O histórico interno já existente pode manter o centro/zoom do mapa em memória até recarregar a aplicação. As consultas não criam visitas nem alteram favoritos.
 
-Os estabelecimentos ainda usam dados demonstrativos. A origem real e a integração web foram exercitadas com GPS simulado; permissão em aparelho, build Android e ciclo de vida nativo exigem validação separada. O navegador precisa oferecer geolocalização em contexto seguro (HTTPS ou localhost).
+Após incorporar a integração de `develop`, os estabelecimentos vêm da API, passando por `mapPlaces`: somente registros mapeáveis com coordenadas válidas oferecem mapa e Como chegar. Ofertas ONLINE permanecem sem rota e sem coordenadas inventadas. A origem fictícia do usuário continua temporariamente habilitada por solicitação expressa; a integração de sessão, cache e favoritos foi preservada. A origem real foi exercitada com GPS simulado; permissão em aparelho, build Android e ciclo de vida nativo exigem validação separada. O navegador precisa oferecer geolocalização em contexto seguro (HTTPS ou localhost).
 
 Ver [relatório de testes de rotas](testes/relatorio-rotas-internas.md).
