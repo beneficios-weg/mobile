@@ -121,6 +121,8 @@
 }
 
 .establishment-page__participation .about-unit-card { min-height: 124px; }
+.establishment-page__content > .primary-button:hover:not(:active):not(:disabled) { background: #00579d; }
+.establishment-page__route-status { margin: 0; padding: 10px 12px; border: 1px solid #d8e2ec; border-radius: 12px; color: #667991; background: #fff; font: inherit; font-size: 13px; }
 .establishment-page__supplementary { min-width: 0; }
 
 .establishment-page__navigation { display: contents; }

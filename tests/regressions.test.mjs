@@ -30,6 +30,16 @@ const { demoBenefits } = await loadTypeScript('../src/services/benefitsService.t
 const { fitDescription } = await loadTypeScript('../src/lib/benefitDescriptionMotion.ts')
 const { resolveRoute, categoryPath, establishmentPath, isInternalPath, routes } = await loadTypeScript('../src/lib/routes.ts')
 const { categories, previewCatalog, homePlaces, previewVisitedPlaces, favoriteExamples, findCategory, findPlace, establishmentDetails } = await loadTypeScript('../src/pages/catalog.ts')
+const { parseDrivingRoute, parseRouteOptions, maneuverInstruction, formatRouteDistance, formatRouteDuration } = await loadTypeScript('../src/lib/directions.ts')
+const { getDrivingRoute, getRouteOptions } = await loadTypeScript('../src/services/routingService.ts')
+
+const routingResponse = () => ({ code: 'Ok', routes: [{ distance: 1250, duration: 300,
+  geometry: { coordinates: [[-48.85, -26.30], [-48.8464, -26.3043]] },
+  legs: [{ steps: [
+    { name: 'Rua de teste', distance: 1250, maneuver: { type: 'depart', location: [-48.85, -26.30] } },
+    { name: '', distance: 0, maneuver: { type: 'arrive', location: [-48.8464, -26.3043] } },
+  ] }],
+}] })
 
 test('preview map datasets have unique IDs and coordinates inside the map bounds', () => {
   for (const places of [previewFavorites, demoBenefits]) {
@@ -132,4 +142,111 @@ test('home and visited cards reference the catalog and favorites do not define v
   for (const place of [...homePlaces, ...previewVisitedPlaces]) assert.equal(findPlace(place.id).name, place.name)
   assert.equal(previewVisitedPlaces.length, 8)
   assert(favoriteExamples.every(place => !previewVisitedPlaces.some(visited => visited.id === place.id)))
+})
+
+test('driving routes convert GeoJSON order, preserve metrics and generate Portuguese steps', () => {
+  const result = parseDrivingRoute(routingResponse())
+  assert.deepEqual(result.coordinates, [[-26.30, -48.85], [-26.3043, -48.8464]])
+  assert.equal(result.distanceMeters, 1250)
+  assert.equal(result.durationSeconds, 300)
+  assert.equal(result.steps[0].instruction, 'Siga em Rua de teste')
+  assert.deepEqual(result.steps[0].location, { latitude: -26.30, longitude: -48.85 })
+  assert.equal(result.steps[1].instruction, 'Chegue ao destino')
+})
+
+test('invalid, missing and unavailable routes are rejected instead of drawing a straight line', () => {
+  for (const code of ['NoRoute', 'NoSegment', 'InvalidQuery']) assert.throws(() => parseDrivingRoute({ code }))
+  for (const update of [r => r.routes = [], r => r.routes[0].distance = -1,
+    r => r.routes[0].duration = null, r => r.routes[0].geometry.coordinates = [],
+    r => r.routes[0].geometry.coordinates[0] = [999, 0], r => r.routes[0].geometry.coordinates[0] = ['0', '0']]) {
+    const response = routingResponse();update(response)
+    assert.throws(() => parseDrivingRoute(response))
+  }
+  assert.throws(() => parseDrivingRoute(null))
+})
+
+test('driving instructions handle turns, returns, roundabouts, ramps and unknown maneuvers', () => {
+  assert.match(maneuverInstruction('turn', 'left', 'Rua A'), /esquerda em Rua A/)
+  assert.match(maneuverInstruction('turn', 'slight right'), /levemente à direita/)
+  assert.match(maneuverInstruction('continue', 'uturn'), /retorno/)
+  assert.match(maneuverInstruction('roundabout', 'right', 'Rua B', 3), /3ª saída em Rua B/)
+  assert.match(maneuverInstruction('off ramp', 'right'), /saída à direita/)
+  assert.equal(maneuverInstruction('unknown'), 'Continue em frente')
+})
+
+test('route summaries format meters, kilometers, minutes and hours in Portuguese', () => {
+  assert.equal(formatRouteDistance(450), '450 m')
+  assert.equal(formatRouteDistance(1250), '1,3 km')
+  assert.equal(formatRouteDuration(0), '1 min')
+  assert.equal(formatRouteDuration(300), '5 min')
+  assert.equal(formatRouteDuration(3600), '1 h')
+  assert.equal(formatRouteDuration(3660), '1 h 1 min')
+})
+
+test('routing service requests driving geometry and steps for the actual origin and destination', async t => {
+  let url
+  t.mock.method(globalThis, 'fetch', async input => { url = input;return new Response(JSON.stringify(routingResponse())) })
+  const route = await getDrivingRoute({ latitude: -26.3, longitude: -48.85 }, { latitude: -26.3043, longitude: -48.8464 })
+  assert.match(url, /\/route\/v1\/driving\/-48.85,-26.3;-48.8464,-26.3043\?/)
+  assert.equal(new URL(url).searchParams.get('steps'), 'true')
+  assert.equal(new URL(url).searchParams.get('geometries'), 'geojson')
+  assert.equal(route.distanceMeters, 1250)
+})
+
+test('routing service handles HTTP failures, invalid origins and cancellation', async t => {
+  const fetch = t.mock.method(globalThis, 'fetch', async () => new Response('', { status: 503 }))
+  const position = { latitude: -26.3, longitude: -48.85 }
+  await assert.rejects(getDrivingRoute(position, position), /indisponível/)
+  fetch.mock.mockImplementation(async () => new Response('{invalid'))
+  await assert.rejects(getDrivingRoute(position, position), /resposta inválida/)
+  await assert.rejects(getDrivingRoute({ latitude: NaN, longitude: 0 }, position), /coordenadas/)
+  const controller = new AbortController();controller.abort()
+  await assert.rejects(getDrivingRoute(position, position, controller.signal), { name: 'AbortError' })
+  assert.equal(fetch.mock.callCount(), 2)
+  t.mock.restoreAll()
+  let aborted = false
+  t.mock.method(globalThis, 'fetch', (_url, { signal }) => new Promise((_resolve, reject) => {
+    signal.addEventListener('abort', () => { aborted = true;reject(signal.reason) }, { once: true })
+  }))
+  const ongoing = new AbortController()
+  const pending = getDrivingRoute(position, position, ongoing.signal)
+  await Promise.resolve()
+  ongoing.abort()
+  await assert.rejects(pending, { name: 'AbortError' })
+  assert.equal(aborted, true)
+})
+
+test('routing service stops an unresponsive request after the time limit', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  t.mock.method(globalThis, 'fetch', (_url, { signal }) => new Promise((_resolve, reject) => {
+    signal.addEventListener('abort', () => reject(signal.reason), { once: true })
+  }))
+  const position = { latitude: -26.3, longitude: -48.85 }
+  const pending = getDrivingRoute(position, position)
+  t.mock.timers.tick(20_000)
+  await assert.rejects(pending, { name: 'TimeoutError' })
+})
+
+test('route options preserve distinct alternatives and reject duplicate or invalid alternatives', () => {
+  const response = routingResponse()
+  const alternate = structuredClone(response.routes[0])
+  alternate.geometry.coordinates.splice(1, 0, [-48.849, -26.302])
+  alternate.legs[0].summary = 'Rua alternativa'
+  response.routes.push(alternate, structuredClone(response.routes[0]), { geometry: {} })
+  const options = parseRouteOptions(response)
+  assert.equal(options.length, 2)
+  assert.equal(options[1].via, 'Rua alternativa')
+  assert.notDeepEqual(options[0].coordinates, options[1].coordinates)
+  assert.equal(parseRouteOptions(routingResponse()).length, 1, 'A single real route is not duplicated')
+})
+
+test('walking and cycling use their own routing servers and request alternatives', async t => {
+  const urls = []
+  t.mock.method(globalThis, 'fetch', async input => { urls.push(input);return new Response(JSON.stringify(routingResponse())) })
+  const position = { latitude: -26.292, longitude: -48.864 }
+  await getRouteOptions(position, position, 'walking')
+  await getRouteOptions(position, position, 'cycling')
+  assert.match(urls[0], /routed-foot\/route\/v1\/walking\//)
+  assert.match(urls[1], /routed-bike\/route\/v1\/cycling\//)
+  assert(urls.every(url => new URL(url).searchParams.get('alternatives') === '3'))
 })

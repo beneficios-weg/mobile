@@ -1,5 +1,7 @@
 # WEG Benefits Mobile
 
+> Prévia atual de Como chegar: a partida do usuário é fictícia em Joinville, sem solicitar GPS. O destino mantém as coordenadas originais do estabelecimento. O fluxo de localização real descrito neste documento só é ativado por `VITE_DIRECTIONS_REAL_LOCATION=true`.
+
 Aplicativo corporativo mobile para colaboradores da WEG descobrirem benefícios em estabelecimentos parceiros próximos. A experiência é centrada em mapa, categorias, detalhes do estabelecimento, favoritos e histórico de visitas detectadas por geolocalização.
 
 ## Problema e solução
@@ -64,7 +66,7 @@ Entrar no Login abre o Início como prévia, conforme autorizado pelo solicitant
 
 ## Variáveis de ambiente
 
-`VITE_OSRM_URL` configura o serviço de rotas preparado em `src/services/routingService.ts`; o padrão de demonstração é `https://router.project-osrm.org`. Esse serviço e a geolocalização ainda não são chamados pelas páginas atuais. Não há URL da API do produto definida. Segredos e tokens privados nunca devem ser versionados.
+`VITE_OSRM_URL` configura o serviço de rotas em `src/services/routingService.ts`; o padrão de demonstração é `https://router.project-osrm.org`. Como chegar usa a partida fictícia do usuário para mostrar primeiro as rotas no minimapa; tocar nele abre a comparação de trajetos de carro, a pé ou de bicicleta em tela cheia, com distância e tempo estimado. Iniciar rota aproxima a partida e apresenta um painel compacto. O cálculo não possui trânsito ou acompanhamento contínuo. O destino vem do estabelecimento carregado pela API; ofertas online não exibem mapa nem Como chegar. Veja [Rotas internas](docs/rotas-internas.md) e as variáveis da API em [Integração](docs/integracao-api-2026-10-28.md). Segredos e tokens privados nunca devem ser versionados.
 
 ## API e dados
 
@@ -88,6 +90,7 @@ Há uma referência de Figma registrada na documentação remota anterior: [App 
 - [Arquitetura mobile](docs/arquitetura-mobile.md)
 - [Telas e fluxos](docs/telas-e-fluxos.md)
 - [Navegação implementada](docs/navegacao.md)
+- [Como chegar no mapa](docs/rotas-internas.md)
 - [Componentes de UI](docs/componentes-ui.md)
 - [Geolocalização](docs/geolocalizacao.md)
 - [Detecção de visitas](docs/deteccao-visitas.md)

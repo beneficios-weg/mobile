@@ -1,5 +1,7 @@
 # Telas e fluxos
 
+> Prévia atual de Como chegar: a partida do usuário é fictícia em Joinville, sem solicitar GPS. O destino mantém as coordenadas originais do estabelecimento. O fluxo de localização real descrito neste documento só é ativado por `VITE_DIRECTIONS_REAL_LOCATION=true`.
+
 Os elementos descritos combinam requisitos funcionais com interfaces já implementadas. As páginas atuais usam dados demonstrativos; API, autenticação e persistência continuam pendentes. Não interpretar detalhes desta página como substitutos do contrato do Backend ou do design vigente.
 
 ## Fluxo principal
@@ -34,7 +36,7 @@ A página de apresentação `src/pages/EstablishmentInfoPage.svelte` está dispo
 
 Reutiliza `BackButton`, `FavoriteButton`, `Map`, `FloatingTabBar`, `EstablishmentFacadeCard`, `PrimaryButton`, `BenefitCard`, `AboutUnitCard`, `ExpandableAboutUnitCard` e `ScrollShadow`, preservando os estilos atuais desses componentes. Sobre a unidade mantém a expansão lateral e aumenta a altura conforme necessário para mostrar toda a descrição sem rolagem interna; Serviços mantém a expansão em área existente. Escape recolhe o card aberto. O mapa mantém os tiles originais do OpenStreetMap e pins azuis.
 
-O catálogo de `src/pages/catalog.ts` fornece os dados demonstrativos correspondentes ao registro selecionado e reutiliza `establishment.ts` para a unidade Move. Favoritar atualiza a prévia compartilhada com as listas; não há persistência. O contato abre a ligação quando informado; campos ausentes mostram indisponibilidade, sem link telefônico vazio. Como chegar abre um provedor externo de direções com o destino selecionado. A foto da fachada não foi fornecida: o botão segue desabilitado pelo componente existente até receber `facadeImageUrl`. A navegação abre Início, Favoritos e Visitados ou expande o mapa local. O retorno usa a origem registrada no histórico da aplicação, com alternativa para a categoria correspondente.
+O catálogo de `src/pages/catalog.ts` fornece os dados demonstrativos correspondentes ao registro selecionado e reutiliza `establishment.ts` para a unidade Move. Favoritar atualiza a prévia compartilhada com as listas; não há persistência. O contato abre a ligação quando informado; campos ausentes mostram indisponibilidade, sem link telefônico vazio. Como chegar abre o mapa em tela cheia dentro do site, solicita uma localização pontual e exibe uma rota de carro com distância, tempo estimado e etapas; ver [Rotas internas](rotas-internas.md). A foto da fachada não foi fornecida: o botão segue desabilitado pelo componente existente até receber `facadeImageUrl`. A navegação abre Início, Favoritos e Visitados ou expande o mapa local. O retorno usa a origem registrada no histórico da aplicação, com alternativa para a categoria correspondente.
 
 Exibe os detalhes fornecidos pelo Backend e destaca um benefício principal no MVP. A tela deve permitir favoritar/desfavoritar sem inferir uma visita. Informações como endereço, horário e ação de rota só podem ser mostradas se fizerem parte do design e dos dados disponíveis.
 

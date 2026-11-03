@@ -1,5 +1,7 @@
 # Navegação da prévia web
 
+> Prévia atual de Como chegar: a partida do usuário é fictícia em Joinville, sem solicitar GPS. O destino mantém as coordenadas originais do estabelecimento. O fluxo de localização real descrito neste documento só é ativado por `VITE_DIRECTIONS_REAL_LOCATION=true`.
+
 A navegação conecta as interfaces existentes sem recarregar o documento. `src/lib/routes.ts` resolve os caminhos, `src/lib/navigation.svelte.ts` coordena a History API e `src/App.svelte` monta a página correspondente. Os estilos, componentes e a expansão das listas continuam compartilhados.
 
 ## Caminhos
@@ -41,7 +43,7 @@ Abrir detalhes pelo popup substitui a entrada de expansão no histórico. Assim,
 
 ## Dados e limites
 
-`src/pages/catalog.ts` reúne somente exemplos de apresentação e mantém IDs distintos para unidades diferentes. Dados ausentes não são copiados da unidade Move: endereço, horário e contato recebem indicação de indisponibilidade, e não há link telefônico vazio. Como chegar mantém a ação externa existente com as coordenadas selecionadas.
+`src/pages/catalog.ts` reúne somente exemplos de apresentação e mantém IDs distintos para unidades diferentes. Dados ausentes não são copiados da unidade Move: endereço, horário e contato recebem indicação de indisponibilidade, e não há link telefônico vazio. Como chegar abre o mapa interno com a posição pontual do usuário e uma rota de carro até a unidade selecionada; ver [Rotas internas](rotas-internas.md). O modo comum do mapa não solicita GPS.
 
 `src/lib/siteState.svelte.ts` compartilha favoritos em memória. Recarregar restaura os exemplos; não há persistência, sincronização nem sessão autenticada. A lista de Visitados continua sendo uma prévia: abrir ou favoritar um estabelecimento não cria uma visita.
 

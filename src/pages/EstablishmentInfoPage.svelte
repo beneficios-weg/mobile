@@ -16,6 +16,10 @@
   import { categoryPath, type TabId } from '../lib/routes'
   import { findPlace } from '../lib/siteState.svelte'
   import { mapPlaces } from '../lib/apiAdapters'
+  import { getCurrentLocation } from '../services/geolocationService'
+  import { getRouteOptions } from '../services/routingService'
+  import { isPosition, type DirectionsPlan } from '../lib/directions'
+  import { useDemoDirectionsLocation, demoDirectionsLocation } from '../lib/directionsLocation'
 
   type Props = {
     establishment?: EstablishmentDetails
@@ -31,6 +35,11 @@
   let contentElement: HTMLDivElement
   let showTopShadow = $state(false)
   let showBottomShadow = $state(false)
+  let routePlan = $state.raw<DirectionsPlan | null>(null)
+  let routeLoading = $state(false)
+  let routeError = $state('')
+  let routeRequest: AbortController | undefined
+  const routeAlternatives = $derived(routePlan?.options.map((route, index) => ({ route, index })).filter(item => item.index !== routePlan?.selected) ?? [])
 
   const mapBenefits = $derived(mapPlaces([establishment]))
   const position = $derived(mapBenefits[0])
@@ -51,6 +60,7 @@
 
   function handleNavigation(tab: TabId) {
     if (tab === 'map' && !position) { selectedTab = 'home'; return }
+    if (tab === 'map' && routePlan) { openRouteMap(); return }
     if (tab === 'map') openMap({ title: establishment.name, benefits: mapBenefits, center: view.mapViewport?.center ?? position,
       initialZoom: view.mapViewport?.zoom ?? 15, onviewportchange: (viewport) => { view.mapViewport = viewport },
       selectedBenefitId: establishment.id, onclose: () => { selectedTab = 'home' },
@@ -58,10 +68,37 @@
     else navigateTab(tab)
   }
 
-  function openDirections() {
+  function openRouteMap() {
+    if (!routePlan || !position) return
+    openMap({ title: `Como chegar — ${establishment.name}`, benefits: mapBenefits,
+      center: position, initialZoom: 15, selectedBenefitId: establishment.id,
+      directionsTo: { ...mapBenefits[0], address: establishment.address },
+      directionsPlan: routePlan,
+      onplanchange: (plan) => { routePlan = plan },
+      onclose: () => { selectedTab = 'home' },
+    })
+  }
+
+  async function openDirections() {
     if (!position) return
-    const destination = encodeURIComponent(`${establishment.latitude},${establishment.longitude}`)
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank', 'noopener,noreferrer')
+    routeRequest?.abort()
+    const request = new AbortController()
+    routeRequest = request
+    routeLoading = true
+    routeError = ''
+    try {
+      const origin = useDemoDirectionsLocation ? { ...demoDirectionsLocation } : await getCurrentLocation()
+      if (request.signal.aborted) return
+      if (!isPosition(origin)) throw new Error('A localização recebida não é válida. Tente novamente.')
+      const options = await getRouteOptions(origin, position, 'driving', request.signal)
+      if (!request.signal.aborted) routePlan = { origin, options, selected: 0, mode: 'driving' }
+    } catch (error) {
+      if (!request.signal.aborted) routeError = error instanceof Error && error.name === 'TimeoutError'
+        ? 'O cálculo demorou para responder. Tente novamente.'
+        : error instanceof Error ? error.message : 'Não foi possível calcular a rota. Tente novamente.'
+    } finally {
+      if (routeRequest === request) routeLoading = false
+    }
   }
 
   onMount(() => {
@@ -70,7 +107,7 @@
     observer.observe(scrollElement)
     observer.observe(contentElement)
     updateScrollShadows()
-    return () => observer.disconnect()
+    return () => { observer.disconnect(); routeRequest?.abort() }
   })
 </script>
 
@@ -95,7 +132,15 @@
 
   {#if position}
   <div class="establishment-page__map">
-    <Map benefits={mapBenefits} variant="category" center={view.mapViewport?.center ?? position} initialZoom={view.mapViewport?.zoom ?? 15} onViewportChange={(viewport) => { view.mapViewport = viewport }} selectedBenefitId={establishment.id} onBenefitOpen={(place) => openEstablishment(place.id)} />
+    <Map benefits={mapBenefits} variant="category" center={view.mapViewport?.center ?? position} initialZoom={view.mapViewport?.zoom ?? 15}
+      userLocation={routePlan?.origin} userLocationLabel="Partida em Joinville"
+      routeCoordinates={routePlan?.options[routePlan.selected]?.coordinates}
+      alternativeRoutes={routeAlternatives.map(item => item.route.coordinates)}
+      onAlternativeSelect={(index) => { if (routePlan) routePlan = { ...routePlan, selected: routeAlternatives[index].index } }}
+      onViewportChange={(viewport) => { view.mapViewport = viewport }} selectedBenefitId={establishment.id}
+      onMapClick={routePlan ? openRouteMap : undefined}
+      onBenefitSelect={routePlan ? () => openRouteMap() : undefined}
+      onBenefitOpen={routePlan ? undefined : (place) => openEstablishment(place.id)} />
   </div>
 
   {/if}
@@ -118,7 +163,13 @@
             contact={establishment.contact}
             facadeImageUrl={establishment.facadeImageUrl}
           />
-          {#if position}<PrimaryButton label="Como chegar" onclick={openDirections} />{/if}
+          {#if position}
+          <PrimaryButton label={routeLoading ? 'Calculando rota…' : 'Como chegar'} disabled={routeLoading} onclick={(event) => {
+            if (event.detail > 0) (event.currentTarget as HTMLButtonElement).blur()
+            void openDirections()
+          }} />
+          {#if routeError}<p class="establishment-page__route-status" role="alert">{routeError}</p>{/if}
+          {/if}
           <BenefitCard discounts={establishment.discounts} audience={establishment.audience} />
           <div class="establishment-page__participation">
             <AboutUnitCard title="Como participar" description={establishment.participation.join('\n')} />
