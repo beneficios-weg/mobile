@@ -4,7 +4,10 @@
   import Search from './atoms/Search.svelte'
   import FloatingTabBar from './atoms/FloatingTabBar.svelte'
   import Map from './Map.svelte'
-  import type { MapPlace } from '../lib/mapTypes'
+  import type { MapPlace, MapPosition } from '../lib/mapTypes'
+  import type { DrivingRoute } from '../lib/directions'
+  import { useDemoDirectionsLocation } from '../lib/directionsLocation'
+  import DirectionsPanel from './DirectionsPanel.svelte'
   import { closeMap, navigateTab, openEstablishment, type MapContext } from '../lib/navigation.svelte'
   import './styles/map-dialog.css'
 
@@ -12,9 +15,16 @@
   let dialog: HTMLDialogElement
   let mapComponent = $state<ReturnType<typeof Map>>()
   let opened = $state(false)
-  let searchElement: HTMLDivElement
+  let searchElement = $state<HTMLDivElement>()
   let resultsOpen = $state(false)
   let activeResult = $state(-1)
+  let drivingRoute = $state.raw<DrivingRoute | null>(null)
+  let drivingOrigin = $state<MapPosition | null>(null)
+  let alternatives = $state.raw<DrivingRoute[]>([])
+  let navigationActive = $state(false)
+  let directionsPanel = $state<ReturnType<typeof DirectionsPanel>>()
+  const alternativeIndices = $derived(context.directionsPlan?.options.map((_, index) => index).filter(index => index !== context.directionsPlan?.selected) ?? [])
+  let routePadding = $state<{ topLeft: [number, number]; bottomRight: [number, number] }>({ topLeft: [32, 140], bottomRight: [72, 300] })
   const initialCenter = untrack(() => context.center ?? { latitude: -26.483, longitude: -49.078 })
   const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim()
   const visibleBenefits = $derived(context.benefits.filter(place =>
@@ -60,14 +70,28 @@
     const previousFocus = document.activeElement as HTMLElement | null
     dialog.showModal()
     opened = true
+    const resize = new ResizeObserver(() => {
+      if (!context.directionsTo) return
+      const rect = dialog.getBoundingClientRect()
+      const panel = dialog.querySelector('.directions-panel')?.getBoundingClientRect()
+      const landscape = rect.width >= 640 && rect.width > rect.height
+      const nextPadding: typeof routePadding = {
+        topLeft: [landscape ? Math.min(rect.width * 0.52, (panel?.right ?? 350) + 24) : 32, landscape ? 40 : 72],
+        bottomRight: [80, landscape ? 44 : rect.height - (panel?.top ?? rect.height - 300) + 20],
+      }
+      if (nextPadding.topLeft.some((value, index) => value !== routePadding.topLeft[index]) || nextPadding.bottomRight.some((value, index) => value !== routePadding.bottomRight[index])) routePadding = nextPadding
+    })
+    resize.observe(dialog)
+    void tick().then(() => { for (const node of dialog.querySelectorAll('.directions-panel, .directions-header')) resize.observe(node) })
     return () => {
+      resize.disconnect()
       dialog.close()
       if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true })
     }
   })
 </script>
 
-<dialog class="map-dialog" bind:this={dialog} aria-labelledby="map-dialog-title"
+<dialog class="map-dialog" class:map-dialog--directions={!!context.directionsTo} bind:this={dialog} aria-labelledby="map-dialog-title"
   oncancel={(event) => { event.preventDefault(); closeMap() }}>
   <h1 id="map-dialog-title" class="map-dialog__title">{context.title}</h1>
   <div class="map-dialog__map">
@@ -76,7 +100,14 @@
       bind:this={mapComponent}
       benefits={visibleBenefits}
       center={context.center}
-      userLocation={context.userLocation}
+      userLocation={context.directionsTo ? drivingOrigin : context.userLocation}
+      userLocationLabel={context.directionsTo && useDemoDirectionsLocation ? 'Partida em Joinville' : 'Você está aqui'}
+      routeCoordinates={drivingRoute?.coordinates}
+      alternativeRoutes={alternatives.map(route => route.coordinates)}
+      onAlternativeSelect={(index) => { if (alternativeIndices[index] !== undefined) void directionsPanel?.chooseRoute(alternativeIndices[index]) }}
+      {navigationActive}
+      {routePadding}
+      constrainToRegion={!context.directionsTo}
       selectedBenefitId={context.selectedBenefitId}
       initialZoom={context.initialZoom ?? 13}
       onViewportChange={(viewport) => {
@@ -95,6 +126,15 @@
   <div class="map-dialog__back">
     <BackButton label="Voltar para a página anterior" onclick={closeMap} />
   </div>
+  {#if context.directionsTo}
+    <DirectionsPanel bind:this={directionsPanel} destination={context.directionsTo}
+      initialPlan={context.directionsPlan}
+      onplanchange={(plan) => { context.directionsPlan = plan; context.onplanchange?.(plan) }}
+      onchange={(route, origin, options) => { drivingRoute = route; drivingOrigin = origin; alternatives = options }}
+      onstart={async () => { navigationActive = true; await tick(); requestAnimationFrame(() => mapComponent?.focusUser()) }}
+      onstop={() => { navigationActive = false }}
+      onfit={(animate = false) => mapComponent?.fitRoute(animate)} />
+  {:else}
   <div class="map-dialog__search" class:has-results={showResults} bind:this={searchElement}>
     <Search
       label="Buscar benefício ou local no mapa"
@@ -109,7 +149,7 @@
         activeResult = -1
       }}
       onfocus={() => { resultsOpen = true }}
-      onblur={(event) => { if (!searchElement.contains(event.relatedTarget as Node | null)) resultsOpen = false }}
+      onblur={(event) => { if (!searchElement?.contains(event.relatedTarget as Node | null)) resultsOpen = false }}
       onkeydown={handleSearchKey}
     />
     {#if showResults}
@@ -133,6 +173,7 @@
       </div>
     {/if}
   </div>
+  {/if}
   <div class="map-dialog__controls" role="group" aria-label="Controles do mapa">
     <button class="back-button" type="button" aria-label="Aumentar zoom" onclick={() => mapComponent?.changeZoom(1)} disabled={(context.initialZoom ?? 13) >= 18}>
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
@@ -140,10 +181,10 @@
     <button class="back-button" type="button" aria-label="Diminuir zoom" onclick={() => mapComponent?.changeZoom(-1)} disabled={(context.initialZoom ?? 13) <= 4}>
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14" /></svg>
     </button>
-    <button class="back-button" type="button" aria-label="Centralizar mapa" onclick={() => mapComponent?.recenter(context.userLocation ?? initialCenter)}>
+    <button class="back-button" type="button" aria-label="Centralizar mapa" onclick={() => mapComponent?.recenter(drivingOrigin ?? context.userLocation ?? initialCenter)}>
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 7 18-7-4-7 4 7-18Z" /></svg>
     </button>
   </div>
-  <button class="map-dialog__all" type="button" onclick={showAllBenefits} disabled={!context.benefits.length}>Todos os benefícios</button>
+  {#if !context.directionsTo}<button class="map-dialog__all" type="button" onclick={showAllBenefits} disabled={!context.benefits.length}>Todos os benefícios</button>{/if}
   <FloatingTabBar selected="map" ontabchange={(tab) => { if (tab !== 'map') navigateTab(tab) }} />
 </dialog>

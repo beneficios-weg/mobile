@@ -40,6 +40,10 @@ Mapa abre `MapDialog.svelte`, um diálogo nativo modal sem rota própria, com os
 
 ## Regras para futuras mudanças
 
+Em `feat/in-app-directions`, Como chegar calcula e desenha as rotas no minimapa; o toque/Enter abre o mapa interno com `MapContext.directionsTo` e o plano já calculado. DirectionsPanel permite escolher o transporte e o trajeto antes de iniciar. Não adicionar rastreamento contínuo nem reintroduzir o redirecionamento ao Google Maps. Manter o mapa comum e a navegação aprovados. O relato anterior de serviços sem consumidores é histórico; implementação e limites em `docs/rotas-internas.md`.
+
+Atualização do solicitante durante a revisão: usar temporariamente uma origem fictícia **para o usuário**, preservando as coordenadas do estabelecimento. `directionsLocation.ts` ativa a demonstração por padrão, sem solicitar GPS; o modo real só é habilitado por `VITE_DIRECTIONS_REAL_LOCATION=true`. A feature recebeu aprovação visual e autorização para merge em 2026-11-03.
+
 Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizando `CategoryPage` na variante `visited`. Não duplicar CSS ou a implementação de busca/filtros para manter essa página igual a Categorias. A aba Histórico abre essa rota a partir de Início, Categorias, Favoritos e detalhe. Os oito exemplos da prévia não representam visitas detectadas ou sincronizadas; favoritar não altera a lista de visitados.
 
 1. Use `docs/modelo-dados.md` como modelo lógico para a UI; os tipos em `src/lib/domain.ts` não são payloads oficiais.
@@ -57,3 +61,7 @@ Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizan
 - `docs/offline-sync.md`
 - `docs/deteccao-visitas.md`
 - `docs/testes-mobile.md`: entrada da documentação de testes; casos em `docs/testes/casos-de-teste.md`, resultados e evidências em `docs/testes/relatorio-execucao.md` e registros anteriores em `docs/testes/historico-validacoes.md`. Caso documentado não equivale a execução aprovada; distinguir funções puras, validação no navegador e integrações ainda pendentes.
+
+A revisão de rotas oferece Carro/A pé/Bicicleta, alternativas reais por perfil e Iniciar rota com zoom na partida fictícia e painel compacto. O pedido mais recente removeu Ver etapas e as barras de rolagem visíveis. Não reintroduzir esses controles nem mover a navegação ao iniciar/encerrar. O destino permanece original; detalhes em `docs/rotas-internas.md`.
+
+O fluxo revisado de Como chegar calcula/desenha no minimapa antes da expansão. O toque/Enter no minimapa abre o plano existente, sem consulta duplicada. Card do destino dentro do menu, sem seção Sua localização; lista com uma opção e ¼ da seguinte; Iniciar e Recalcular lado a lado com o mesmo PrimaryButton, mudando só as cores. Preservar a navegação e o painel compacto após iniciar.

@@ -45,7 +45,10 @@ export async function getCurrentLocation(): Promise<Coordinates> {
           longitude: coords.longitude,
           accuracy: coords.accuracy,
         }),
-      (error) => reject(new Error(error.message || 'Não foi possível obter a localização.')),
+      (error) => reject(new Error(error.code === 1
+        ? 'Permita o acesso à localização nas configurações do navegador para calcular sua rota.'
+        : error.code === 3 ? 'A localização demorou para responder. Tente novamente em um local com sinal.'
+        : 'Não foi possível obter sua localização. Verifique o GPS e tente novamente.')),
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 5_000 },
     )
   })
