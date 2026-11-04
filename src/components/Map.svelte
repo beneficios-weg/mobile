@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import * as L from 'leaflet'
   import 'leaflet/dist/leaflet.css'
   import type { MapPlace as MapBenefit, MapPosition, MapViewport } from '../lib/mapTypes'
@@ -12,10 +12,17 @@
     initialZoom?: number
     selectedBenefitId?: string | null
     userLocation?: MapPosition | null
+    userLocationLabel?: string
     routeCoordinates?: [number, number][] | null
+    alternativeRoutes?: [number, number][][]
+    navigationActive?: boolean
+    routePadding?: { topLeft: [number, number]; bottomRight: [number, number] }
+    constrainToRegion?: boolean
     onBenefitSelect?: (benefit: MapBenefit) => void
     onBenefitOpen?: (benefit: MapBenefit) => void
     onViewportChange?: (viewport: MapViewport) => void
+    onMapClick?: () => void
+    onAlternativeSelect?: (index: number) => void
   }
 
   let {
@@ -26,10 +33,17 @@
     initialZoom = 13,
     selectedBenefitId = null,
     userLocation = null,
+    userLocationLabel = 'Você está aqui',
     routeCoordinates = null,
+    alternativeRoutes = [],
+    navigationActive = false,
+    routePadding = { topLeft: [32, 32], bottomRight: [32, 32] },
+    constrainToRegion = true,
     onBenefitSelect,
     onBenefitOpen,
     onViewportChange,
+    onMapClick,
+    onAlternativeSelect,
   }: Props = $props()
 
   const southAmericaBounds = L.latLngBounds([-45, -78], [10, -34])
@@ -39,6 +53,10 @@
   let benefitMarkers = $state.raw<L.LayerGroup | undefined>(undefined)
   let locationMarker = $state.raw<L.CircleMarker | undefined>(undefined)
   let routeLayer = $state.raw<L.Polyline | undefined>(undefined)
+  let routeOutline: L.Polyline | undefined
+  let alternativeLayers: L.LayerGroup | undefined
+  let routeRenderer: L.Canvas | undefined
+  let reportedViewport: MapViewport | undefined
   const markersById = new globalThis.Map<string, L.Marker>()
 
   export function changeZoom(delta: number) {
@@ -47,6 +65,30 @@
 
   export function recenter(position: MapPosition) {
     map?.panTo([position.latitude, position.longitude])
+  }
+
+  export function fitRoute(animate = false) {
+    if (!map || !routeCoordinates?.length) return
+    const bounds = L.latLngBounds(routeCoordinates)
+    for (const route of alternativeRoutes) bounds.extend(L.latLngBounds(route))
+    if (userLocation) bounds.extend([userLocation.latitude, userLocation.longitude])
+    for (const place of benefits) bounds.extend([place.latitude, place.longitude])
+    const padding = { paddingTopLeft: routePadding.topLeft, paddingBottomRight: routePadding.bottomRight, maxZoom: 16 }
+    if (animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      map.flyToBounds(bounds, { ...padding, duration: 0.7 })
+    } else map.fitBounds(bounds, { ...padding, animate: false })
+  }
+
+  export function focusUser() {
+    if (!map || !userLocation) return
+    const zoom = 17
+    const size = map.getSize()
+    const left = routePadding.topLeft[0], top = routePadding.topLeft[1]
+    const right = routePadding.bottomRight[0], bottom = routePadding.bottomRight[1]
+    const target = L.point(left + Math.max(40, size.x - left - right) / 2, top + Math.max(40, size.y - top - bottom) * 0.65)
+    const position = map.project([userLocation.latitude, userLocation.longitude], zoom)
+    const center = map.unproject(position.subtract(target.subtract(size.divideBy(2))), zoom)
+    map.setView(center, zoom, { animate: !window.matchMedia('(prefers-reduced-motion: reduce)').matches })
   }
 
   export function focusBenefit(id: string) {
@@ -153,7 +195,7 @@
       fillColor: '#1684e8',
       fillOpacity: 1,
     })
-      .bindTooltip('Você está aqui')
+      .bindTooltip(userLocationLabel)
       .addTo(mapInstance)
   }
 
@@ -162,21 +204,41 @@
     coordinates: [number, number][] | null,
   ) {
     routeLayer?.remove()
+    routeOutline?.remove()
+    alternativeLayers?.remove()
     routeLayer = undefined
+    routeOutline = undefined
+    alternativeLayers = undefined
     if (!coordinates?.length) return
+    routeRenderer ??= L.canvas({ tolerance: 2 })
 
+    alternativeLayers = L.layerGroup().addTo(mapInstance)
+    if (!navigationActive) for (const [index, alternative] of alternativeRoutes.entries()) {
+      L.polyline(alternative, { renderer: routeRenderer, color: '#fff', weight: 9, opacity: 0.9, interactive: false }).addTo(alternativeLayers)
+      L.polyline(alternative, { renderer: routeRenderer, color: '#8ba4ba', weight: 5, opacity: 1,
+        interactive: !!onAlternativeSelect, bubblingMouseEvents: false,
+      }).on('click', (event: L.LeafletMouseEvent) => {
+        L.DomEvent.stopPropagation(event.originalEvent)
+        onAlternativeSelect?.(index)
+      }).addTo(alternativeLayers)
+    }
+
+    routeOutline = L.polyline(coordinates, { renderer: routeRenderer, color: '#fff', weight: 10, opacity: 0.95, interactive: false }).addTo(mapInstance)
     routeLayer = L.polyline(coordinates, {
+      renderer: routeRenderer,
       className: 'benefit-route',
       color: '#0878e8',
-      weight: 5,
-      opacity: 0.9,
+      weight: 6,
+      opacity: 1,
+      interactive: !!onMapClick || !!onAlternativeSelect,
+      bubblingMouseEvents: false,
       lineCap: 'round',
       lineJoin: 'round',
+    }).on('click', (event: L.LeafletMouseEvent) => {
+      L.DomEvent.stopPropagation(event.originalEvent)
+      onMapClick?.()
     }).addTo(mapInstance)
 
-    const bounds = L.latLngBounds(coordinates)
-    if (locationMarker) bounds.extend(locationMarker.getLatLng())
-    mapInstance.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 })
   }
 
   $effect(() => {
@@ -184,7 +246,6 @@
     const currentBenefits = benefits
     const currentSelectedBenefitId = selectedBenefitId
     const currentLocation = userLocation
-    const currentRouteCoordinates = routeCoordinates
 
     if (!currentMap) return
 
@@ -194,7 +255,6 @@
       currentSelectedBenefitId,
     )
     renderUserLocation(currentMap, currentLocation)
-    renderRoute(currentMap, currentRouteCoordinates)
     const selectedBenefit = currentBenefits.find((benefit) => benefit.id === currentSelectedBenefitId)
     if (selectedBenefit && !currentMap.getBounds().contains([selectedBenefit.latitude, selectedBenefit.longitude])) {
       currentMap.panTo([selectedBenefit.latitude, selectedBenefit.longitude])
@@ -202,12 +262,29 @@
   })
 
   $effect(() => {
+    const currentMap = map
+    const coordinates = routeCoordinates
+    alternativeRoutes
+    const started = navigationActive
+    routePadding
+    if (!currentMap) return
+    untrack(() => { renderRoute(currentMap, coordinates); if (!started) fitRoute() })
+  })
+
+  $effect(() => {
+    map?.setMaxBounds(constrainToRegion ? southAmericaBounds : L.latLngBounds([-85, -180], [85, 180]))
+  })
+
+  $effect(() => {
     const instance = map
     const nextCenter = center
     const nextZoom = initialZoom
     if (!instance) return
+    // A viewport reported by Leaflet is an acknowledgement, not a new camera command.
+    if (reportedViewport?.zoom === nextZoom && reportedViewport.center.latitude === nextCenter.latitude && reportedViewport.center.longitude === nextCenter.longitude) return
     const current = instance.getCenter()
-    if (Math.abs(current.lat - nextCenter.latitude) > 0.000001 || Math.abs(current.lng - nextCenter.longitude) > 0.000001 || instance.getZoom() !== nextZoom) {
+    const offset = instance.project(current, nextZoom).distanceTo(instance.project([nextCenter.latitude, nextCenter.longitude], nextZoom))
+    if (offset > 1 || instance.getZoom() !== nextZoom) {
       instance.setView([nextCenter.latitude, nextCenter.longitude], nextZoom, { animate: false })
     }
   })
@@ -217,19 +294,27 @@
       zoomControl: false,
       attributionControl: showTiles,
       preferCanvas: true,
-      maxBounds: southAmericaBounds,
+      maxBounds: constrainToRegion ? southAmericaBounds : undefined,
       maxBoundsViscosity: 2,
       minZoom: 4,
       maxZoom: 18,
     }).setView([center.latitude, center.longitude], initialZoom)
     map.attributionControl?.setPrefix(false)
+    map.on('click', () => onMapClick?.())
+    const openOnEnter = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && onMapClick) { event.preventDefault(); onMapClick() }
+    }
+    mapElement.addEventListener('keydown', openOnEnter)
 
     const reportViewport = () => {
       if (!map) return
       const current = map.getCenter()
-      onViewportChange?.({ center: { latitude: current.lat, longitude: current.lng }, zoom: map.getZoom() })
+      const zoom = map.getZoom()
+      if (reportedViewport?.zoom === zoom && reportedViewport.center.latitude === current.lat && reportedViewport.center.longitude === current.lng) return
+      reportedViewport = { center: { latitude: current.lat, longitude: current.lng }, zoom }
+      onViewportChange?.(reportedViewport)
     }
-    map.on('moveend zoomend', reportViewport)
+    map.on('moveend', reportViewport)
     reportViewport()
 
     if (showTiles) {
@@ -238,7 +323,8 @@
         maxZoom: 18,
         noWrap: true,
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
+          (constrainToRegion ? '' : ' · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Corrigir mapa</a>'),
       }).addTo(map)
     }
 
@@ -248,12 +334,16 @@
 
     return () => {
       resizeObserver.disconnect()
+      mapElement.removeEventListener('keydown', openOnEnter)
       map?.remove()
       map = undefined
       benefitMarkers = undefined
       markersById.clear()
       locationMarker = undefined
       routeLayer = undefined
+      routeOutline = undefined
+      alternativeLayers = undefined
+      routeRenderer = undefined
     }
   })
 </script>
@@ -263,7 +353,7 @@
     <div
       class="map-canvas"
       bind:this={mapElement}
-      aria-label="Mapa interativo com benefícios no Brasil."
+      aria-label={onMapClick ? 'Mapa da rota. Pressione Enter para abrir em tela cheia.' : 'Mapa interativo com benefícios no Brasil.'}
       role="application"
     ></div>
   </div>

@@ -2,9 +2,9 @@
 
 ## Objetivo e versão de referência
 
-Orientar a verificação do WEG Benefits Mobile, permitir a repetição dos cenários e distinguir resultados obtidos de funcionalidades ainda planejadas. A referência desta edição é o código do commit `0c44191`, com Svelte/Vite, Leaflet e configuração Android do Capacitor. A documentação foi consolidada na branch `docs/system-testing`.
+Orientar a verificação do WEG Benefits Mobile, permitir a repetição dos cenários e distinguir resultados obtidos de funcionalidades ainda planejadas. A consolidação inicial tomou o commit `0c44191` como referência; a funcionalidade de rotas internas em `feat/in-app-directions`, baseada em `87963bc`, possui [relatório próprio](testes/relatorio-rotas-internas.md). O projeto usa Svelte/Vite, Leaflet e configuração Android do Capacitor.
 
-O sistema atual é uma prévia web com dados demonstrativos. Entrar abre o Início sem autenticação real; favoritos e estados de navegação ficam em memória; Visitados não representa visitas detectadas. Não usar esta validação para afirmar que API, autenticação, persistência, modo offline ou aplicação nativa foram homologados.
+Os roteiros iniciais abaixo descrevem a prévia web com dados demonstrativos. A integração posterior de login, catálogo, favoritos e histórico está documentada em [Integração com a API](integracao-api-2026-10-28.md) e possui [relatório próprio](testes/integracao-api-2026-10-28.md). Após incorporá-la à feature de rotas, a suíte totalizou 39 testes aprovados (21 de regressões/rotas e 18 de API). A aprovação visual de rotas foi recebida em 2026-11-03. Testes com respostas simuladas e aprovação web não homologam autenticação real ou aplicação nativa.
 
 ## Documentos e evidências
 
@@ -12,6 +12,7 @@ O sistema atual é uma prévia web com dados demonstrativos. Entrar abre o Iníc
 |---|---|
 | [Casos de teste](testes/casos-de-teste.md) | Pré-condições, ações e resultados esperados por funcionalidade |
 | [Relatório de execução](testes/relatorio-execucao.md) | Ambiente, versão, resultados efetivamente executados e limitações |
+| [Relatório de rotas internas](testes/relatorio-rotas-internas.md) | Validação de Como chegar, localização, trajeto e tratamento de falhas |
 | [Evidências da execução](testes/evidencias/2026-10-27/) | Saídas de check, testes e build desta consolidação |
 | [Histórico de validações](testes/historico-validacoes.md) | Registros anteriores preservados, incluindo aprovações visuais |
 | [Navegação](navegacao.md) | Rotas e comportamento da prévia |
@@ -27,8 +28,8 @@ Os casos definem o que verificar. Somente um relatório com versão, resultado e
 | Início e categorias | Sete categorias, listas, busca, filtros, contador e estados vazios | Dados, filtros e paginação da API |
 | Navegação | Rotas, retorno, histórico, estado em memória e menu animado | Navegação nativa em dispositivo e configuração da hospedagem |
 | Favoritos e Visitados | Favoritos compartilhados na sessão; histórico demonstrativo independente | Persistência, sincronização e visitas reais |
-| Estabelecimento | Dados do registro, favorito, links e cards expansíveis | Dados reais e foto da fachada |
-| Mapa | Tiles/pins atuais, seleção, expansão modal, busca/sugestões e controles | Localização real, regras de proximidade e serviços integrados |
+| Estabelecimento | Dados do registro, favorito, contato, rota interna e cards expansíveis | Dados reais e foto da fachada |
+| Mapa | Tiles/pins atuais, seleção, expansão modal, busca/sugestões e rota de carro com GPS pontual | Localização nativa validada em aparelho, regras de proximidade e homologação do serviço de rotas |
 | Responsividade e acessibilidade | Quatro viewports, foco, teclado e estados acessíveis | Dispositivos físicos, leitores de tela e auditoria completa |
 
 ## Ambiente e preparação
@@ -52,7 +53,7 @@ Usar somente valores fictícios no Login, como `teste@example.com` e uma senha d
 | Nível | Comando ou método | O que comprova |
 |---|---|---|
 | Análise estática | `npm run check` | Diagnósticos Svelte/TypeScript e configuração TypeScript do projeto |
-| Regressão de funções puras | `npm test` | 12 testes em [regressions.test.mjs](../tests/regressions.test.mjs), com Node Test Runner e compilador TypeScript existente |
+| Regressão de funções, serviço de rota e API | `npm test` | 39 testes: 21 em [regressions.test.mjs](../tests/regressions.test.mjs) e 18 em [api-integration.test.mjs](../tests/api-integration.test.mjs); HTTP simulado nos testes de serviço |
 | Compilação | `npm run build` | Geração de `dist/`; não comprova comportamento visual ou integração |
 | Funcional e visual web | Casos manuais e inspeção no navegador | Jornadas, posições, animações, foco e interação entre componentes |
 | Integração/nativo | Casos bloqueados descritos no catálogo | Dependem de contrato, implementação, ambiente e/ou dispositivo |

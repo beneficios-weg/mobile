@@ -11,6 +11,7 @@
   type Props = {
     label: string
     icon?: string
+    colorHex?: string
     tone?: CategoryButtonTone
     selected?: boolean
     disabled?: boolean
@@ -20,6 +21,7 @@
   let {
     label,
     icon,
+    colorHex,
     tone = 'sky',
     selected = false,
     disabled = false,
@@ -32,6 +34,7 @@
   class="category-button"
   class:selected
   data-tone={tone}
+  style={colorHex && /^#[0-9a-f]{6}$/i.test(colorHex) ? `--category-foreground: ${colorHex}; --category-background: color-mix(in srgb, ${colorHex} 12%, white)` : undefined}
   {disabled}
   aria-pressed={selected}
   {onclick}

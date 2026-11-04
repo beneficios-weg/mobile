@@ -1,5 +1,7 @@
 # Geolocalização
 
+> Prévia atual de Como chegar: a partida do usuário é fictícia em Joinville, sem solicitar GPS. O destino mantém as coordenadas originais do estabelecimento. O fluxo de localização real descrito neste documento só é ativado por `VITE_DIRECTIONS_REAL_LOCATION=true`.
+
 ## Finalidades autorizadas
 
 A localização é utilizada para:
@@ -7,6 +9,7 @@ A localização é utilizada para:
 - mostrar estabelecimentos próximos;
 - calcular contexto de proximidade;
 - posicionar e alimentar o mapa;
+- obter a origem de uma rota ao acionar Como chegar;
 - fornecer sinais à detecção automática de visitas.
 
 Não há previsão de armazenar permanentemente o trajeto. Os pontos usados durante a análise de visita são temporários e devem ser descartados após a janela necessária, preservando apenas o resultado exigido pelo contrato.
@@ -25,6 +28,8 @@ O aplicativo deve explicar o benefício antes ou no contexto do pedido de permis
 | Precisão insuficiente | Não promover um ponto impreciso a visita confirmada |
 
 ## Uso no mapa e proximidade
+
+Como chegar usa `getCurrentLocation` uma vez por solicitação ou recálculo para traçar a rota interna. A origem e o destino são enviados ao serviço OSRM configurado, sem monitoramento contínuo ou persistência do trajeto. GPS negado, indisponível ou expirado impede o cálculo e exibe uma nova tentativa; a página continua acessível pelo retorno. O mapa comum mantém a localização opcional recebida por props, sem solicitar GPS. Ver [Rotas internas](rotas-internas.md).
 
 A posição ajuda a ordenar ou contextualizar resultados próximos, mas estabelecimentos e coordenadas oficiais vêm do Backend. Distância calculada no dispositivo é informação derivada para UX; critérios e campos calculados pelo servidor continuam sob autoridade do Backend.
 

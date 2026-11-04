@@ -1,6 +1,7 @@
 import { categoryPath, establishmentPath, isInternalPath, routes, type TabId } from './routes'
 import type { FavoritesFilterState } from '../pages/favorites'
 import type { MapPlace, MapViewport } from './mapTypes'
+import type { DirectionsPlan } from './directions'
 
 export type MapContext = {
   title: string
@@ -10,6 +11,9 @@ export type MapContext = {
   selectedBenefitId?: string | null
   initialZoom?: number
   searchValue?: string
+  directionsTo?: MapPlace & { address?: string }
+  directionsPlan?: DirectionsPlan
+  onplanchange?: (plan: DirectionsPlan) => void
   onviewportchange?: (viewport: MapViewport) => void
   onselect?: (id: string) => void
   onclose?: () => void
@@ -92,3 +96,10 @@ export function navigateTab(tab: TabId, map?: MapContext) {
 
 export function openCategory(slug: string) { navigate(categoryPath(slug)) }
 export function openEstablishment(id: string) { navigate(establishmentPath(id)) }
+
+/** Remove account-specific selections, map callbacks and history-restored directory state. */
+export function resetNavigation() {
+  dismissMap()
+  mapEntries.clear()
+  for (const key of Object.keys(views)) delete views[key]
+}

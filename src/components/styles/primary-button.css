@@ -37,3 +37,7 @@
   background: #9aafc1;
   cursor: not-allowed;
 }
+
+.primary-button.secondary { background: #e8f3fb; color: #00579d; }
+.primary-button.secondary:hover:not(:disabled) { background: #d8eaf7; }
+.primary-button.secondary:active:not(:disabled) { background: #c6dfef; }

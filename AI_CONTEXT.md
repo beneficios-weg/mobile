@@ -26,6 +26,10 @@ Em conflito entre documentação e implementação, não corrija silenciosamente
 
 O checkout contém um starter Svelte/Vite com Capacitor, documentação e tipos de domínio em `src/lib/domain.ts`. As telas reais, integração da API, testes de produto e designs versionados ainda não estão implementados. A stack mobile final permanece pendente e não deve ser chamada de React Native na implementação encontrada.
 
+## Integração com a API — 2026-10-28
+
+O usuário solicitou integrar a versão atual do GitHub. Esta entrega consome o Backend publicado, usa login real por username/e-mail e cookie, catálogo paginado, favoritos persistidos e histórico. Cache/fila de favoritos em IndexedDB separados por conta; não armazena credenciais nem cookie em JavaScript. DTOs e transporte estão em `src/api`, orquestração em `siteState.svelte.ts`, adaptação em `apiAdapters.ts`. ONLINE nunca vai ao mapa. Não inventar horários, distâncias ou posição. Nenhum detector/POST de visita foi adicionado. A implementação anterior com prévias descrita abaixo é histórica. Leia `docs/integracao-api-2026-10-28.md`, `docs/implementation-log.md` e o relatório de testes antes de continuar. Validação autenticada nativa ainda pendente; não afirmar que o Android foi homologado.
+
 ## Estado atual após a revisão de 2026-10-26
 
 Há interfaces de Início, Login, Categoria, Favoritos e Informações do Estabelecimento. `/` renderiza `MainPage`; a galeria permanece em `/componentes-preview`. `DirectoryPage.css` centraliza o layout de Início/Categoria/Favoritos, e `src/components/styles/index.css` é a única entrada dos estilos dos componentes em `src/main.ts`. O mapa usa Leaflet com tiles OpenStreetMap e pins azuis nas páginas. O Início reutiliza CategoryButton, FloatingTabBar e ScrollShadow nos tamanhos existentes; Saúde e Bem-Estar e Favoritos abrem suas rotas, enquanto outras categorias filtram os pins demonstrativos.
@@ -39,6 +43,10 @@ As sete categorias abrem `/categoria/:slug`; cards e popups abrem `/estabelecime
 Mapa abre `MapDialog.svelte`, um diálogo nativo modal sem rota própria, com os resultados e o viewport da origem. Não permitir interação com a busca atrás dele. Voltar/Escape fecham a expansão; detalhes abertos pelo popup retornam à página de origem. Não trocar o layout aprovado nem introduzir rotas de expansão. Login abre o Início como prévia, sem autenticação real, por confirmação do solicitante. Detalhes e limites em `docs/navegacao.md`.
 
 ## Regras para futuras mudanças
+
+Em `feat/in-app-directions`, Como chegar calcula e desenha as rotas no minimapa; o toque/Enter abre o mapa interno com `MapContext.directionsTo` e o plano já calculado. DirectionsPanel permite escolher o transporte e o trajeto antes de iniciar. Não adicionar rastreamento contínuo nem reintroduzir o redirecionamento ao Google Maps. Manter o mapa comum e a navegação aprovados. O relato anterior de serviços sem consumidores é histórico; implementação e limites em `docs/rotas-internas.md`.
+
+Atualização do solicitante durante a revisão: usar temporariamente uma origem fictícia **para o usuário**, preservando as coordenadas do estabelecimento. `directionsLocation.ts` ativa a demonstração por padrão, sem solicitar GPS; o modo real só é habilitado por `VITE_DIRECTIONS_REAL_LOCATION=true`. A feature recebeu aprovação visual e autorização para merge em 2026-11-03.
 
 Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizando `CategoryPage` na variante `visited`. Não duplicar CSS ou a implementação de busca/filtros para manter essa página igual a Categorias. A aba Histórico abre essa rota a partir de Início, Categorias, Favoritos e detalhe. Os oito exemplos da prévia não representam visitas detectadas ou sincronizadas; favoritar não altera a lista de visitados.
 
@@ -57,3 +65,7 @@ Visitados está disponível em `/visitados`, com `VisitedPage.svelte` reutilizan
 - `docs/offline-sync.md`
 - `docs/deteccao-visitas.md`
 - `docs/testes-mobile.md`: entrada da documentação de testes; casos em `docs/testes/casos-de-teste.md`, resultados e evidências em `docs/testes/relatorio-execucao.md` e registros anteriores em `docs/testes/historico-validacoes.md`. Caso documentado não equivale a execução aprovada; distinguir funções puras, validação no navegador e integrações ainda pendentes.
+
+A revisão de rotas oferece Carro/A pé/Bicicleta, alternativas reais por perfil e Iniciar rota com zoom na partida fictícia e painel compacto. O pedido mais recente removeu Ver etapas e as barras de rolagem visíveis. Não reintroduzir esses controles nem mover a navegação ao iniciar/encerrar. O destino permanece original; detalhes em `docs/rotas-internas.md`.
+
+O fluxo revisado de Como chegar calcula/desenha no minimapa antes da expansão. O toque/Enter no minimapa abre o plano existente, sem consulta duplicada. Card do destino dentro do menu, sem seção Sua localização; lista com uma opção e ¼ da seguinte; Iniciar e Recalcular lado a lado com o mesmo PrimaryButton, mudando só as cores. Preservar a navegação e o painel compacto após iniciar.

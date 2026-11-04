@@ -16,6 +16,8 @@ A tela que usa o mapa fornece esses dados por propriedades:
 
 As integrações ficam nos serviços `src/services/geolocationService.ts` e `src/services/routingService.ts`. Os dados fictícios do protótipo ficam em `src/services/benefitsService.ts`.
 
+Como chegar consome esses serviços em `DirectionsPanel.svelte` e apresenta o trajeto no MapDialog existente, sem redirecionamento externo. A linha azul é renderizada separadamente dos marcadores para não reenquadrar a rota a cada seleção. `routePadding` reserva espaço para os painéis e `fitRoute` permite reenquadramento explícito. O modo de rota permite o enquadramento da origem fora dos limites regionais do mapa comum. Fluxo, dados compartilhados e limites em [Rotas internas](rotas-internas.md).
+
 ## Como usar
 
 ```svelte

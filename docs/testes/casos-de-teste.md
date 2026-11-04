@@ -39,7 +39,7 @@ Este catálogo contém resultados **esperados**. Resultados obtidos estão no [r
 |---|---|---|
 | CT-EST-01 / P0 | Abrir unidades distintas por Categoria e Favoritos; comparar nome, bairro e coordenadas com o catálogo. Abrir `/estabelecimento/bem-viver`. | Cada detalhe corresponde ao ID selecionado. Informações ausentes são indicadas; não são substituídas pelos dados da unidade Move. |
 | CT-EST-02 / P1 | Em `/estabelecimento/academia-move`, conferir o endereço do link Contato. Em `/estabelecimento/bem-viver`, conferir a área de contato. | Move possui link `tel:` correspondente ao exemplo; registro sem contato não gera link telefônico vazio. O teste web não comprova uma chamada telefônica. |
-| CT-EST-03 / P1 | No detalhe, acionar Como chegar e conferir a URL de destino aberta. | Provedor externo recebe latitude/longitude da unidade selecionada; a página de origem permanece acessível. Não comprova sucesso de rota ou disponibilidade do provedor. |
+| CT-EST-03 / P1 | No detalhe, acionar Como chegar, aguardar a rota no minimapa e depois tocar nele. | Primeiro mostra somente o trajeto no minimapa; o toque expande para a mesma URL, sem janela externa ou consulta duplicada. Origem de teste e destino da unidade mantidos. Ver também CT-ROTA. |
 | CT-EST-04 / P2 | Conferir Ver fachada em uma unidade sem foto; na galeria, abrir o exemplo que fornece imagem e fechar seu diálogo. | Sem imagem, ação desabilitada. No exemplo com imagem, diálogo abre e fecha sem perder a navegação. |
 | CT-EST-05 / P1 | No benefício de Move, reduzir a largura até truncar uma descrição; expandir/recolher por clique e teclado; repetir com cliques consecutivos. | Reticências após palavras inteiras; texto completo disponível e visível durante a animação; público permanece abaixo da divisória; descrições que cabem não exibem expansão desnecessária. |
 | CT-EST-06 / P1 | Nos quatro viewports, medir Sobre a unidade e Serviços antes do clique em Move e em Bem Viver; expandir e recolher cada um. | Mesma largura na grade e altura recolhida de 124 px, independentemente do texto. Apenas linhas completas da prévia ficam visíveis; recolher restaura as mesmas dimensões. |
@@ -82,6 +82,21 @@ if (description) description.textContent = (description.textContent ?? '').repea
 
 Expandir Sobre a unidade, percorrer a descrição completa e recolher. A alteração é somente no DOM da sessão; recarregar restaura a massa original. Não editar os arquivos do catálogo para executar esse caso. Nos quatro tamanhos, conferir aumento de altura quando necessário, texto completo sem rolagem interna e retorno à altura recolhida de 124 px.
 
+## Rotas internas — Como chegar
+
+Executar CT-ROTA-01 e CT-ROTA-02 nos quatro viewports. Por solicitação do usuário, o padrão atual usa a partida fictícia de Joinville e não solicita GPS: conferir o rótulo e manter o destino original. Para executar especificamente os cenários de GPS deste catálogo, habilitar `VITE_DIRECTIONS_REAL_LOCATION=true` e reiniciar o Vite, usando GPS simulado nas ferramentas de desenvolvimento, sem registrar localização pessoal. Testes de indisponibilidade devem usar interceptação controlada das consultas ou permissão negada no modo real; não alterar o catálogo para simular origem.
+
+| ID / prioridade | Pré-condições e passos | Resultado esperado |
+|---|---|---|
+| CT-ROTA-01 / P0 | Abrir Move, clicar em Como chegar e aguardar o cálculo; confirmar que o diálogo não abriu. Clicar no minimapa, fechar e reabrir; testar Enter no mapa focado. | Rota primeiro no minimapa, sem menu sobre ele; tela cheia somente após interação, reaproveitando plano/consulta. No menu expandido, card de origem/destino dentro do painel, primeira opção e ¼ da segunda, botões Iniciar/Recalcular lado a lado e com o mesmo estilo salvo cores. Navegação mantém posição/tamanho. |
+| CT-ROTA-02 / P1 | Alternar Carro/A pé/Bicicleta; comparar alternativas e escolher outra; clicar em Iniciar rota, mover/alterar zoom e acionar Ver rota completa; encerrar e girar a tela. | Rotas correspondem ao perfil, com tempo/distância/vias; selecionada em azul e demais cinza. Iniciar aplica zoom 17 na partida e reduz o painel, sem mover a navegação. Encerrar restaura opções sem consultar novamente. Sem Ver etapas ou barras visíveis; conteúdo excedente continua acessível. Uma única opção real não é duplicada. |
+| CT-ROTA-03 / P0 | Negar permissão de localização; acionar Tentar novamente após permitir. Testar também GPS indisponível ou expirado. | Mensagem compreensível; nenhuma consulta com posição fictícia; após permissão válida, cálculo e rota disponíveis. Retorno continua operante. |
+| CT-ROTA-04 / P1 | Interceptar resposta HTTP 503, ausência de trajeto e geometria inválida; tentar novamente com resposta válida. | Erro e nova tentativa; sem linha reta substituindo uma rota; resposta inválida não gera tempo/distância falsos. |
+| CT-ROTA-05 / P1 | Fechar o mapa durante a localização e durante uma consulta de rota; liberar respostas atrasadas. | Nenhuma rota iniciada após GPS tardio; requisição HTTP cancelada ao fechar; resposta antiga não reabre o mapa nem altera a página. |
+| CT-ROTA-06 / P1 | Recalcular, retornar pelo navegador, avançar, fechar por Escape e navegar a Favoritos. | Nova posição a cada cálculo; sem respostas concorrentes obsoletas; retorno e navegação funcionam sem rota própria ou janela externa. Avançar recalcula a entrada restaurada. |
+| CT-ROTA-07 / P1 | Abrir Mapa pela aba normal antes e depois de Como chegar; pesquisar e selecionar resultados. | Mapa comum mantém busca/sugestões e visual aprovado, sem solicitar localização ou consultar serviço de rota. Favoritos e Visitados não são alterados pelo trajeto. |
+| CT-ROTA-08 / P1 | Com a rota no minimapa, clicar em um trecho cinza que se separa do azul; abrir a tela cheia pelo fundo/azul e conferir a opção ativa. Repetir no mapa expandido. Iniciar e conferir card, ícone e botão de encerrar. | Cinza passa a azul sem consulta nova e sem expandir por engano; menu reflete a seleção. Como chegar volta ao fundo azul padrão após soltar o clique, mesmo com o mouse sobre ele. Card do destino alinhado e sem Sua localização permanece após iniciar; botão Encerrar tem o mesmo raio, fonte e estilo do PrimaryButton. Ícone Ver rota completa representa um mapa. |
+
 ## Regressão automatizada existente
 
 Todos os casos AUT são executados por `npm test` em [regressions.test.mjs](../../tests/regressions.test.mjs). Não são testes E2E das telas.
@@ -100,6 +115,15 @@ Todos os casos AUT são executados por `npm test` em [regressions.test.mjs](../.
 | AUT-10 | `internal navigation rejects external and ambiguous targets` | Restrição de navegação a caminhos internos |
 | AUT-11 | `each navigable fixture has a unique identity and its own correct details` | IDs únicos, detalhes por registro e compatibilidade de `academia-move` |
 | AUT-12 | `home and visited cards reference the catalog and favorites do not define visits` | Referências de catálogo e independência dos exemplos de visita |
+| AUT-13 | `driving routes convert GeoJSON order, preserve metrics and generate Portuguese steps` | Ordem das coordenadas, métricas e instruções |
+| AUT-14 | `invalid, missing and unavailable routes are rejected instead of drawing a straight line` | Validação de geometria, métricas e ausência de rota |
+| AUT-15 | `driving instructions handle turns, returns, roundabouts, ramps and unknown maneuvers` | Conversão de manobras para português |
+| AUT-16 | `route summaries format meters, kilometers, minutes and hours in Portuguese` | Unidades de distância e duração |
+| AUT-17 | `routing service requests driving geometry and steps for the actual origin and destination` | Coordenadas solicitadas e opções da API com fetch simulado |
+| AUT-18 | `routing service handles HTTP failures, invalid origins and cancellation` | Erros HTTP, origem inválida e cancelamento antes/durante a consulta |
+| AUT-19 | `routing service stops an unresponsive request after the time limit` | Timeout de 20 segundos com relógio controlado |
+| AUT-20 | `route options preserve distinct alternatives and reject duplicate or invalid alternatives` | Preservação de alternativas reais e deduplicação de geometria |
+| AUT-21 | `walking and cycling use their own routing servers and request alternatives` | Endpoints apropriados para caminhada e bicicleta e solicitação de alternativas |
 
 ## Rastreabilidade funcional
 
@@ -113,6 +137,7 @@ Todos os casos AUT são executados por `npm test` em [regressions.test.mjs](../.
 | Favoritos e Visitados | CT-FAV-01, CT-FAV-02, CT-VIS-01 | AUT-11 e AUT-12 |
 | Detalhes e cards | CT-EST-01 a CT-EST-07, CT-GAL-01 | AUT-07 e AUT-11 |
 | Mapa e sugestões | CT-MAPA-01 a CT-MAPA-07 | AUT-01 e AUT-02 cobrem somente dados |
+| Rotas internas | CT-EST-03 e CT-ROTA-01 a CT-ROTA-08 | AUT-13 a AUT-21; serviço simulado, não valida disponibilidade externa |
 | Responsividade e acessibilidade | CT-RESP-01, CT-RESP-02, CT-ACESS-01, CT-ACESS-02 | Análise Svelte é parcial; não substitui teste de acessibilidade |
 
 ## Integrações e plataformas pendentes
@@ -124,7 +149,7 @@ Estes cenários estão **bloqueados para aceite integrado** na versão atual. De
 | INT-01 | Login real, credenciais rejeitadas, sessão expirada, primeiro acesso e recuperação | Contrato e ambiente de autenticação; respostas, renovação e proteção de sessão |
 | INT-02 | Leitura remota, pesquisa, filtros e paginação | API e massa controlada; loading, vazio, cancelamento e tratamento de erros contratados |
 | INT-03 | Favoritos persistidos e sincronizados | Autoridade, endpoint, conflitos, idempotência e eventual operação offline |
-| INT-04 | Permissão/localização real, negada ou indisponível | Integração das páginas e testes em dispositivo; alternativa utilizável sem localização |
+| INT-04 | Localização em dispositivo, proximidade e outros consumidores | Como chegar já usa GPS pontual e possui CT-ROTA; permissões/ciclo nativo e regras de proximidade ainda precisam de testes em aparelho e integrações próprias |
 | INT-05 | Visitas reais, GPS inconsistente e candidatos sobrepostos | Algoritmo, parâmetros, aceitação/deduplicação e retenção de dados aprovados |
 | INT-06 | Offline com/sem cache, timeout, 4xx/5xx e sincronização | Storage, política de cache/fila/retry e contrato do Backend |
 | INT-07 | Logout, troca de usuário e isolamento dos dados | Sessão e armazenamento reais; política de limpeza e retenção |

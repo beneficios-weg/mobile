@@ -13,6 +13,7 @@
   type Props = {
     id?: string
     value?: EstablishmentFilterState
+    available?: EstablishmentFilterOption[]
     onapply?: (selected: EstablishmentFilterState) => void
   }
 
@@ -28,6 +29,7 @@
     id = 'establishment-filter',
     value = $bindable<EstablishmentFilterState>([]),
     onapply,
+    available = ['name-asc', 'name-desc', 'discount', 'nearest', 'open-now'],
   }: Props = $props()
 
   let isOpen = $state(false)
@@ -40,7 +42,7 @@
   const selectedLabel = $derived(
     visibleValue.length
       ? visibleValue.map((value) => options.find((option) => option.value === value)!.label).join('; ')
-      : 'Mais Próximo',
+      : available.includes('nearest') ? 'Mais Próximo' : 'Ordenar',
   )
   const canClear = $derived(draftValue.length > 0)
 
@@ -127,7 +129,7 @@
     </header>
 
     <div class="filter-dropdown__options">
-      {#each options as option (option.value)}
+      {#each options.filter(option => available.includes(option.value)) as option (option.value)}
         <label
           class="filter-dropdown__option"
           class:selected={isSelected(option.value)}

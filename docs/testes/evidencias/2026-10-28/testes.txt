@@ -1,0 +1,42 @@
+
+> weg-benefits@0.0.0 test
+> node --test tests/*.test.mjs
+
+✔ catalog pagination loads 70 entries in two public pages of 50 (1.4593ms)
+✔ HTTP errors are generic and non-idempotent requests are never retried (0.2522ms)
+✔ ONLINE remains in lists but never creates a map pin, route or fake coordinates (0.2818ms)
+✔ shared benefits keep all discount, instruction and contact text verbatim without conditions or hours (0.1211ms)
+✔ visited view keeps latest visit ordering and does not derive visits from favorites (6.6436ms)
+✔ offline cache survives restart and favorites synchronize only after /me validates the same account (115.1741ms)
+✔ 401 blocks replay, removes personal UI and offers deleting the saved pending queue (33.2738ms)
+✔ a changed server identity cannot replay a previous account queue (28.0029ms)
+✔ login as another account retains but never sends the old account queue or password (25.3101ms)
+✔ partial refresh failure preserves the last complete catalog and sync timestamp (24.3656ms)
+✔ storage failure rolls back favorite toggles instead of falsely promising offline delivery (24.3595ms)
+✔ logout clears visible personal state only after server success (18.2266ms)
+✔ acknowledging an in-flight toggle preserves newer intent (0.166ms)
+✔ server unavailability on restart permits cached reading but never pretends to validate a session (18.9331ms)
+✔ malformed authentication replies fail safely without creating a local account (26.7587ms)
+✔ 401 while replaying a queued favorite stops further mutations and preserves unsent intent (15.7059ms)
+✔ a toggle persisted during a manual refresh is replayed after that refresh completes (20.818ms)
+✔ switching accounts starts an independent refresh and ignores the previous account response (16.8343ms)
+✔ preview map datasets have unique IDs and coordinates inside the map bounds (0.6121ms)
+✔ favorites preview location belongs to the same map region as its pins (0.1068ms)
+✔ favorite search normalizes accents, capitalization and outer whitespace (0.8089ms)
+✔ sorting honors criteria and does not mutate the original dataset (6.769ms)
+✔ default order is nearest and missing operating hours do not imply open (0.7055ms)
+✔ open-now includes opening time and excludes closing time and closed weekdays (0.2179ms)
+✔ benefit summaries preserve whole words and leave fitting text unchanged (0.1603ms)
+✔ fixed routes and category links resolve to their intended destinations (0.3843ms)
+✔ route parsing handles trailing slashes and queries without falling back to home (0.1653ms)
+✔ internal navigation rejects external and ambiguous targets (0.2016ms)
+✔ each navigable fixture has a unique identity and its own correct details (0.3026ms)
+✔ home and visited cards reference the catalog and favorites do not define visits (0.1101ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1050.5899
